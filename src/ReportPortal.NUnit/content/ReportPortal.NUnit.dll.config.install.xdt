@@ -1,0 +1,11 @@
+﻿<configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
+  <configSections xdt:Transform="InsertIfMissing">
+    <section name="reportPortal" type="ReportPortal.NUnit.ReportPortalSection, ReportPortal.NUnit, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"  xdt:Transform="InsertIfMissing" />
+  </configSections>
+  <reportPortal enabled="true" logConsoleOutput="true" xdt:Transform="InsertIfMissing">
+    <server url="https://rp.epam.com/api/v1/" project="default_project" xdt:Transform="InsertIfMissing">
+      <authentication password="aa19555c-c9ce-42eb-bb11-87757225d535" xdt:Transform="InsertIfMissing" />
+    </server>
+    <launch name="NUnit Demo Launch" debugMode="true" tags="t1,t2" xdt:Transform="InsertIfMissing" />
+  </reportPortal>
+</configuration>
