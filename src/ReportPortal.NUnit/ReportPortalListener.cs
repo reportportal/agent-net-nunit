@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ReportPortal.NUnit
+namespace ReportPortal.NUnitAddin
 {
     [Extension]
     public class ReportPortalListener : ITestEventListener
