@@ -13,6 +13,7 @@ namespace ReportPortal.NUnitAddin
     {
         public void OnTestEvent(string report)
         {
+            Console.WriteLine("Message from addin ID: " + this.GetHashCode());
             Console.WriteLine(report);
         }
     }
