@@ -1,6 +1,6 @@
 ﻿<configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
   <configSections xdt:Transform="InsertIfMissing">
-    <section name="reportPortal" type="ReportPortal.NUnit.ReportPortalSection, ReportPortal.NUnit, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"  xdt:Transform="InsertIfMissing" />
+    <section name="reportPortal" type="ReportPortal.NUnitExtension.ReportPortalSection, ReportPortal.NUnitExtension, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"  xdt:Transform="InsertIfMissing" />
   </configSections>
   <reportPortal enabled="true" logConsoleOutput="true" xdt:Transform="InsertIfMissing">
     <server url="https://rp.epam.com/api/v1/" project="default_project" xdt:Transform="InsertIfMissing">
