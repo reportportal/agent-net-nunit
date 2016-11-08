@@ -7,8 +7,8 @@
     <ProjectGuid>{3550FE3E-28F4-43E8-9789-57F53C4A3F95}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ReportPortal.NUnit</RootNamespace>
-    <AssemblyName>ReportPortal.NUnit</AssemblyName>
+    <RootNamespace>ReportPortal.NUnitExtension</RootNamespace>
+    <AssemblyName>ReportPortal.NUnitExtension</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

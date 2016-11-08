@@ -6,11 +6,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ReportPortal.NUnitAddin
+namespace ReportPortal.NUnitExtension
 {
     [Extension]
     public class ReportPortalListener : ITestEventListener
     {
+        public ReportPortalListener()
+        {
+            Console.WriteLine(Configuration.ReportPortal.Launch.Name);
+        }
+
         public void OnTestEvent(string report)
         {
             Console.WriteLine("Message from addin ID: " + this.GetHashCode());

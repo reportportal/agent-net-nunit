@@ -30,7 +30,7 @@
   <files>
     <file src="..\..\tools\" target="tools" />
     <file src="..\..\content\" target="content" />
-     <file src="ReportPortal.NUnit.dll" target="lib" />
+     <file src="ReportPortal.NUnitExtension.dll" target="lib" />
 
   </files>
 

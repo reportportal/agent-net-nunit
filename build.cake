@@ -14,7 +14,7 @@ var build = Argument("build", "1.0.0");
 var isAppVeyorBuild = AppVeyor.IsRunningOnAppVeyor;
 
 // Define directories.
-var buildDir = Directory("./src/ReportPortal.NUnit/bin") + Directory(configuration);
+var buildDir = Directory("./src/ReportPortal.NUnitExtension/bin") + Directory(configuration);
 
 //////////////////////////////////////////////////////////////////////
 // TASKS
@@ -30,7 +30,7 @@ Task("Restore-NuGet-Packages")
 	.IsDependentOn("Clean")
 	.Does(() =>
 {
-	NuGetRestore("./src/ReportPortal.NUnit.sln");
+	NuGetRestore("./src/ReportPortal.NUnitExtension.sln");
 });
 
 Task("Build")
@@ -40,12 +40,12 @@ Task("Build")
 	if(IsRunningOnWindows())
 	{
 	  // Use MSBuild
-	  MSBuild("./src/ReportPortal.NUnit.sln", new MSBuildSettings().SetConfiguration(configuration));
+	  MSBuild("./src/ReportPortal.NUnitExtension.sln", new MSBuildSettings().SetConfiguration(configuration));
 	}
 	else
 	{
 	  // Use XBuild
-	  XBuild("./src/ReportPortal.NUnit.sln", settings =>
+	  XBuild("./src/ReportPortal.NUnitExtension.sln", settings =>
 		settings.SetConfiguration(configuration));
 	}
 });
@@ -69,9 +69,9 @@ Task("Package")
 	{
 		build += "-prerelease";
 	}
-	NuGetPack("src/ReportPortal.NUnit/ReportPortal.NUnit.nuspec", new NuGetPackSettings()
+	NuGetPack("src/ReportPortal.NUnitExtension/ReportPortal.NUnitExtension.nuspec", new NuGetPackSettings()
 	{
-		BasePath = "./src/ReportPortal.NUnit/bin/" + configuration,
+		BasePath = "./src/ReportPortal.NUnitExtension/bin/" + configuration,
 		Version = build
 	});
 	}

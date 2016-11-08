@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Configuration;
 
-namespace ReportPortal.NUnit
+namespace ReportPortal.NUnitExtension
 {
     public static class Configuration
     {
