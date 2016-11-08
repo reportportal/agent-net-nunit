@@ -25,7 +25,7 @@ bld/
 
 tools
 !tools/packages.config
-!src/ReportPortal.NUnit/tools
+!src/ReportPortal.NUnitExtension/tools
 
 # Visual Studio 2015 cache/options directory
 .vs/
