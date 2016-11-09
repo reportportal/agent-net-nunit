@@ -7,7 +7,7 @@ param($installPath, $toolsPath, $package, $project)
 # $package is a reference to the package object.
 # $project is a reference to the project the package was installed to.
 
-$file1 = $project.ProjectItems.Item("ReportPortal.NUnitExtension.dll.config")
+$file1 = $project.ProjectItems.Item("ReportPortal.conf")
 
 # set 'Copy To Output Directory' to 'Copy if newer'
 $copyToOutput1 = $file1.Properties.Item("CopyToOutputDirectory")

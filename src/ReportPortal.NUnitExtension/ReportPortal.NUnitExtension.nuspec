@@ -22,10 +22,6 @@
       </group>
     </dependencies>
 
-    <frameworkAssemblies>
-      <frameworkAssembly assemblyName="System.Configuration" />
-    </frameworkAssemblies>
-
   </metadata>
   <files>
     <file src="..\..\tools\" target="tools" />
