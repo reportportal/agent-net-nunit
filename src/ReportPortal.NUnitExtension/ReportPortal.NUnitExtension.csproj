@@ -80,6 +80,7 @@
     <Compile Include="Configuration\Config.cs" />
     <Compile Include="Configuration\Launch.cs" />
     <Compile Include="Configuration\Server.cs" />
+    <Compile Include="EventArguments\RunStartedEventArgs.cs" />
     <Compile Include="ReportPortalListener.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

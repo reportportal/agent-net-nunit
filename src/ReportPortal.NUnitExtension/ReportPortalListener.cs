@@ -5,6 +5,7 @@ using ReportPortal.Client;
 using ReportPortal.Client.Models;
 using ReportPortal.Client.Requests;
 using ReportPortal.NUnitExtension.Configuration;
+using ReportPortal.NUnitExtension.EventArguments;
 using ReportPortal.Shared;
 using System;
 using System.IO;
@@ -43,6 +44,10 @@ namespace ReportPortal.NUnitExtension
         }
 
         private string _launchId;
+
+        public delegate void RunStartedHandler(object sender, RunStartedEventArgs e);
+        public static event RunStartedHandler BeforeRunStarted;
+
         private void StartRun(XmlDocument xmlDoc)
         {
             LaunchMode launchMode;
@@ -62,6 +67,9 @@ namespace ReportPortal.NUnitExtension
                 Mode = launchMode,
                 Tags = Config.Launch.Tags
             };
+
+            var eventArg = new RunStartedEventArgs(Bridge.Service, startLaunchRequest);
+            if (BeforeRunStarted != null) BeforeRunStarted(this, eventArg);
 
             _launchId = Bridge.Service.StartLaunch(startLaunchRequest).Id;
         }
