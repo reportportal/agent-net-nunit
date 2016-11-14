@@ -3,18 +3,18 @@ using NUnit.Engine;
 using NUnit.Engine.Extensibility;
 using ReportPortal.Client;
 using ReportPortal.Client.Models;
-using ReportPortal.Client.Requests;
 using ReportPortal.NUnitExtension.Configuration;
 using ReportPortal.NUnitExtension.EventArguments;
 using ReportPortal.Shared;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Xml;
 
 namespace ReportPortal.NUnitExtension
 {
     [Extension(Description = "Report Portal extension point")]
-    public class ReportPortalListener : ITestEventListener
+    public partial class ReportPortalListener : ITestEventListener
     {
         static ReportPortalListener()
         {
@@ -23,7 +23,16 @@ namespace ReportPortal.NUnitExtension
 
             var rpService = new Service(Config.Server.Url, Config.Server.Project, Config.Server.Authentication.Uuid);
             Bridge.Service = rpService;
+
+            _statusMap["Passed"] = Status.Passed;
+            _statusMap["Failed"] = Status.Failed;
+            _statusMap["Skipped"] = Status.Skipped;
+            _statusMap["Inconclusive"] = Status.Skipped;
         }
+
+        private static Dictionary<string, Status> _statusMap = new Dictionary<string, Status>();
+
+        private Dictionary<string, TestItemStartedEventArgs> _suitesFlow = new Dictionary<string, TestItemStartedEventArgs>();
 
         public static Config Config { get; private set; }
 
@@ -41,46 +50,14 @@ namespace ReportPortal.NUnitExtension
             {
                 FinishRun(xmlDoc);
             }
-        }
-
-        private string _launchId;
-
-        public delegate void RunStartedHandler(object sender, RunStartedEventArgs e);
-        public static event RunStartedHandler BeforeRunStarted;
-
-        private void StartRun(XmlDocument xmlDoc)
-        {
-            LaunchMode launchMode;
-            if (Config.Launch.IsDebugMode == true)
+            else if (xmlDoc.SelectSingleNode("/start-suite") != null)
             {
-                launchMode = LaunchMode.Debug;
+                StartSuite(xmlDoc);
             }
-            else
+            else if (xmlDoc.SelectSingleNode("/test-suite") != null)
             {
-                launchMode = LaunchMode.Default;
+                FinishSuite(xmlDoc);
             }
-            var startLaunchRequest = new StartLaunchRequest
-            {
-                Name = Config.Launch.Name,
-                Description = Config.Launch.Description,
-                StartTime = DateTime.UtcNow,
-                Mode = launchMode,
-                Tags = Config.Launch.Tags
-            };
-
-            var eventArg = new RunStartedEventArgs(Bridge.Service, startLaunchRequest);
-            if (BeforeRunStarted != null) BeforeRunStarted(this, eventArg);
-
-            _launchId = Bridge.Service.StartLaunch(startLaunchRequest).Id;
-        }
-
-        private void FinishRun(XmlDocument xmlDoc)
-        {
-            var finishLaunchRequest = new FinishLaunchRequest
-            {
-                EndTime = DateTime.UtcNow
-            };
-            Bridge.Service.FinishLaunch(_launchId, finishLaunchRequest);
         }
     }
 }
