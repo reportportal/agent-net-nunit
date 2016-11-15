@@ -113,6 +113,22 @@ namespace ReportPortal.NUnitExtension
                         Bridge.Service.UpdateTestItem(_testsFlow[id].Id, updateTestRequest);
                     }
 
+                    // adding console output
+                    var outputNode = xmlDoc.SelectSingleNode("//output");
+                    if (outputNode != null)
+                    {
+                        foreach (var outputLine in outputNode.InnerText.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries))
+                        {
+                            Bridge.Service.AddLogItem(new AddLogItemRequest
+                            {
+                                Level = LogLevel.Trace,
+                                TestItemId = _testsFlow[id].Id,
+                                Time = DateTime.UtcNow,
+                                Text = outputLine
+                            });
+                        }
+                    }
+
                     // adding failure message
                     var failureNode = xmlDoc.SelectSingleNode("//failure");
                     if (failureNode != null)
@@ -148,6 +164,7 @@ namespace ReportPortal.NUnitExtension
                     }
 
                     var message = Bridge.Service.FinishTestItem(_testsFlow[id].Id, finishTestRequest).Info;
+                    Bridge.Context.TestId = null;
 
                     try
                     {

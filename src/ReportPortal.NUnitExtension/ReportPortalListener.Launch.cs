@@ -93,6 +93,7 @@ namespace ReportPortal.NUnitExtension
                 if (!eventArg.Canceled)
                 {
                     var message = Bridge.Service.FinishLaunch(Bridge.Context.LaunchId, finishLaunchRequest);
+                    Bridge.Context.LaunchId = null;
 
                     try
                     {

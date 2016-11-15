@@ -39,6 +39,7 @@ namespace ReportPortal.NUnitExtension
 
         public void OnTestEvent(string report)
         {
+            Console.WriteLine(System.Threading.Thread.CurrentThread.Name + " : " + System.Threading.Thread.CurrentThread.ManagedThreadId);
             Console.WriteLine(report + Environment.NewLine);
 
             var xmlDoc = new XmlDocument();
