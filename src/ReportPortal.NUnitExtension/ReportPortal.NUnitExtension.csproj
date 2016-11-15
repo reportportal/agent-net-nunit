@@ -88,6 +88,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReportPortalListener.Launch.cs" />
     <Compile Include="ReportPortalListener.Suite.cs" />
+    <Compile Include="ReportPortalListener.Test.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

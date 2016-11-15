@@ -33,6 +33,7 @@ namespace ReportPortal.NUnitExtension
         private static Dictionary<string, Status> _statusMap = new Dictionary<string, Status>();
 
         private Dictionary<string, TestItemStartedEventArgs> _suitesFlow = new Dictionary<string, TestItemStartedEventArgs>();
+        private Dictionary<string, TestItemStartedEventArgs> _testsFlow = new Dictionary<string, TestItemStartedEventArgs>();
 
         public static Config Config { get; private set; }
 
@@ -57,6 +58,14 @@ namespace ReportPortal.NUnitExtension
             else if (xmlDoc.SelectSingleNode("/test-suite") != null)
             {
                 FinishSuite(xmlDoc);
+            }
+            else if (xmlDoc.SelectSingleNode("/start-test") != null)
+            {
+                StartTest(xmlDoc);
+            }
+            else if (xmlDoc.SelectSingleNode("/test-case") != null)
+            {
+                FinishTest(xmlDoc);
             }
         }
     }
