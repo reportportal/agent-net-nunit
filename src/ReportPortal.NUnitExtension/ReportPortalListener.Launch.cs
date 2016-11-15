@@ -15,47 +15,54 @@ namespace ReportPortal.NUnitExtension
 
         private void StartRun(XmlDocument xmlDoc)
         {
-            LaunchMode launchMode;
-            if (Config.Launch.IsDebugMode == true)
-            {
-                launchMode = LaunchMode.Debug;
-            }
-            else
-            {
-                launchMode = LaunchMode.Default;
-            }
-            var startLaunchRequest = new StartLaunchRequest
-            {
-                Name = Config.Launch.Name,
-                Description = Config.Launch.Description,
-                StartTime = DateTime.UtcNow,
-                Mode = launchMode,
-                Tags = Config.Launch.Tags
-            };
-
-            var eventArg = new RunStartedEventArgs(Bridge.Service, startLaunchRequest);
-
             try
             {
-                if (BeforeRunStarted != null) BeforeRunStarted(this, eventArg);
-            }
-            catch (Exception exp)
-            {
-                Console.WriteLine("Exception was thrown in 'BeforeRunStarted' subscriber." + Environment.NewLine + exp);
-            }
+                LaunchMode launchMode;
+                if (Config.Launch.IsDebugMode == true)
+                {
+                    launchMode = LaunchMode.Debug;
+                }
+                else
+                {
+                    launchMode = LaunchMode.Default;
+                }
+                var startLaunchRequest = new StartLaunchRequest
+                {
+                    Name = Config.Launch.Name,
+                    Description = Config.Launch.Description,
+                    StartTime = DateTime.UtcNow,
+                    Mode = launchMode,
+                    Tags = Config.Launch.Tags
+                };
 
-            if (!eventArg.Canceled)
-            {
-                Bridge.Context.LaunchId = Bridge.Service.StartLaunch(startLaunchRequest).Id;
+                var eventArg = new RunStartedEventArgs(Bridge.Service, startLaunchRequest);
 
                 try
                 {
-                    if (AfterRunStarted != null) AfterRunStarted(this, new RunStartedEventArgs(Bridge.Service, startLaunchRequest, Bridge.Context.LaunchId));
+                    if (BeforeRunStarted != null) BeforeRunStarted(this, eventArg);
                 }
                 catch (Exception exp)
                 {
-                    Console.WriteLine("Exception was thrown in 'AfterRunStarted' subscriber." + Environment.NewLine + exp);
+                    Console.WriteLine("Exception was thrown in 'BeforeRunStarted' subscriber." + Environment.NewLine + exp);
                 }
+
+                if (!eventArg.Canceled)
+                {
+                    Bridge.Context.LaunchId = Bridge.Service.StartLaunch(startLaunchRequest).Id;
+
+                    try
+                    {
+                        if (AfterRunStarted != null) AfterRunStarted(this, new RunStartedEventArgs(Bridge.Service, startLaunchRequest, Bridge.Context.LaunchId));
+                    }
+                    catch (Exception exp)
+                    {
+                        Console.WriteLine("Exception was thrown in 'AfterRunStarted' subscriber." + Environment.NewLine + exp);
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine("ReportPortal exception was thrown." + Environment.NewLine + exception);
             }
         }
 
@@ -65,35 +72,42 @@ namespace ReportPortal.NUnitExtension
 
         private void FinishRun(XmlDocument xmlDoc)
         {
-            var finishLaunchRequest = new FinishLaunchRequest
-            {
-                EndTime = DateTime.UtcNow,
-                
-            };
-
-            var eventArg = new RunFinishedEventArgs(Bridge.Service, finishLaunchRequest, null, Bridge.Context.LaunchId);
             try
             {
-                if (BeforeRunFinished != null) BeforeRunFinished(this, eventArg);
-            }
-            catch (Exception exp)
-            {
-                Console.WriteLine("Exception was thrown in 'BeforeRunFinished' subscriber." + Environment.NewLine + exp);
-            }
+                var finishLaunchRequest = new FinishLaunchRequest
+                {
+                    EndTime = DateTime.UtcNow,
 
-            if (!eventArg.Canceled)
-            {
-                var message = Bridge.Service.FinishLaunch(Bridge.Context.LaunchId, finishLaunchRequest);
+                };
 
+                var eventArg = new RunFinishedEventArgs(Bridge.Service, finishLaunchRequest, null, Bridge.Context.LaunchId);
                 try
                 {
-                    if (AfterRunFinished != null) AfterRunFinished(this, new RunFinishedEventArgs(Bridge.Service, finishLaunchRequest, message.Info, Bridge.Context.LaunchId));
+                    if (BeforeRunFinished != null) BeforeRunFinished(this, eventArg);
                 }
                 catch (Exception exp)
                 {
-                    Console.WriteLine("Exception was thrown in 'AfterRunFinished' subscriber." + Environment.NewLine + exp);
+                    Console.WriteLine("Exception was thrown in 'BeforeRunFinished' subscriber." + Environment.NewLine + exp);
                 }
 
+                if (!eventArg.Canceled)
+                {
+                    var message = Bridge.Service.FinishLaunch(Bridge.Context.LaunchId, finishLaunchRequest);
+
+                    try
+                    {
+                        if (AfterRunFinished != null) AfterRunFinished(this, new RunFinishedEventArgs(Bridge.Service, finishLaunchRequest, message.Info, Bridge.Context.LaunchId));
+                    }
+                    catch (Exception exp)
+                    {
+                        Console.WriteLine("Exception was thrown in 'AfterRunFinished' subscriber." + Environment.NewLine + exp);
+                    }
+
+                }
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine("ReportPortal exception was thrown." + Environment.NewLine + exception);
             }
         }
     }

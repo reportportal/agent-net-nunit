@@ -16,54 +16,61 @@ namespace ReportPortal.NUnitExtension
 
         private void StartSuite(XmlDocument xmlDoc)
         {
-            var id = xmlDoc.SelectSingleNode("/*/@id").Value;
-            var parentId = xmlDoc.SelectSingleNode("/*/@parentId").Value;
-            var name = xmlDoc.SelectSingleNode("/*/@name").Value;
-
-            var startSuiteRequest = new StartTestItemRequest
-            {
-                LaunchId = Bridge.Context.LaunchId,
-                StartTime = DateTime.UtcNow,
-                Name = name,
-                Type = TestItemType.Suite
-            };
-
-            var beforeSuiteEventArg = new TestItemStartedEventArgs(Bridge.Service, startSuiteRequest);
             try
             {
-                if (BeforeSuiteStarted != null) BeforeSuiteStarted(this, beforeSuiteEventArg);
-            }
-            catch (Exception exp)
-            {
-                Console.WriteLine("Exception was thrown in 'BeforeSuiteStarted' subscriber." + Environment.NewLine + exp);
-            }
-            if (!beforeSuiteEventArg.Canceled)
-            {
-                TestItem test;
-                if (string.IsNullOrEmpty(parentId))
-                {
-                    test = Bridge.Service.StartTestItem(startSuiteRequest);
-                }
-                else
-                {
-                    test = Bridge.Service.StartTestItem(_suitesFlow[parentId].Id, startSuiteRequest);
-                }
+                var id = xmlDoc.SelectSingleNode("/*/@id").Value;
+                var parentId = xmlDoc.SelectSingleNode("/*/@parentId").Value;
+                var name = xmlDoc.SelectSingleNode("/*/@name").Value;
 
-                _suitesFlow[id] = beforeSuiteEventArg;
-                beforeSuiteEventArg.Id = test.Id;
+                var startSuiteRequest = new StartTestItemRequest
+                {
+                    LaunchId = Bridge.Context.LaunchId,
+                    StartTime = DateTime.UtcNow,
+                    Name = name,
+                    Type = TestItemType.Suite
+                };
 
+                var beforeSuiteEventArg = new TestItemStartedEventArgs(Bridge.Service, startSuiteRequest);
                 try
                 {
-                    if (AfterSuiteStarted != null) AfterSuiteStarted(this, new TestItemStartedEventArgs(Bridge.Service, startSuiteRequest, test.Id));
+                    if (BeforeSuiteStarted != null) BeforeSuiteStarted(this, beforeSuiteEventArg);
                 }
                 catch (Exception exp)
                 {
-                    Console.WriteLine("Exception was thrown in 'AfterSuiteStarted' subscriber." + Environment.NewLine + exp);
+                    Console.WriteLine("Exception was thrown in 'BeforeSuiteStarted' subscriber." + Environment.NewLine + exp);
+                }
+                if (!beforeSuiteEventArg.Canceled)
+                {
+                    TestItem test;
+                    if (string.IsNullOrEmpty(parentId))
+                    {
+                        test = Bridge.Service.StartTestItem(startSuiteRequest);
+                    }
+                    else
+                    {
+                        test = Bridge.Service.StartTestItem(_suitesFlow[parentId].Id, startSuiteRequest);
+                    }
+
+                    _suitesFlow[id] = beforeSuiteEventArg;
+                    beforeSuiteEventArg.Id = test.Id;
+
+                    try
+                    {
+                        if (AfterSuiteStarted != null) AfterSuiteStarted(this, new TestItemStartedEventArgs(Bridge.Service, startSuiteRequest, test.Id));
+                    }
+                    catch (Exception exp)
+                    {
+                        Console.WriteLine("Exception was thrown in 'AfterSuiteStarted' subscriber." + Environment.NewLine + exp);
+                    }
+                }
+                else
+                {
+                    _suitesFlow[id] = beforeSuiteEventArg;
                 }
             }
-            else
+            catch (Exception exception)
             {
-                _suitesFlow[id] = beforeSuiteEventArg;
+                Console.WriteLine("ReportPortal exception was thrown." + Environment.NewLine + exception);
             }
         }
 
