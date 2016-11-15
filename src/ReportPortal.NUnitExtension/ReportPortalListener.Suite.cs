@@ -91,31 +91,39 @@ namespace ReportPortal.NUnitExtension
                 {
                     if (!_suitesFlow[id].Canceled)
                     {
-                        // adding properties to suite
-                        var properties = xmlDoc.SelectNodes("//properties/property");
-                        if (properties != null)
+                        var updateSuiteRequest = new UpdateTestItemRequest();
+
+                        // adding categories to suite
+                        var categories = xmlDoc.SelectNodes("//properties/property[@name='Category']");
+                        if (categories != null)
                         {
-                            var updateSuiteRequest = new UpdateTestItemRequest()
-                            {
-                                Description = "",
-                                Tags = new List<string>()
-                            };
+                            updateSuiteRequest.Tags = new List<string>();
 
-                            foreach (XmlNode property in properties)
+                            foreach (XmlNode category in categories)
                             {
-                                updateSuiteRequest.Tags.Add(string.Format("{0}: {1}", property.Attributes["name"].Value, property.Attributes["value"].Value));
+                                updateSuiteRequest.Tags.Add(category.Attributes["value"].Value);
                             }
+                        }
 
+                        // adding description to suite
+                        var description = xmlDoc.SelectSingleNode("//properties/property[@name='Description']");
+                        if (description != null)
+                        {
+                            updateSuiteRequest.Description = description.Attributes["value"].Value;
+                        }
+
+                        if (updateSuiteRequest.Description != null || updateSuiteRequest.Tags != null)
+                        {
                             Bridge.Service.UpdateTestItem(_suitesFlow[id].Id, updateSuiteRequest);
                         }
 
+                        // finishing suite
                         var finishSuiteRequest = new FinishTestItemRequest
                         {
                             EndTime = DateTime.UtcNow,
                             Status = _statusMap[result]
                         };
-
-                        // finishing suite
+                        
                         var eventArg = new TestItemFinishedEventArgs(Bridge.Service, finishSuiteRequest, result, _suitesFlow[id].Id);
 
                         try
