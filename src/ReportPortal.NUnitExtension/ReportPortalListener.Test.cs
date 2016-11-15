@@ -85,64 +85,80 @@ namespace ReportPortal.NUnitExtension
                 var parentId = xmlDoc.SelectSingleNode("/*/@parentId");
 
 
-                    if (!_testsFlow[id].Canceled)
+                if (!_testsFlow[id].Canceled)
+                {
+                    var updateTestRequest = new UpdateTestItemRequest();
+
+                    // adding categories to test
+                    var categories = xmlDoc.SelectNodes("//properties/property[@name='Category']");
+                    if (categories != null)
                     {
-                        var updateTestRequest = new UpdateTestItemRequest();
+                        updateTestRequest.Tags = new List<string>();
 
-                        // adding categories to test
-                        var categories = xmlDoc.SelectNodes("//properties/property[@name='Category']");
-                        if (categories != null)
+                        foreach (XmlNode category in categories)
                         {
-                            updateTestRequest.Tags = new List<string>();
-
-                            foreach (XmlNode category in categories)
-                            {
-                                updateTestRequest.Tags.Add(category.Attributes["value"].Value);
-                            }
-                        }
-
-                        // adding description to test
-                        var description = xmlDoc.SelectSingleNode("//properties/property[@name='Description']");
-                        if (description != null)
-                        {
-                            updateTestRequest.Description = description.Attributes["value"].Value;
-                        }
-
-                        if (updateTestRequest.Description != null || updateTestRequest.Tags != null)
-                        {
-                            Bridge.Service.UpdateTestItem(_testsFlow[id].Id, updateTestRequest);
-                        }
-
-                        // finishing test
-                        var finishTestRequest = new FinishTestItemRequest
-                        {
-                            EndTime = DateTime.UtcNow,
-                            Status = _statusMap[result]
-                        };
-
-                        var eventArg = new TestItemFinishedEventArgs(Bridge.Service, finishTestRequest, result, _testsFlow[id].Id);
-
-                        try
-                        {
-                            if (BeforeTestFinished != null) BeforeTestFinished(this, eventArg);
-                        }
-                        catch (Exception exp)
-                        {
-                            Console.WriteLine("Exception was thrown in 'BeforeTestFinished' subscriber." + Environment.NewLine + exp);
-                        }
-
-                        var message = Bridge.Service.FinishTestItem(_testsFlow[id].Id, finishTestRequest).Info;
-
-                        try
-                        {
-                            if (AfterTestFinished != null) AfterTestFinished(this, new TestItemFinishedEventArgs(Bridge.Service, finishTestRequest, message, _testsFlow[id].Id));
-                        }
-                        catch (Exception exp)
-                        {
-                            Console.WriteLine("Exception was thrown in 'AfterTestFinished' subscriber." + Environment.NewLine + exp);
+                            updateTestRequest.Tags.Add(category.Attributes["value"].Value);
                         }
                     }
-                
+
+                    // adding description to test
+                    var description = xmlDoc.SelectSingleNode("//properties/property[@name='Description']");
+                    if (description != null)
+                    {
+                        updateTestRequest.Description = description.Attributes["value"].Value;
+                    }
+
+                    if (updateTestRequest.Description != null || updateTestRequest.Tags != null)
+                    {
+                        Bridge.Service.UpdateTestItem(_testsFlow[id].Id, updateTestRequest);
+                    }
+
+                    // adding failure message
+                    var failureNode = xmlDoc.SelectSingleNode("//failure");
+                    if (failureNode != null)
+                    {
+                        var failureMessage = failureNode.SelectSingleNode("./message").InnerText;
+                        var failureStacktrace = failureNode.SelectSingleNode("./stack-trace").InnerText;
+
+                        Bridge.Service.AddLogItem(new AddLogItemRequest
+                        {
+                            Level = LogLevel.Error,
+                            TestItemId = _testsFlow[id].Id,
+                            Time = DateTime.UtcNow,
+                            Text = failureMessage + Environment.NewLine + failureStacktrace
+                        });
+                    }
+
+                    // finishing test
+                    var finishTestRequest = new FinishTestItemRequest
+                    {
+                        EndTime = DateTime.UtcNow,
+                        Status = _statusMap[result]
+                    };
+
+                    var eventArg = new TestItemFinishedEventArgs(Bridge.Service, finishTestRequest, result, _testsFlow[id].Id);
+
+                    try
+                    {
+                        if (BeforeTestFinished != null) BeforeTestFinished(this, eventArg);
+                    }
+                    catch (Exception exp)
+                    {
+                        Console.WriteLine("Exception was thrown in 'BeforeTestFinished' subscriber." + Environment.NewLine + exp);
+                    }
+
+                    var message = Bridge.Service.FinishTestItem(_testsFlow[id].Id, finishTestRequest).Info;
+
+                    try
+                    {
+                        if (AfterTestFinished != null) AfterTestFinished(this, new TestItemFinishedEventArgs(Bridge.Service, finishTestRequest, message, _testsFlow[id].Id));
+                    }
+                    catch (Exception exp)
+                    {
+                        Console.WriteLine("Exception was thrown in 'AfterTestFinished' subscriber." + Environment.NewLine + exp);
+                    }
+                }
+
             }
             catch (Exception exception)
             {
