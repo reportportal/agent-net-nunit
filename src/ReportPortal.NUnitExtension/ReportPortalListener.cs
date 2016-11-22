@@ -33,15 +33,13 @@ namespace ReportPortal.NUnitExtension
         private static Dictionary<string, Status> _statusMap = new Dictionary<string, Status>();
 
         private Dictionary<string, TestItemStartedEventArgs> _suitesFlow = new Dictionary<string, TestItemStartedEventArgs>();
-        private Dictionary<string, TestItemStartedEventArgs> _testsFlow = new Dictionary<string, TestItemStartedEventArgs>();
+        private Dictionary<string, TestItemStartedEventArgs> _testFlowIds = new Dictionary<string, TestItemStartedEventArgs>();
+        private Dictionary<string, string> _testFlowNames = new Dictionary<string, string>();
 
         public static Config Config { get; private set; }
 
         public void OnTestEvent(string report)
         {
-            Console.WriteLine(System.Threading.Thread.CurrentThread.Name + " : " + System.Threading.Thread.CurrentThread.ManagedThreadId);
-            Console.WriteLine(report + Environment.NewLine);
-
             var xmlDoc = new XmlDocument();
             xmlDoc.LoadXml(report);
             if (xmlDoc.SelectSingleNode("/start-run") != null)
@@ -67,6 +65,10 @@ namespace ReportPortal.NUnitExtension
             else if (xmlDoc.SelectSingleNode("/test-case") != null)
             {
                 FinishTest(xmlDoc);
+            }
+            else if (xmlDoc.SelectSingleNode("/test-output") != null)
+            {
+                TestOutput(xmlDoc);
             }
         }
     }

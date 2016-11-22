@@ -14,6 +14,7 @@ Imagine you have the next folders structure:
 C:
 |- NUnitRunner
   |- nunit.console.exe
+  |- *ReportPortal.addins*
 |- YourProject
   |- bin
     |- Debug
