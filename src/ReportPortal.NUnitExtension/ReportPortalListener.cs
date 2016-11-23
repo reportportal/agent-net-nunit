@@ -40,35 +40,38 @@ namespace ReportPortal.NUnitExtension
 
         public void OnTestEvent(string report)
         {
-            var xmlDoc = new XmlDocument();
-            xmlDoc.LoadXml(report);
-            if (xmlDoc.SelectSingleNode("/start-run") != null)
+            if (Config.IsEnabled)
             {
-                StartRun(xmlDoc);
-            }
-            else if (xmlDoc.SelectSingleNode("/test-run") != null)
-            {
-                FinishRun(xmlDoc);
-            }
-            else if (xmlDoc.SelectSingleNode("/start-suite") != null)
-            {
-                StartSuite(xmlDoc);
-            }
-            else if (xmlDoc.SelectSingleNode("/test-suite") != null)
-            {
-                FinishSuite(xmlDoc);
-            }
-            else if (xmlDoc.SelectSingleNode("/start-test") != null)
-            {
-                StartTest(xmlDoc);
-            }
-            else if (xmlDoc.SelectSingleNode("/test-case") != null)
-            {
-                FinishTest(xmlDoc);
-            }
-            else if (xmlDoc.SelectSingleNode("/test-output") != null)
-            {
-                TestOutput(xmlDoc);
+                var xmlDoc = new XmlDocument();
+                xmlDoc.LoadXml(report);
+                if (xmlDoc.SelectSingleNode("/start-run") != null)
+                {
+                    StartRun(xmlDoc);
+                }
+                else if (xmlDoc.SelectSingleNode("/test-run") != null)
+                {
+                    FinishRun(xmlDoc);
+                }
+                else if (xmlDoc.SelectSingleNode("/start-suite") != null)
+                {
+                    StartSuite(xmlDoc);
+                }
+                else if (xmlDoc.SelectSingleNode("/test-suite") != null)
+                {
+                    FinishSuite(xmlDoc);
+                }
+                else if (xmlDoc.SelectSingleNode("/start-test") != null)
+                {
+                    StartTest(xmlDoc);
+                }
+                else if (xmlDoc.SelectSingleNode("/test-case") != null)
+                {
+                    FinishTest(xmlDoc);
+                }
+                else if (xmlDoc.SelectSingleNode("/test-output") != null)
+                {
+                    TestOutput(xmlDoc);
+                }
             }
         }
     }
