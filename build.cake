@@ -59,6 +59,7 @@ Task("Package")
 		if (AppVeyor.Environment.Repository.Tag.IsTag)
 		{
 			build = AppVeyor.Environment.Repository.Tag.Name;
+			BuildSystem.AppVeyor.UpdateBuildVersion(build);
 		}
 		else
 		{
