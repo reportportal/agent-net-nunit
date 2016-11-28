@@ -9,6 +9,7 @@ using ReportPortal.Shared;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Xml;
 
 namespace ReportPortal.NUnitExtension
@@ -21,7 +22,16 @@ namespace ReportPortal.NUnitExtension
             var configPath = Path.GetDirectoryName(new Uri(typeof(Config).Assembly.CodeBase).LocalPath) + "\\ReportPortal.conf";
             Config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(configPath));
 
-            var rpService = new Service(Config.Server.Url, Config.Server.Project, Config.Server.Authentication.Uuid);
+            Service rpService;
+            if (Config.Proxy != null)
+            {
+                rpService = new Service(Config.Server.Url, Config.Server.Project, Config.Server.Authentication.Uuid, new WebProxy(Config.Proxy));
+            }
+            else
+            {
+                rpService = new Service(Config.Server.Url, Config.Server.Project, Config.Server.Authentication.Uuid);
+            }
+
             Bridge.Service = rpService;
 
             _statusMap["Passed"] = Status.Passed;
