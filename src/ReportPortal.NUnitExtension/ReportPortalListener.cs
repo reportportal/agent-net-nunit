@@ -23,9 +23,9 @@ namespace ReportPortal.NUnitExtension
             Config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(configPath));
 
             Service rpService;
-            if (Config.Proxy != null)
+            if (Config.Server.Proxy != null)
             {
-                rpService = new Service(Config.Server.Url, Config.Server.Project, Config.Server.Authentication.Uuid, new WebProxy(Config.Proxy));
+                rpService = new Service(Config.Server.Url, Config.Server.Project, Config.Server.Authentication.Uuid, new WebProxy(Config.Server.Proxy));
             }
             else
             {

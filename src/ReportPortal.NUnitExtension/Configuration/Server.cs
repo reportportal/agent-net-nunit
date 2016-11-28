@@ -13,5 +13,7 @@ namespace ReportPortal.NUnitExtension.Configuration
         public string Project { get; set; }
 
         public Authentication Authentication { get; set; }
+
+        public Uri Proxy { get; set; }
     }
 }

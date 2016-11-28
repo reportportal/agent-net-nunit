@@ -11,7 +11,5 @@ namespace ReportPortal.NUnitExtension.Configuration
         public Server Server { get; set; }
 
         public Launch Launch { get; set; }
-
-        public Uri Proxy { get; set; }
     }
 }
