@@ -97,7 +97,7 @@ namespace ReportPortal.NUnitExtension
                         var categories = xmlDoc.SelectNodes("//properties/property[@name='Category']");
                         if (categories != null)
                         {
-                            updateSuiteRequest.Tags = new List<string>();
+                            updateSuiteRequest.Tags = Config.Launch.Tags;
 
                             foreach (XmlNode category in categories)
                             {
