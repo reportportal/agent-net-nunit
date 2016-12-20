@@ -28,7 +28,8 @@ namespace ReportPortal.NUnitExtension
                     LaunchId = Bridge.Context.LaunchId,
                     StartTime = DateTime.UtcNow,
                     Name = name,
-                    Type = TestItemType.Step
+                    Type = TestItemType.Step,
+                    Tags = Config.Launch.Tags
                 };
 
                 var beforeTestEventArg = new TestItemStartedEventArgs(Bridge.Service, startTestRequest);
@@ -89,12 +90,13 @@ namespace ReportPortal.NUnitExtension
                 {
                     var updateTestRequest = new UpdateTestItemRequest();
 
+                    // adding tags to test
+                    updateTestRequest.Tags = Config.Launch.Tags;
+
                     // adding categories to test
                     var categories = xmlDoc.SelectNodes("//properties/property[@name='Category']");
                     if (categories != null)
                     {
-                        updateTestRequest.Tags = new List<string>();
-
                         foreach (XmlNode category in categories)
                         {
                             updateTestRequest.Tags.Add(category.Attributes["value"].Value);
