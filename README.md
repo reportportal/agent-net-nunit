@@ -54,12 +54,24 @@ Example of config file:
 Proxy element is optional.
 
 
+# Logging integration
+By default nunit extension sends console output to Report Portal at the end of test. To see log messages in realtime please follow [Logging Integration](http://reportportal.io/#documentation/Logging-Integration) instructions.
+
+After that just add class somewhere into your project:
+```csharp
+    public class BridgeExtension : ReportPortal.Shared.IBridgeExtension
+    {
+        public void Log(ReportPortal.Client.Models.LogLevel level, string message)
+        {
+            NUnit.Framework.TestContext.Progress.WriteLine(message);
+        }
+    }
+```
+
+
 # Example
 Follow [reportportal example-net-nunit](https://github.com/reportportal/example-net-nunit) repo to see the source of test project with Report Portal integration.
 
-
-# Known issues
-- Logger integration doesn't work properly if tests are being executed in several workers (log messages will be reported into the latest active test)
 
 # Video tutorial
 Integration tutorial by @Kate.yurasova
