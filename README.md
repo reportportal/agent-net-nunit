@@ -27,6 +27,10 @@ To enable ReportPortal.Extension you need create a `ReportPortal.addins` file in
 ../YourProject/bin/Debug/ReportPortal.NUnitExtension.dll
 ```
 
+To verify installed extension just execute:
+```
+nunit3-console.exe --list-extensions
+```
 
 # Configuration
 NuGet package installation adds `ReportPortal.conf` file with configuration of the integration.
