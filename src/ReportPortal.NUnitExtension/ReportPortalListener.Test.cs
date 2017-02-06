@@ -4,6 +4,7 @@ using ReportPortal.NUnitExtension.EventArguments;
 using ReportPortal.Shared;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Xml;
 
 namespace ReportPortal.NUnitExtension
@@ -189,13 +190,15 @@ namespace ReportPortal.NUnitExtension
 
                 if (_testFlowNames.ContainsKey(fullTestName))
                 {
-                    Bridge.Service.AddLogItem(new AddLogItemRequest
-                    {
-                        Level = LogLevel.Info,
-                        TestItemId = _testFlowNames[fullTestName],
-                        Time = DateTime.UtcNow,
-                        Text = message
-                    });
+                    Task.Run(
+                        () => Bridge.Service.AddLogItem(new AddLogItemRequest
+                        {
+                            Level = LogLevel.Info,
+                            TestItemId = _testFlowNames[fullTestName],
+                            Time = DateTime.UtcNow,
+                            Text = message
+                        })
+                    );
                 }
             }
             catch (Exception exception)
