@@ -1,52 +1,25 @@
 ﻿using System;
 using ReportPortal.Client;
 using ReportPortal.Client.Requests;
+using ReportPortal.Shared;
 
 namespace ReportPortal.NUnitExtension.EventArguments
 {
-    public class TestItemFinishedEventArgs: EventArgs
+    public class TestItemFinishedEventArgs : EventArgs
     {
-        private readonly Service _service;
-        private readonly FinishTestItemRequest _request;
-        private readonly string _message;
-        private readonly string _id;
-        public TestItemFinishedEventArgs(Service service, FinishTestItemRequest request)
+        public TestItemFinishedEventArgs(Service service, FinishTestItemRequest request, TestReporter testReporter)
         {
-            _service = service;
-            _request = request;
+            Service = service;
+            TestItem = request;
+            TestReporter = testReporter;
         }
 
-        public TestItemFinishedEventArgs(Service service, FinishTestItemRequest request, string message)
-            :this(service, request)
-        {
-            _message = message;
-        }
+        public Service Service { get; }
 
-        public TestItemFinishedEventArgs(Service service, FinishTestItemRequest request, string message, string id)
-            : this(service, request, message)
-        {
-            _id = id;
-        }
+        public FinishTestItemRequest TestItem { get; }
 
-        public Service Service
-        {
-            get { return _service; }
-        }
 
-        public FinishTestItemRequest TestItem
-        {
-            get { return _request; }
-        }
-
-        public string Message
-        {
-            get { return _message; }
-        }
-
-        public string Id
-        {
-            get { return _id; }
-        }
+        public TestReporter TestReporter { get; }
 
         public bool Canceled { get; set; }
     }

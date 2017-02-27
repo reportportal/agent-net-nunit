@@ -4,6 +4,7 @@ using ReportPortal.NUnitExtension.EventArguments;
 using ReportPortal.Shared;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Xml;
 
 namespace ReportPortal.NUnitExtension
@@ -24,7 +25,6 @@ namespace ReportPortal.NUnitExtension
 
                 var startSuiteRequest = new StartTestItemRequest
                 {
-                    LaunchId = Bridge.Context.LaunchId,
                     StartTime = DateTime.UtcNow,
                     Name = name,
                     Type = TestItemType.Suite
@@ -41,31 +41,26 @@ namespace ReportPortal.NUnitExtension
                 }
                 if (!beforeSuiteEventArg.Canceled)
                 {
-                    TestItem test;
-                    if (string.IsNullOrEmpty(parentId))
+                    TestReporter test;
+                    if (string.IsNullOrEmpty(parentId) || !_suitesFlow.ContainsKey(parentId))
                     {
-                        test = Bridge.Service.StartTestItem(startSuiteRequest);
+                        test = Bridge.Context.LaunchReporter.StartNewTestNode(startSuiteRequest);
                     }
                     else
                     {
-                        test = Bridge.Service.StartTestItem(_suitesFlow[parentId].Id, startSuiteRequest);
+                        test = _suitesFlow[parentId].StartNewTestNode(startSuiteRequest);
                     }
 
-                    _suitesFlow[id] = beforeSuiteEventArg;
-                    beforeSuiteEventArg.Id = test.Id;
+                    _suitesFlow[id] = test;
 
                     try
                     {
-                        if (AfterSuiteStarted != null) AfterSuiteStarted(this, new TestItemStartedEventArgs(Bridge.Service, startSuiteRequest, test.Id));
+                        if (AfterSuiteStarted != null) AfterSuiteStarted(this, new TestItemStartedEventArgs(Bridge.Service, startSuiteRequest, test));
                     }
                     catch (Exception exp)
                     {
                         Console.WriteLine("Exception was thrown in 'AfterSuiteStarted' subscriber." + Environment.NewLine + exp);
                     }
-                }
-                else
-                {
-                    _suitesFlow[id] = beforeSuiteEventArg;
                 }
             }
             catch (Exception exception)
@@ -89,7 +84,7 @@ namespace ReportPortal.NUnitExtension
                 // at the end of execution nunit raises 2 the same events, we need only that which has 'parentId' xml tag
                 if (parentId != null)
                 {
-                    if (!_suitesFlow[id].Canceled)
+                    if (_suitesFlow.ContainsKey(id))
                     {
                         var updateSuiteRequest = new UpdateTestItemRequest();
 
@@ -114,7 +109,11 @@ namespace ReportPortal.NUnitExtension
 
                         if (updateSuiteRequest.Description != null || updateSuiteRequest.Tags != null)
                         {
-                            Bridge.Service.UpdateTestItem(_suitesFlow[id].Id, updateSuiteRequest);
+                            _suitesFlow[id].AdditionalTasks.Add(Task.Run(() =>
+                            {
+                                _suitesFlow[id].StartTask.Wait();
+                                Bridge.Service.UpdateTestItem(_suitesFlow[id].TestId, updateSuiteRequest);
+                            }));
                         }
 
                         // finishing suite
@@ -124,7 +123,7 @@ namespace ReportPortal.NUnitExtension
                             Status = _statusMap[result]
                         };
                         
-                        var eventArg = new TestItemFinishedEventArgs(Bridge.Service, finishSuiteRequest, result, _suitesFlow[id].Id);
+                        var eventArg = new TestItemFinishedEventArgs(Bridge.Service, finishSuiteRequest, _suitesFlow[id]);
 
                         try
                         {
@@ -135,11 +134,11 @@ namespace ReportPortal.NUnitExtension
                             Console.WriteLine("Exception was thrown in 'BeforeSuiteFinished' subscriber." + Environment.NewLine + exp);
                         }
 
-                        var message = Bridge.Service.FinishTestItem(_suitesFlow[id].Id, finishSuiteRequest).Info;
+                        _suitesFlow[id].Finish(finishSuiteRequest);
 
                         try
                         {
-                            if (AfterSuiteFinished != null) AfterSuiteFinished(this, new TestItemFinishedEventArgs(Bridge.Service, finishSuiteRequest, message, _suitesFlow[id].Id));
+                            if (AfterSuiteFinished != null) AfterSuiteFinished(this, new TestItemFinishedEventArgs(Bridge.Service, finishSuiteRequest,_suitesFlow[id]));
                         }
                         catch (Exception exp)
                         {

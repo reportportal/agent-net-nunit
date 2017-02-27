@@ -26,7 +26,6 @@ namespace ReportPortal.NUnitExtension
 
                 var startTestRequest = new StartTestItemRequest
                 {
-                    LaunchId = Bridge.Context.LaunchId,
                     StartTime = DateTime.UtcNow,
                     Name = name,
                     Type = TestItemType.Step
@@ -43,28 +42,20 @@ namespace ReportPortal.NUnitExtension
                 }
                 if (!beforeTestEventArg.Canceled)
                 {
-                    TestItem test;
+                    var test = _suitesFlow[parentId].StartNewTestNode(startTestRequest);
 
-                    test = Bridge.Service.StartTestItem(_suitesFlow[parentId].Id, startTestRequest);
+                    _testFlowIds[id] = test;
 
-                    _testFlowIds[id] = beforeTestEventArg;
-                    beforeTestEventArg.Id = test.Id;
-                    Bridge.Context.TestId = test.Id;
-
-                    _testFlowNames[fullname] = test.Id;
+                    _testFlowNames[fullname] = test;
 
                     try
                     {
-                        if (AfterTestStarted != null) AfterTestStarted(this, new TestItemStartedEventArgs(Bridge.Service, startTestRequest, test.Id));
+                        if (AfterTestStarted != null) AfterTestStarted(this, new TestItemStartedEventArgs(Bridge.Service, startTestRequest, test));
                     }
                     catch (Exception exp)
                     {
                         Console.WriteLine("Exception was thrown in 'AfterTestStarted' subscriber." + Environment.NewLine + exp);
                     }
-                }
-                else
-                {
-                    _testFlowIds[id] = beforeTestEventArg;
                 }
             }
             catch (Exception exception)
@@ -86,7 +77,7 @@ namespace ReportPortal.NUnitExtension
                 var parentId = xmlDoc.SelectSingleNode("/*/@parentId");
 
 
-                if (!_testFlowIds[id].Canceled)
+                if (_testFlowIds.ContainsKey(id))
                 {
                     var updateTestRequest = new UpdateTestItemRequest();
 
@@ -111,20 +102,28 @@ namespace ReportPortal.NUnitExtension
 
                     if (updateTestRequest.Description != null || updateTestRequest.Tags != null)
                     {
-                        Bridge.Service.UpdateTestItem(_testFlowIds[id].Id, updateTestRequest);
+                        _testFlowIds[id].AdditionalTasks.Add(Task.Run(() =>
+                        {
+                            _testFlowIds[id].StartTask.Wait();
+                            Bridge.Service.UpdateTestItem(_testFlowIds[id].TestId, updateTestRequest);
+                        }));
                     }
 
                     // adding console output
                     var outputNode = xmlDoc.SelectSingleNode("//output");
                     if (outputNode != null)
                     {
-                        Bridge.Service.AddLogItem(new AddLogItemRequest
+                        _testFlowIds[id].AdditionalTasks.Add(Task.Run(() =>
                         {
-                            Level = LogLevel.Trace,
-                            TestItemId = _testFlowIds[id].Id,
-                            Time = DateTime.UtcNow,
-                            Text = "Test Output: " + Environment.NewLine + outputNode.InnerText
-                        });
+                            _testFlowIds[id].StartTask.Wait();
+                            Bridge.Service.AddLogItem(new AddLogItemRequest
+                            {
+                                Level = LogLevel.Trace,
+                                TestItemId = _testFlowIds[id].TestId,
+                                Time = DateTime.UtcNow,
+                                Text = "Test Output: " + Environment.NewLine + outputNode.InnerText
+                            });
+                        }));
                     }
 
                     // adding failure message
@@ -134,13 +133,17 @@ namespace ReportPortal.NUnitExtension
                         var failureMessage = failureNode.SelectSingleNode("./message").InnerText;
                         var failureStacktrace = failureNode.SelectSingleNode("./stack-trace").InnerText;
 
-                        Bridge.Service.AddLogItem(new AddLogItemRequest
+                        _testFlowIds[id].AdditionalTasks.Add(Task.Run(() =>
                         {
-                            Level = LogLevel.Error,
-                            TestItemId = _testFlowIds[id].Id,
-                            Time = DateTime.UtcNow,
-                            Text = failureMessage + Environment.NewLine + failureStacktrace
-                        });
+                            _testFlowIds[id].StartTask.Wait();
+                            Bridge.Service.AddLogItem(new AddLogItemRequest
+                            {
+                                Level = LogLevel.Error,
+                                TestItemId = _testFlowIds[id].TestId,
+                                Time = DateTime.UtcNow,
+                                Text = failureMessage + Environment.NewLine + failureStacktrace
+                            });
+                        }));
                     }
 
                     // finishing test
@@ -150,7 +153,7 @@ namespace ReportPortal.NUnitExtension
                         Status = _statusMap[result]
                     };
 
-                    var eventArg = new TestItemFinishedEventArgs(Bridge.Service, finishTestRequest, result, _testFlowIds[id].Id);
+                    var eventArg = new TestItemFinishedEventArgs(Bridge.Service, finishTestRequest, _testFlowIds[id]);
 
                     try
                     {
@@ -161,12 +164,11 @@ namespace ReportPortal.NUnitExtension
                         Console.WriteLine("Exception was thrown in 'BeforeTestFinished' subscriber." + Environment.NewLine + exp);
                     }
 
-                    var message = Bridge.Service.FinishTestItem(_testFlowIds[id].Id, finishTestRequest).Info;
-                    Bridge.Context.TestId = null;
+                    _testFlowIds[id].Finish(finishTestRequest);
 
                     try
                     {
-                        if (AfterTestFinished != null) AfterTestFinished(this, new TestItemFinishedEventArgs(Bridge.Service, finishTestRequest, message, _testFlowIds[id].Id));
+                        if (AfterTestFinished != null) AfterTestFinished(this, new TestItemFinishedEventArgs(Bridge.Service, finishTestRequest, _testFlowIds[id]));
                     }
                     catch (Exception exp)
                     {
@@ -190,15 +192,16 @@ namespace ReportPortal.NUnitExtension
 
                 if (_testFlowNames.ContainsKey(fullTestName))
                 {
-                    Task.Run(
+
+                    _testFlowNames[fullTestName].AdditionalTasks.Add(Task.Run(
                         () => Bridge.Service.AddLogItem(new AddLogItemRequest
                         {
                             Level = LogLevel.Info,
-                            TestItemId = _testFlowNames[fullTestName],
+                            TestItemId = _testFlowNames[fullTestName].TestId,
                             Time = DateTime.UtcNow,
                             Text = message
                         })
-                    );
+                    ));
                 }
             }
             catch (Exception exception)
