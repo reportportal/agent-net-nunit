@@ -1,40 +1,28 @@
 ﻿using System;
 using ReportPortal.Client;
 using ReportPortal.Client.Requests;
+using ReportPortal.Shared;
 
 namespace ReportPortal.NUnitExtension.EventArguments
 {
-    public class RunStartedEventArgs: EventArgs
+    public class RunStartedEventArgs : EventArgs
     {
-        private readonly Service _service;
-        private readonly StartLaunchRequest _request;
-        private readonly string _id;
         public RunStartedEventArgs(Service service, StartLaunchRequest request)
         {
-            _service = service;
-            _request = request;
+            Service = service;
+            Launch = request;
         }
 
-        public RunStartedEventArgs(Service service, StartLaunchRequest request, string id)
-            :this(service, request)
+        public RunStartedEventArgs(Service service, StartLaunchRequest request, LaunchReporter launchReporter) : this(service, request)
         {
-            _id = id;
+            LaunchReporter = launchReporter;
         }
 
-        public Service Service
-        {
-            get { return _service; }
-        }
+        public Service Service { get; }
 
-        public StartLaunchRequest Launch
-        {
-            get { return _request; }
-        }
+        public StartLaunchRequest Launch { get; }
 
-        public string Id
-        {
-            get { return _id; }
-        }
+        public LaunchReporter LaunchReporter { get; }
 
         public bool Canceled { get; set; }
     }

@@ -18,7 +18,7 @@ namespace ReportPortal.NUnitExtension
             try
             {
                 LaunchMode launchMode;
-                if (Config.Launch.IsDebugMode == true)
+                if (Config.Launch.IsDebugMode)
                 {
                     launchMode = LaunchMode.Debug;
                 }
@@ -48,11 +48,12 @@ namespace ReportPortal.NUnitExtension
 
                 if (!eventArg.Canceled)
                 {
-                    Bridge.Context.LaunchId = Bridge.Service.StartLaunch(startLaunchRequest).Id;
+                    Bridge.Context.LaunchReporter = new LaunchReporter(Bridge.Service);
+                    Bridge.Context.LaunchReporter.Start(eventArg.Launch);
 
                     try
                     {
-                        if (AfterRunStarted != null) AfterRunStarted(this, new RunStartedEventArgs(Bridge.Service, startLaunchRequest, Bridge.Context.LaunchId));
+                        if (AfterRunStarted != null) AfterRunStarted(this, new RunStartedEventArgs(Bridge.Service, startLaunchRequest, Bridge.Context.LaunchReporter));
                     }
                     catch (Exception exp)
                     {
@@ -80,7 +81,7 @@ namespace ReportPortal.NUnitExtension
 
                 };
 
-                var eventArg = new RunFinishedEventArgs(Bridge.Service, finishLaunchRequest, null, Bridge.Context.LaunchId);
+                var eventArg = new RunFinishedEventArgs(Bridge.Service, finishLaunchRequest, Bridge.Context.LaunchReporter);
                 try
                 {
                     if (BeforeRunFinished != null) BeforeRunFinished(this, eventArg);
@@ -92,12 +93,12 @@ namespace ReportPortal.NUnitExtension
 
                 if (!eventArg.Canceled)
                 {
-                    var message = Bridge.Service.FinishLaunch(Bridge.Context.LaunchId, finishLaunchRequest);
-                    Bridge.Context.LaunchId = null;
+                    Bridge.Context.LaunchReporter.Finish(finishLaunchRequest);
+                    Bridge.Context.LaunchReporter.FinishTask.Wait();
 
                     try
                     {
-                        if (AfterRunFinished != null) AfterRunFinished(this, new RunFinishedEventArgs(Bridge.Service, finishLaunchRequest, message.Info, Bridge.Context.LaunchId));
+                        if (AfterRunFinished != null) AfterRunFinished(this, new RunFinishedEventArgs(Bridge.Service, finishLaunchRequest, Bridge.Context.LaunchReporter));
                     }
                     catch (Exception exp)
                     {

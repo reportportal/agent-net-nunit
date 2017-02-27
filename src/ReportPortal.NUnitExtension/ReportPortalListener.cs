@@ -42,9 +42,9 @@ namespace ReportPortal.NUnitExtension
 
         private static Dictionary<string, Status> _statusMap = new Dictionary<string, Status>();
 
-        private Dictionary<string, TestItemStartedEventArgs> _suitesFlow = new Dictionary<string, TestItemStartedEventArgs>();
-        private Dictionary<string, TestItemStartedEventArgs> _testFlowIds = new Dictionary<string, TestItemStartedEventArgs>();
-        private Dictionary<string, string> _testFlowNames = new Dictionary<string, string>();
+        private Dictionary<string, TestReporter> _suitesFlow = new Dictionary<string, TestReporter>();
+        private Dictionary<string, TestReporter> _testFlowIds = new Dictionary<string, TestReporter>();
+        private Dictionary<string, TestReporter> _testFlowNames = new Dictionary<string, TestReporter>();
 
         public static Config Config { get; private set; }
 
