@@ -102,28 +102,19 @@ namespace ReportPortal.NUnitExtension
 
                     if (updateTestRequest.Description != null || updateTestRequest.Tags != null)
                     {
-                        _testFlowIds[id].AdditionalTasks.Add(Task.Run(() =>
-                        {
-                            _testFlowIds[id].StartTask.Wait();
-                            Bridge.Service.UpdateTestItem(_testFlowIds[id].TestId, updateTestRequest);
-                        }));
+                        _testFlowIds[id].Update(updateTestRequest);
                     }
 
                     // adding console output
                     var outputNode = xmlDoc.SelectSingleNode("//output");
                     if (outputNode != null)
                     {
-                        _testFlowIds[id].AdditionalTasks.Add(Task.Run(() =>
+                        _testFlowIds[id].Log(new AddLogItemRequest
                         {
-                            _testFlowIds[id].StartTask.Wait();
-                            Bridge.Service.AddLogItem(new AddLogItemRequest
-                            {
-                                Level = LogLevel.Trace,
-                                TestItemId = _testFlowIds[id].TestId,
-                                Time = DateTime.UtcNow,
-                                Text = "Test Output: " + Environment.NewLine + outputNode.InnerText
-                            });
-                        }));
+                            Level = LogLevel.Trace,
+                            Time = DateTime.UtcNow,
+                            Text = "Test Output: " + Environment.NewLine + outputNode.InnerText
+                        });
                     }
 
                     // adding failure message
@@ -133,17 +124,12 @@ namespace ReportPortal.NUnitExtension
                         var failureMessage = failureNode.SelectSingleNode("./message").InnerText;
                         var failureStacktrace = failureNode.SelectSingleNode("./stack-trace").InnerText;
 
-                        _testFlowIds[id].AdditionalTasks.Add(Task.Run(() =>
+                        _testFlowIds[id].Log(new AddLogItemRequest
                         {
-                            _testFlowIds[id].StartTask.Wait();
-                            Bridge.Service.AddLogItem(new AddLogItemRequest
-                            {
-                                Level = LogLevel.Error,
-                                TestItemId = _testFlowIds[id].TestId,
-                                Time = DateTime.UtcNow,
-                                Text = failureMessage + Environment.NewLine + failureStacktrace
-                            });
-                        }));
+                            Level = LogLevel.Error,
+                            Time = DateTime.UtcNow,
+                            Text = failureMessage + Environment.NewLine + failureStacktrace
+                        });
                     }
 
                     // finishing test
@@ -192,16 +178,12 @@ namespace ReportPortal.NUnitExtension
 
                 if (_testFlowNames.ContainsKey(fullTestName))
                 {
-
-                    _testFlowNames[fullTestName].AdditionalTasks.Add(Task.Run(
-                        () => Bridge.Service.AddLogItem(new AddLogItemRequest
-                        {
-                            Level = LogLevel.Info,
-                            TestItemId = _testFlowNames[fullTestName].TestId,
-                            Time = DateTime.UtcNow,
-                            Text = message
-                        })
-                    ));
+                    _testFlowNames[fullTestName].Log(new AddLogItemRequest
+                    {
+                        Level = LogLevel.Info,
+                        Time = DateTime.UtcNow,
+                        Text = message
+                    });
                 }
             }
             catch (Exception exception)
