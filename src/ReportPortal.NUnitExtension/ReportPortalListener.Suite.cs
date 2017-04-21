@@ -27,7 +27,8 @@ namespace ReportPortal.NUnitExtension
                 {
                     StartTime = DateTime.UtcNow,
                     Name = name,
-                    Type = TestItemType.Suite
+                    Type = TestItemType.Suite,
+                    Tags = Config.Launch.Tags
                 };
 
                 var beforeSuiteEventArg = new TestItemStartedEventArgs(Bridge.Service, startSuiteRequest);
@@ -88,12 +89,13 @@ namespace ReportPortal.NUnitExtension
                     {
                         var updateSuiteRequest = new UpdateTestItemRequest();
 
+                        // adding tags to suite
+                        updateSuiteRequest.Tags = Config.Launch.Tags;
+
                         // adding categories to suite
                         var categories = xmlDoc.SelectNodes("//properties/property[@name='Category']");
                         if (categories != null)
                         {
-                            updateSuiteRequest.Tags = new List<string>();
-
                             foreach (XmlNode category in categories)
                             {
                                 updateSuiteRequest.Tags.Add(category.Attributes["value"].Value);
