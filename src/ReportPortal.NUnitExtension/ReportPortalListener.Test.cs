@@ -178,12 +178,7 @@ namespace ReportPortal.NUnitExtension
 
                 if (_testFlowNames.ContainsKey(fullTestName))
                 {
-                    _testFlowNames[fullTestName].Log(new AddLogItemRequest
-                    {
-                        Level = LogLevel.Info,
-                        Time = DateTime.UtcNow,
-                        Text = message
-                    });
+                    _testFlowNames[fullTestName].Log(Bridge.BuildRequest(message));
                 }
             }
             catch (Exception exception)
