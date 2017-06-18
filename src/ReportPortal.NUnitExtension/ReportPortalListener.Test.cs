@@ -183,12 +183,11 @@ namespace ReportPortal.NUnitExtension
                     var logRequest = serializer.Deserialize<AddLogItemRequest>(message);
                     if (logRequest != null)
                     {
-                        logRequest.Time = logRequest.Time?.AddMilliseconds(1);
                         _testFlowNames[fullTestName].Log(logRequest);
                     }
                     else
                     {
-                        _testFlowNames[fullTestName].Log(new AddLogItemRequest { Level = LogLevel.Info, Time = DateTime.UtcNow.AddMilliseconds(1), Text = message});
+                        _testFlowNames[fullTestName].Log(new AddLogItemRequest { Level = LogLevel.Info, Time = DateTime.UtcNow, Text = message});
                     }
                     
                 }

@@ -59,7 +59,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="ReportPortal.Client, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ReportPortal.Client.1.2.7\lib\ReportPortal.Client.dll</HintPath>
+      <HintPath>..\packages\ReportPortal.Client.1.2.8\lib\ReportPortal.Client.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="ReportPortal.Shared, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">

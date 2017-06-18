@@ -16,7 +16,8 @@
 
     <dependencies>
       <group>
-        <dependency id="ReportPortal.Shared" version="[1.4.0,1.5)" />
+      	<dependency id="ReportPortal.Client" version="[1.2.8,1.3)" />
+        <dependency id="ReportPortal.Shared" version="[1.4.1,1.5)" />
         <dependency id="NUnit.Engine" version="[3.5,)" />
         <dependency id="NUnit" version="[3.5,)" />
       </group>
