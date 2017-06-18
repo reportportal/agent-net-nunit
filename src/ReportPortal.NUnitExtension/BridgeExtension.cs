@@ -5,15 +5,22 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ReportPortal.Client.Models;
+using ReportPortal.Client.Requests;
+using System.Web.Script.Serialization;
 
 namespace ReportPortal.NUnitExtension
 {
     public class BridgeExtension : IBridgeExtension
     {
-        public bool Log(LogLevel level, string message)
+        public bool Handled { get; set; }
+
+        public int Order => int.MaxValue;
+
+        public void FormatLog(ref AddLogItemRequest logRequest)
         {
-            NUnit.Framework.TestContext.Progress.WriteLine(message);
-            return true;
+            var serializer = new JavaScriptSerializer();
+            NUnit.Framework.TestContext.Progress.WriteLine(serializer.Serialize(logRequest));
+            Handled = true;
         }
     }
 }
