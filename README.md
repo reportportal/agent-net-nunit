@@ -4,7 +4,7 @@
 Install **ReportPortal.NUnit 3+** NuGet package into your project with tests.
 
 [![NuGet version](https://badge.fury.io/nu/reportportal.nunit.svg)](https://badge.fury.io/nu/reportportal.nunit)
-> PS> Install-Package ReportPortal.NUnit -Version 3.0.0-beta-21 -Pre
+> PS> Install-Package ReportPortal.NUnit
 
 To enable NUnit extension you have to add `ReportPortal.addins` file in the folder where NUnit Runner is located. The content of the file should contain line with path to the `ReportPortal.NUnitExtension.dll`. To read more about how NUnit is locating extensions please follow [this](https://github.com/nunit/docs/wiki/Engine-Extensibility#locating-addins).
 
