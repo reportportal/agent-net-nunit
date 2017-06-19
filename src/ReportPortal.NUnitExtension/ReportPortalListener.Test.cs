@@ -13,6 +13,7 @@ namespace ReportPortal.NUnitExtension
     public partial class ReportPortalListener
     {
         public delegate void TestStartedHandler(object sender, TestItemStartedEventArgs e);
+
         public static event TestStartedHandler BeforeTestStarted;
         public static event TestStartedHandler AfterTestStarted;
 
@@ -39,7 +40,8 @@ namespace ReportPortal.NUnitExtension
                 }
                 catch (Exception exp)
                 {
-                    Console.WriteLine("Exception was thrown in 'BeforeTestStarted' subscriber." + Environment.NewLine + exp);
+                    Console.WriteLine("Exception was thrown in 'BeforeTestStarted' subscriber." + Environment.NewLine +
+                                      exp);
                 }
                 if (!beforeTestEventArg.Canceled)
                 {
@@ -51,11 +53,13 @@ namespace ReportPortal.NUnitExtension
 
                     try
                     {
-                        if (AfterTestStarted != null) AfterTestStarted(this, new TestItemStartedEventArgs(Bridge.Service, startTestRequest, test));
+                        if (AfterTestStarted != null)
+                            AfterTestStarted(this, new TestItemStartedEventArgs(Bridge.Service, startTestRequest, test));
                     }
                     catch (Exception exp)
                     {
-                        Console.WriteLine("Exception was thrown in 'AfterTestStarted' subscriber." + Environment.NewLine + exp);
+                        Console.WriteLine("Exception was thrown in 'AfterTestStarted' subscriber." + Environment.NewLine +
+                                          exp);
                     }
                 }
             }
@@ -66,6 +70,7 @@ namespace ReportPortal.NUnitExtension
         }
 
         public delegate void TestFinishedHandler(object sender, TestItemFinishedEventArgs e);
+
         public static event TestFinishedHandler BeforeTestFinished;
         public static event TestFinishedHandler AfterTestFinished;
 
@@ -148,18 +153,22 @@ namespace ReportPortal.NUnitExtension
                     }
                     catch (Exception exp)
                     {
-                        Console.WriteLine("Exception was thrown in 'BeforeTestFinished' subscriber." + Environment.NewLine + exp);
+                        Console.WriteLine("Exception was thrown in 'BeforeTestFinished' subscriber." +
+                                          Environment.NewLine + exp);
                     }
 
                     _testFlowIds[id].Finish(finishTestRequest);
 
                     try
                     {
-                        if (AfterTestFinished != null) AfterTestFinished(this, new TestItemFinishedEventArgs(Bridge.Service, finishTestRequest, _testFlowIds[id]));
+                        if (AfterTestFinished != null)
+                            AfterTestFinished(this,
+                                new TestItemFinishedEventArgs(Bridge.Service, finishTestRequest, _testFlowIds[id]));
                     }
                     catch (Exception exp)
                     {
-                        Console.WriteLine("Exception was thrown in 'AfterTestFinished' subscriber." + Environment.NewLine + exp);
+                        Console.WriteLine("Exception was thrown in 'AfterTestFinished' subscriber." +
+                                          Environment.NewLine + exp);
                     }
                 }
 
@@ -180,7 +189,16 @@ namespace ReportPortal.NUnitExtension
                 if (_testFlowNames.ContainsKey(fullTestName))
                 {
                     var serializer = new JavaScriptSerializer();
-                    var logRequest = serializer.Deserialize<AddLogItemRequest>(message);
+                    AddLogItemRequest logRequest = null;
+                    try
+                    {
+                        logRequest = serializer.Deserialize<AddLogItemRequest>(message);
+                    }
+                    catch (Exception)
+                    {
+
+                    }
+                    
                     if (logRequest != null)
                     {
                         _testFlowNames[fullTestName].Log(logRequest);
