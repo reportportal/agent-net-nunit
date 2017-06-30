@@ -18,7 +18,7 @@ namespace ReportPortal.NUnitExtension
 
         public void FormatLog(ref AddLogItemRequest logRequest)
         {
-            var serializer = new JavaScriptSerializer();
+            var serializer = new JavaScriptSerializer {MaxJsonLength = int.MaxValue};
             NUnit.Framework.TestContext.Progress.WriteLine(serializer.Serialize(logRequest));
             Handled = true;
         }

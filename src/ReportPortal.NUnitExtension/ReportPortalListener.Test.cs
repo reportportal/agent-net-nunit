@@ -188,7 +188,7 @@ namespace ReportPortal.NUnitExtension
 
                 if (_testFlowNames.ContainsKey(fullTestName))
                 {
-                    var serializer = new JavaScriptSerializer();
+                    var serializer = new JavaScriptSerializer {MaxJsonLength = int.MaxValue};
                     AddLogItemRequest logRequest = null;
                     try
                     {
