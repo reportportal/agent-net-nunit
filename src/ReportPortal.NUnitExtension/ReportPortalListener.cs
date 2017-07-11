@@ -19,7 +19,7 @@ namespace ReportPortal.NUnitExtension
     {
         static ReportPortalListener()
         {
-            var configPath = Path.GetDirectoryName(new Uri(typeof(Config).Assembly.CodeBase).LocalPath) + "\\ReportPortal.conf";
+            var configPath = Path.GetDirectoryName(new Uri(typeof(Config).Assembly.CodeBase).LocalPath) + "/ReportPortal.conf";
             Config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(configPath));
 
             Service rpService;
