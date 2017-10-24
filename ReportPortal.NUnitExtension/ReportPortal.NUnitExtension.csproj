@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NUnit" Version="3.8.1" />
+    <PackageReference Include="NUnit" Version="3.7.0" />
     <PackageReference Include="NUnit.Engine" Version="3.7.0" />
     <PackageReference Include="ReportPortal.Shared" Version="2.0.0-beta1" />
   </ItemGroup>
