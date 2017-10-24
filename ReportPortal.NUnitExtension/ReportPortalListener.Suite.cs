@@ -109,10 +109,10 @@ namespace ReportPortal.NUnitExtension
 
                         if (updateSuiteRequest.Description != null || updateSuiteRequest.Tags != null)
                         {
-                            _suitesFlow[id].AdditionalTasks.Add(Task.Run(() =>
+                            _suitesFlow[id].AdditionalTasks.Add(Task.Run(async () =>
                             {
                                 _suitesFlow[id].StartTask.Wait();
-                                Bridge.Service.UpdateTestItem(_suitesFlow[id].TestId, updateSuiteRequest);
+                                await Bridge.Service.UpdateTestItemAsync(_suitesFlow[id].TestId, updateSuiteRequest);
                             }));
                         }
 

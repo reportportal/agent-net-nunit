@@ -1,11 +1,11 @@
-﻿using ReportPortal.Client.Models;
+﻿using ReportPortal.Client.Converters;
+using ReportPortal.Client.Models;
 using ReportPortal.Client.Requests;
 using ReportPortal.NUnitExtension.EventArguments;
 using ReportPortal.Shared;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Web.Script.Serialization;
 using System.Xml;
 
 namespace ReportPortal.NUnitExtension
@@ -188,11 +188,27 @@ namespace ReportPortal.NUnitExtension
 
                 if (_testFlowNames.ContainsKey(fullTestName))
                 {
-                    var serializer = new JavaScriptSerializer {MaxJsonLength = int.MaxValue};
                     AddLogItemRequest logRequest = null;
                     try
                     {
-                        logRequest = serializer.Deserialize<AddLogItemRequest>(message);
+                        var sharedMessage = ModelSerializer.Deserialize<SharedLogMessage>(message);
+
+                        logRequest = new AddLogItemRequest
+                        {
+                            Level = sharedMessage.Level,
+                            Time = sharedMessage.Time,
+                            TestItemId = sharedMessage.TestItemId,
+                            Text = sharedMessage.Text
+                        };
+                        if (sharedMessage.Attach != null)
+                        {
+                            logRequest.Attach = new Client.Models.Attach
+                            {
+                                Name = sharedMessage.Attach.Name,
+                                MimeType = sharedMessage.Attach.MimeType,
+                                Data = sharedMessage.Attach.Data
+                            };
+                        }
                     }
                     catch (Exception)
                     {

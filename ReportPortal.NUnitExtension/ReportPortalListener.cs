@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using NUnit.Engine;
+﻿using NUnit.Engine;
 using NUnit.Engine.Extensibility;
 using ReportPortal.Client;
 using ReportPortal.Client.Models;
@@ -20,7 +19,7 @@ namespace ReportPortal.NUnitExtension
         static ReportPortalListener()
         {
             var configPath = Path.GetDirectoryName(new Uri(typeof(Config).Assembly.CodeBase).LocalPath) + "/ReportPortal.conf";
-            Config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(configPath));
+            Config = Client.Converters.ModelSerializer.Deserialize<Config>(File.ReadAllText(configPath));
 
             Service rpService;
             if (Config.Server.Proxy != null)
