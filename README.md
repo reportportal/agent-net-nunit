@@ -57,6 +57,56 @@ Example of config file:
 ```
 Proxy element is optional.
 
+# Send a screenshot
+
+To log a screenshot to a test run you can use Bridge.LogMessage method. You need to encode an image as base64 string and pass it to the method in following format: "{rp#base64#(.*)#(.*)}". First parameter is MIME type, second parameter is the base64 string image representation. In the example below a screenshot is taken with Selenium Web driver instance and send to Report portal if a test fails. Do not forget to add needed references to your test project.
+
+```csharp
+using NUnit.Framework;
+using NUnit.Framework.Interfaces;
+using OpenQA.Selenium;
+using ReportPortal.Shared;
+using LogLevel = ReportPortal.Client.Models.LogLevel;
+
+// ...
+
+	[TearDown]
+	public void NunitTearDown()
+	{
+		if (TestContext.CurrentContext.Result.Outcome.Equals(ResultState.Failure) ||
+			TestContext.CurrentContext.Result.Outcome.Equals(ResultState.Error) ||
+			TestContext.CurrentContext.Result.Outcome.Equals(ResultState.SetUpError) ||
+			TestContext.CurrentContext.Result.Outcome.Equals(ResultState.SetUpFailure))
+		{
+			string base64 = ((ITakesScreenshot) WebDriver.Instance).GetScreenshot().AsBase64EncodedString; 
+
+			if (base64 != null)
+			{
+				Bridge.LogMessage(LogLevel.Error, "Screen shot on failure {rp#base64#image/png#" + base64 + "}");
+			}
+		}
+	}
+```
+
+# Customization
+
+You can customize a test run in order to have a user-friendly report. Following customization is supported:
+* update run/feature/test name
+* update run/feature/test description
+* add run/feature/test tags
+
+Please note, test categories are added to tags and test description is added to description by default
+
+Add a class that implements NUnit.Engine.ITestEventListener to a project. Assume the class is implemented within the YourProject.Tests project. To enable your extension you need to add path to the project assembly to `ReportPortal.addins` file in the `NUnitRunner` folder with the following content (see folder structure above):  
+
+```
+../YourProject/bin/Debug/YourProject.Tests.dll
+```
+
+Twelve handlers are available for event subscription that can be represented with following combination: [Before/After][Run/Suite/Test][Started/Finished]. The subscription is implemented in the constructor.
+
+See deatils of the customization in the [example](https://github.com/reportportal/example-net-nunit/blob/master/src/Example/ReportPortalCustomization/Customization.cs)
+
 # Example
 Follow [reportportal example-net-nunit](https://github.com/reportportal/example-net-nunit) repo to see the source of test project with Report Portal integration.
 
