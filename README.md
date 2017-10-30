@@ -57,37 +57,6 @@ Example of config file:
 ```
 Proxy element is optional.
 
-# Send a screenshot
-
-To log a screenshot to a test run you can use Bridge.LogMessage method. You need to encode an image as base64 string and pass it to the method in following format: "{rp#base64#(.*)#(.*)}". First parameter is MIME type, second parameter is the base64 string image representation. In the example below a screenshot is taken with Selenium Web driver instance and send to Report portal if a test fails. Do not forget to add needed references to your test project.
-
-```csharp
-using NUnit.Framework;
-using NUnit.Framework.Interfaces;
-using OpenQA.Selenium;
-using ReportPortal.Shared;
-using LogLevel = ReportPortal.Client.Models.LogLevel;
-
-// ...
-
-	[TearDown]
-	public void NunitTearDown()
-	{
-		if (TestContext.CurrentContext.Result.Outcome.Equals(ResultState.Failure) ||
-			TestContext.CurrentContext.Result.Outcome.Equals(ResultState.Error) ||
-			TestContext.CurrentContext.Result.Outcome.Equals(ResultState.SetUpError) ||
-			TestContext.CurrentContext.Result.Outcome.Equals(ResultState.SetUpFailure))
-		{
-			string base64 = ((ITakesScreenshot) WebDriver.Instance).GetScreenshot().AsBase64EncodedString; 
-
-			if (base64 != null)
-			{
-				Bridge.LogMessage(LogLevel.Error, "Screen shot on failure {rp#base64#image/png#" + base64 + "}");
-			}
-		}
-	}
-```
-
 # Customization
 
 You can customize a test run in order to have a user-friendly report. Following customization is supported:
