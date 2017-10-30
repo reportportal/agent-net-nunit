@@ -57,6 +57,25 @@ Example of config file:
 ```
 Proxy element is optional.
 
+# Customization
+
+You can customize a test run in order to have a user-friendly report. Following customization is supported:
+* update run/feature/test name
+* update run/feature/test description
+* add run/feature/test tags
+
+Please note, test categories are added to tags and test description is added to description by default
+
+Add a class that implements NUnit.Engine.ITestEventListener to a project. Assume the class is implemented within the YourProject.Tests project. To enable your extension you need to add path to the project assembly to `ReportPortal.addins` file in the `NUnitRunner` folder with the following content (see folder structure above):  
+
+```
+../YourProject/bin/Debug/YourProject.Tests.dll
+```
+
+Twelve handlers are available for event subscription that can be represented with following combination: [Before/After][Run/Suite/Test][Started/Finished]. The subscription is implemented in the constructor.
+
+See deatils of the customization in the [example](https://github.com/reportportal/example-net-nunit/blob/master/src/Example/ReportPortalCustomization/Customization.cs)
+
 # Example
 Follow [reportportal example-net-nunit](https://github.com/reportportal/example-net-nunit) repo to see the source of test project with Report Portal integration.
 
