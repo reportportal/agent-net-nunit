@@ -93,7 +93,7 @@ namespace ReportPortal.NUnitExtension
 
                 if (!eventArg.Canceled)
                 {
-                    Bridge.Context.LaunchReporter.Finish(finishLaunchRequest);
+                    Bridge.Context.LaunchReporter.Finish(finishLaunchRequest, force: false);
                     Bridge.Context.LaunchReporter.FinishTask.Wait();
 
                     try
