@@ -82,7 +82,6 @@ namespace ReportPortal.NUnitExtension
                 var result = xmlDoc.SelectSingleNode("/*/@result").Value;
                 var parentId = xmlDoc.SelectSingleNode("/*/@parentId");
 
-
                 if (_testFlowIds.ContainsKey(id))
                 {
                     var updateTestRequest = new UpdateTestItemRequest();
@@ -144,6 +143,12 @@ namespace ReportPortal.NUnitExtension
                         EndTime = DateTime.UtcNow,
                         Status = _statusMap[result]
                     };
+
+                    var isRetry = xmlDoc.SelectSingleNode("//properties/property[@name='Retry']");
+                    if (isRetry != null)
+                    {
+                        finishTestRequest.IsRetry = true;
+                    }
 
                     var eventArg = new TestItemFinishedEventArgs(Bridge.Service, finishTestRequest, _testFlowIds[id]);
 
