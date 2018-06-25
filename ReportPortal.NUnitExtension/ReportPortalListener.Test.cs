@@ -127,7 +127,7 @@ namespace ReportPortal.NUnitExtension
                     if (failureNode != null)
                     {
                         var failureMessage = failureNode.SelectSingleNode("./message").InnerText;
-                        var failureStacktrace = failureNode.SelectSingleNode("./stack-trace").InnerText;
+                        var failureStacktrace = failureNode.SelectSingleNode("./stack-trace")?.InnerText;
 
                         _testFlowIds[id].Log(new AddLogItemRequest
                         {
