@@ -2,17 +2,27 @@
 
   <PropertyGroup>
     <TargetFramework>net45</TargetFramework>
-    <Version>3.3.0-beta2</Version>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>1.0.0</Version>
     <PackageId>ReportPortal.NUnit</PackageId>
     <Authors>reportportal</Authors>
     <PackageLicenseUrl>https://raw.githubusercontent.com/reportportal/agent-net-nunit/master/LICENSE</PackageLicenseUrl>
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="ReportPortal.conf">
+      <IncludeInPackage>true</IncludeInPackage>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Update="Install.ps1">
+      <PackagePath>tools</PackagePath>
+      <Pack>true</Pack>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="NUnit" Version="3.7.0" />
     <PackageReference Include="NUnit.Engine.Api" Version="3.7.0" />
-    <PackageReference Include="ReportPortal.Shared" Version="2.0.0-beta4" />
+    <PackageReference Include="ReportPortal.Shared" Version="2.0.*" />
   </ItemGroup>
 
 </Project>
