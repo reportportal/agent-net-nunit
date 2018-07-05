@@ -3,6 +3,7 @@ using ReportPortal.Client.Requests;
 using ReportPortal.NUnitExtension.EventArguments;
 using ReportPortal.Shared;
 using System;
+using System.Diagnostics;
 using System.Xml;
 
 namespace ReportPortal.NUnitExtension
@@ -93,8 +94,13 @@ namespace ReportPortal.NUnitExtension
 
                 if (!eventArg.Canceled)
                 {
+                    var sw = Stopwatch.StartNew();
+                    Console.Write("Finishing to send the results to Report Portal... ");
+
                     Bridge.Context.LaunchReporter.Finish(finishLaunchRequest, force: false);
                     Bridge.Context.LaunchReporter.FinishTask.Wait();
+
+                    Console.WriteLine($"Elapsed: {sw.Elapsed}");
 
                     try
                     {
