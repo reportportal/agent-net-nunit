@@ -84,32 +84,6 @@ namespace ReportPortal.NUnitExtension
 
                 if (_testFlowIds.ContainsKey(id))
                 {
-                    var updateTestRequest = new UpdateTestItemRequest();
-
-                    // adding categories to test
-                    var categories = xmlDoc.SelectNodes("//properties/property[@name='Category']");
-                    if (categories != null)
-                    {
-                        updateTestRequest.Tags = new List<string>();
-
-                        foreach (XmlNode category in categories)
-                        {
-                            updateTestRequest.Tags.Add(category.Attributes["value"].Value);
-                        }
-                    }
-
-                    // adding description to test
-                    var description = xmlDoc.SelectSingleNode("//properties/property[@name='Description']");
-                    if (description != null)
-                    {
-                        updateTestRequest.Description = description.Attributes["value"].Value;
-                    }
-
-                    if (updateTestRequest.Description != null || updateTestRequest.Tags != null)
-                    {
-                        _testFlowIds[id].Update(updateTestRequest);
-                    }
-
                     // adding console output
                     var outputNode = xmlDoc.SelectSingleNode("//output");
                     if (outputNode != null)
@@ -143,6 +117,25 @@ namespace ReportPortal.NUnitExtension
                         EndTime = DateTime.UtcNow,
                         Status = _statusMap[result]
                     };
+
+                    // adding categories to test
+                    var categories = xmlDoc.SelectNodes("//properties/property[@name='Category']");
+                    if (categories != null)
+                    {
+                        finishTestRequest.Tags = new List<string>();
+
+                        foreach (XmlNode category in categories)
+                        {
+                            finishTestRequest.Tags.Add(category.Attributes["value"].Value);
+                        }
+                    }
+
+                    // adding description to test
+                    var description = xmlDoc.SelectSingleNode("//properties/property[@name='Description']");
+                    if (description != null)
+                    {
+                        finishTestRequest.Description = description.Attributes["value"].Value;
+                    }
 
                     var isRetry = xmlDoc.SelectSingleNode("//properties/property[@name='Retry']");
                     if (isRetry != null)
