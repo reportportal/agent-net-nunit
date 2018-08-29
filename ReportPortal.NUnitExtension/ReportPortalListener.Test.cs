@@ -82,6 +82,11 @@ namespace ReportPortal.NUnitExtension
                 var result = xmlDoc.SelectSingleNode("/*/@result").Value;
                 var parentId = xmlDoc.SelectSingleNode("/*/@parentId");
 
+                if (!_testFlowIds.ContainsKey(id))
+                {
+                    StartTest(xmlDoc);
+                }
+
                 if (_testFlowIds.ContainsKey(id))
                 {
                     // adding console output
