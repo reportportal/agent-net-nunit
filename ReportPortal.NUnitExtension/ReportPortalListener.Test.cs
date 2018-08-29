@@ -86,7 +86,7 @@ namespace ReportPortal.NUnitExtension
                 {
                     StartTest(xmlDoc);
                 }
-
+                
                 if (_testFlowIds.ContainsKey(id))
                 {
                     // adding console output
@@ -113,6 +113,20 @@ namespace ReportPortal.NUnitExtension
                             Level = LogLevel.Error,
                             Time = DateTime.UtcNow,
                             Text = failureMessage + Environment.NewLine + failureStacktrace
+                        });
+                    }
+
+                    // adding reason message
+                    var reasonNode = xmlDoc.SelectSingleNode("//reason");
+                    if (reasonNode != null)
+                    {
+                        var reasonMessage = reasonNode.SelectSingleNode("./message").InnerText;
+
+                        _testFlowIds[id].Log(new AddLogItemRequest
+                        {
+                            Level = LogLevel.Error,
+                            Time = DateTime.UtcNow,
+                            Text = reasonMessage
                         });
                     }
 
