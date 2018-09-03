@@ -60,10 +60,10 @@ namespace ReportPortal.NUnitExtension
         [DataMember]
         public string Name { get; set; }
 
-        [DataMember]
+        [IgnoreDataMember]
         public byte[] Data { get; set; }
 
-        [DataMember]
+        [IgnoreDataMember]
         public string MimeType { get; set; }
     }
 }
