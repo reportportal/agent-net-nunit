@@ -2,16 +2,20 @@
 
   <PropertyGroup>
     <TargetFramework>net45</TargetFramework>
-    <Version>1.0.0</Version>
     <PackageId>ReportPortal.NUnit</PackageId>
-    <Authors>reportportal</Authors>
+    <Version>1.0.0</Version>
+    <Description>NUnit addin for reporting test results into ReportPortal</Description>
+    <Authors>Nikolay Borisenko</Authors>
+    <PackageTags>nunit addin reportportal testing</PackageTags>
     <PackageLicenseUrl>https://raw.githubusercontent.com/reportportal/agent-net-nunit/master/LICENSE</PackageLicenseUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/reportportal/agent-net-nunit/master/Logo.png</PackageIconUrl>
   </PropertyGroup>
 
   <ItemGroup>
     <Content Include="ReportPortal.conf">
       <IncludeInPackage>true</IncludeInPackage>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
     </Content>
     <None Update="Install.ps1">
       <PackagePath>tools</PackagePath>
