@@ -5,7 +5,7 @@
     <PackageId>ReportPortal.NUnit</PackageId>
     <Version>1.0.0</Version>
     <Description>NUnit addin for reporting test results into ReportPortal</Description>
-    <Authors>Nikolay Borisenko</Authors>
+    <Authors>Nikolay Borisenko, Report Portal Community</Authors>
     <PackageTags>nunit addin reportportal testing</PackageTags>
     <PackageLicenseUrl>https://raw.githubusercontent.com/reportportal/agent-net-nunit/master/LICENSE</PackageLicenseUrl>
     <PackageIconUrl>https://raw.githubusercontent.com/reportportal/agent-net-nunit/master/Logo.png</PackageIconUrl>
