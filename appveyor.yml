@@ -2,6 +2,9 @@
 install:
   - ps: gitversion /l console /output buildserver
 
+configuration:
+  - Release
+
 dotnet_csproj:
   patch: true
   version: '$(GitVersion_NuGetVersion)'
