@@ -74,6 +74,11 @@ namespace ReportPortal.NUnitExtension
         public static event TestFinishedHandler BeforeTestFinished;
         public static event TestFinishedHandler AfterTestFinished;
 
+        public delegate void TestOutputHandler(object sender, TestItemOutputEventArgs e);
+
+        public static event TestOutputHandler BeforeTestOutput;
+        public static event TestOutputHandler AfterTestOutput;
+
         public void FinishTest(XmlDocument xmlDoc)
         {
             try
@@ -86,19 +91,44 @@ namespace ReportPortal.NUnitExtension
                 {
                     StartTest(xmlDoc);
                 }
-                
+
                 if (_testFlowIds.ContainsKey(id))
                 {
                     // adding console output
                     var outputNode = xmlDoc.SelectSingleNode("//output");
                     if (outputNode != null)
                     {
-                        _testFlowIds[id].Log(new AddLogItemRequest
+                        var outputLogRequest = new AddLogItemRequest
                         {
                             Level = LogLevel.Trace,
                             Time = DateTime.UtcNow,
                             Text = "Test Output: " + Environment.NewLine + outputNode.InnerText
-                        });
+                        };
+
+                        var outputEventArgs = new TestItemOutputEventArgs(Bridge.Service, outputLogRequest, _testFlowIds[id]);
+
+                        try
+                        {
+                            BeforeTestOutput?.Invoke(this, outputEventArgs);
+                        }
+                        catch (Exception exp)
+                        {
+                            Console.WriteLine("Exception was thrown in 'BeforeTestOutput' subscriber." + Environment.NewLine + exp);
+                        }
+
+                        if (!outputEventArgs.Canceled)
+                        {
+                            _testFlowIds[id].Log(outputLogRequest);
+
+                            try
+                            {
+                                AfterTestOutput?.Invoke(this, outputEventArgs);
+                            }
+                            catch (Exception exp)
+                            {
+                                Console.WriteLine("Exception was thrown in 'AfterTestOutput' subscriber." + Environment.NewLine + exp);
+                            }
+                        }
                     }
 
                     // adding failure message
@@ -231,16 +261,16 @@ namespace ReportPortal.NUnitExtension
                     {
 
                     }
-                    
+
                     if (logRequest != null)
                     {
                         _testFlowNames[fullTestName].Log(logRequest);
                     }
                     else
                     {
-                        _testFlowNames[fullTestName].Log(new AddLogItemRequest { Level = LogLevel.Info, Time = DateTime.UtcNow, Text = message});
+                        _testFlowNames[fullTestName].Log(new AddLogItemRequest { Level = LogLevel.Info, Time = DateTime.UtcNow, Text = message });
                     }
-                    
+
                 }
             }
             catch (Exception exception)
