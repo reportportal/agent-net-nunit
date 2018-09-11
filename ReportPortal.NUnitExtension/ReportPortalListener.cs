@@ -37,6 +37,7 @@ namespace ReportPortal.NUnitExtension
             _statusMap["Failed"] = Status.Failed;
             _statusMap["Skipped"] = Status.Skipped;
             _statusMap["Inconclusive"] = Status.Skipped;
+            _statusMap["Warning"] = Status.Failed;
         }
 
         private static Dictionary<string, Status> _statusMap = new Dictionary<string, Status>();
