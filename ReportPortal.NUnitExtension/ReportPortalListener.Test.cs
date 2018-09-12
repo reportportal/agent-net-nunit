@@ -146,7 +146,7 @@ namespace ReportPortal.NUnitExtension
                             Attach = new Client.Models.Attach
                             {
                                 Name = System.IO.Path.GetFileName(filePath),
-                                MimeType = "images/png",
+                                MimeType = Shared.MimeTypes.MimeTypeMap.GetMimeType(System.IO.Path.GetExtension(filePath)),
                                 Data = System.IO.File.ReadAllBytes(filePath)
                             }
                         });
