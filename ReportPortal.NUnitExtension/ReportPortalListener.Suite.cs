@@ -86,17 +86,22 @@ namespace ReportPortal.NUnitExtension
                 {
                     if (_suitesFlow.ContainsKey(id))
                     {
-                        var updateSuiteRequest = new UpdateTestItemRequest();
+                        // finishing suite
+                        var finishSuiteRequest = new FinishTestItemRequest
+                        {
+                            EndTime = DateTime.UtcNow,
+                            Status = _statusMap[result]
+                        };
 
                         // adding categories to suite
                         var categories = xmlDoc.SelectNodes("//properties/property[@name='Category']");
                         if (categories != null)
                         {
-                            updateSuiteRequest.Tags = new List<string>();
+                            finishSuiteRequest.Tags = new List<string>();
 
                             foreach (XmlNode category in categories)
                             {
-                                updateSuiteRequest.Tags.Add(category.Attributes["value"].Value);
+                                finishSuiteRequest.Tags.Add(category.Attributes["value"].Value);
                             }
                         }
 
@@ -104,25 +109,9 @@ namespace ReportPortal.NUnitExtension
                         var description = xmlDoc.SelectSingleNode("//properties/property[@name='Description']");
                         if (description != null)
                         {
-                            updateSuiteRequest.Description = description.Attributes["value"].Value;
+                            finishSuiteRequest.Description = description.Attributes["value"].Value;
                         }
 
-                        if (updateSuiteRequest.Description != null || updateSuiteRequest.Tags != null)
-                        {
-                            _suitesFlow[id].AdditionalTasks.Add(Task.Run(async () =>
-                            {
-                                _suitesFlow[id].StartTask.Wait();
-                                await Bridge.Service.UpdateTestItemAsync(_suitesFlow[id].TestId, updateSuiteRequest);
-                            }));
-                        }
-
-                        // finishing suite
-                        var finishSuiteRequest = new FinishTestItemRequest
-                        {
-                            EndTime = DateTime.UtcNow,
-                            Status = _statusMap[result]
-                        };
-                        
                         var eventArg = new TestItemFinishedEventArgs(Bridge.Service, finishSuiteRequest, _suitesFlow[id]);
 
                         try

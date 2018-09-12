@@ -17,7 +17,7 @@
   <ItemGroup>
     <PackageReference Include="NUnit" Version="3.5.0" />
     <PackageReference Include="NUnit.Engine.Api" Version="3.5.0" />
-    <PackageReference Include="ReportPortal.Shared" Version="2.0.4" />
+    <PackageReference Include="ReportPortal.Shared" Version="2.0.5" />
   </ItemGroup>
 
 </Project>
