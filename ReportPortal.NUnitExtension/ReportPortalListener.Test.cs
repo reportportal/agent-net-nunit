@@ -131,6 +131,27 @@ namespace ReportPortal.NUnitExtension
                         }
                     }
 
+                    // adding attachments
+                    var attachmentNodes = xmlDoc.SelectNodes("//attachments/attachment");
+                    foreach(XmlNode attachmentNode in attachmentNodes)
+                    {
+                        var filePath = attachmentNode.SelectSingleNode("./filePath").InnerText;
+                        var fileDescription = attachmentNode.SelectSingleNode("./description")?.InnerText;
+
+                        _testFlowIds[id].Log(new AddLogItemRequest
+                        {
+                            Level = LogLevel.Info,
+                            Time = DateTime.UtcNow,
+                            Text = fileDescription != null ? fileDescription : System.IO.Path.GetFileName(filePath),
+                            Attach = new Client.Models.Attach
+                            {
+                                Name = System.IO.Path.GetFileName(filePath),
+                                MimeType = "images/png",
+                                Data = System.IO.File.ReadAllBytes(filePath)
+                            }
+                        });
+                    }
+
                     // adding failure message
                     var failureNode = xmlDoc.SelectSingleNode("//failure");
                     if (failureNode != null)
