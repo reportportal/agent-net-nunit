@@ -78,11 +78,3 @@ See deatils of the customization in the [example](https://github.com/reportporta
 
 # Example
 Follow [reportportal example-net-nunit](https://github.com/reportportal/example-net-nunit) repo to see the source of test project with Report Portal integration.
-
-
-# Video tutorial
-Integration tutorial by @Kate.yurasova
-
-<a href="http://www.youtube.com/watch?feature=player_embedded&v=BsU-DjBx-DQ
-" target="_blank"><img src="http://img.youtube.com/vi/BsU-DjBx-DQ/0.jpg" 
-alt="Report Portal - Setup Integration with Nunit" width="240" height="180" border="10" /></a>
