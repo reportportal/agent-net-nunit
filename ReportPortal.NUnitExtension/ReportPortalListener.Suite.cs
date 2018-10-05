@@ -84,6 +84,11 @@ namespace ReportPortal.NUnitExtension
                 // at the end of execution nunit raises 2 the same events, we need only that which has 'parentId' xml tag
                 if (parentId != null)
                 {
+                    if(!_suitesFlow.ContainsKey(id))
+                    {
+                        StartSuite(xmlDoc);
+                    }
+
                     if (_suitesFlow.ContainsKey(id))
                     {
                         // finishing suite
