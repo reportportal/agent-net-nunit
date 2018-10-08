@@ -305,7 +305,7 @@ namespace ReportPortal.NUnitExtension
             try
             {
                 var testId = xmlDoc.SelectSingleNode("/test-message/@testid").Value;
-                var message = xmlDoc.SelectSingleNode("/test-output").InnerText;
+                var message = xmlDoc.SelectSingleNode("/test-message").InnerText;
 
                 if (_testFlowIds.ContainsKey(testId))
                 {
