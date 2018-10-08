@@ -33,19 +33,19 @@ nunit3-console.exe --list-extensions
 ```
 
 # Configuration
-NuGet package installation adds `ReportPortal.conf` file with configuration of the integration.
+Add `ReportPortal.config.json` file with configuration of the integration.
 
 Example of config file:
 ```json
 {
+  "$schema": "https://raw.githubusercontent.com/reportportal/agent-net-nunit/master/ReportPortal.NUnitExtension/ReportPortal.config.schema",
   "enabled": true,
   "server": {
     "url": "https://rp.epam.com/api/v1/",
     "project": "default_project",
     "authentication": {
       "uuid": "aa19555c-c9ce-42eb-bb11-87757225d535"
-    },
-    /* "proxy": "http://host:port" */
+    }
   },
   "launch": {
     "name": "NUnit 3 Demo Launch",
@@ -55,7 +55,6 @@ Example of config file:
   }
 }
 ```
-Proxy element is optional.
 
 # Customization
 
