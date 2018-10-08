@@ -81,6 +81,11 @@ namespace ReportPortal.NUnitExtension
                 {
                     TestOutput(xmlDoc);
                 }
+
+                else if (xmlDoc.SelectSingleNode("/test-message") != null)
+                {
+                    TestMessage(xmlDoc);
+                }
             }
         }
     }

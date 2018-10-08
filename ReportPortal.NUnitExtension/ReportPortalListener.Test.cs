@@ -299,5 +299,57 @@ namespace ReportPortal.NUnitExtension
                 Console.WriteLine("ReportPortal exception was thrown." + Environment.NewLine + exception);
             }
         }
+
+        public void TestMessage(XmlDocument xmlDoc)
+        {
+            try
+            {
+                var testId = xmlDoc.SelectSingleNode("/test-message/@testid").Value;
+                var message = xmlDoc.SelectSingleNode("/test-output").InnerText;
+
+                if (_testFlowIds.ContainsKey(testId))
+                {
+                    AddLogItemRequest logRequest = null;
+                    try
+                    {
+                        var sharedMessage = ModelSerializer.Deserialize<SharedLogMessage>(message);
+
+                        logRequest = new AddLogItemRequest
+                        {
+                            Level = sharedMessage.Level,
+                            Time = sharedMessage.Time,
+                            TestItemId = sharedMessage.TestItemId,
+                            Text = sharedMessage.Text
+                        };
+                        if (sharedMessage.Attach != null)
+                        {
+                            logRequest.Attach = new Client.Models.Attach
+                            {
+                                Name = sharedMessage.Attach.Name,
+                                MimeType = sharedMessage.Attach.MimeType,
+                                Data = sharedMessage.Attach.Data
+                            };
+                        }
+                    }
+                    catch (Exception)
+                    {
+
+                    }
+
+                    if (logRequest != null)
+                    {
+                        _testFlowIds[testId].Log(logRequest);
+                    }
+                    else
+                    {
+                        _testFlowIds[testId].Log(new AddLogItemRequest { Level = LogLevel.Info, Time = DateTime.UtcNow, Text = message });
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine("ReportPortal exception was thrown." + Environment.NewLine + exception);
+            }
+        }
     }
 }
