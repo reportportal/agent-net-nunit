@@ -1,0 +1,133 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$id": "http://example.com/root.json",
+  "type": "object",
+  "title": "The Root Schema",
+  "required": [
+    "enabled",
+    "server",
+    "launch"
+  ],
+  "properties": {
+    "enabled": {
+      "$id": "#/properties/enabled",
+      "type": "boolean",
+      "title": "The Enabled Schema",
+      "default": true,
+      "examples": [
+        true
+      ]
+    },
+    "server": {
+      "$id": "#/properties/server",
+      "type": "object",
+      "title": "The Server Schema",
+      "required": [
+        "url",
+        "project",
+        "authentication"
+      ],
+      "properties": {
+        "url": {
+          "$id": "#/properties/server/properties/url",
+          "type": "string",
+          "title": "The Url Schema",
+          "default": "",
+          "examples": [
+            "https://rp.epam.com/api/v1/"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "project": {
+          "$id": "#/properties/server/properties/project",
+          "type": "string",
+          "title": "The Project Schema",
+          "default": "",
+          "examples": [
+            "default_project"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "authentication": {
+          "$id": "#/properties/server/properties/authentication",
+          "type": "object",
+          "title": "The Authentication Schema",
+          "required": [
+            "uuid"
+          ],
+          "properties": {
+            "uuid": {
+              "$id": "#/properties/server/properties/authentication/properties/uuid",
+              "type": "string",
+              "title": "The Uuid Schema",
+              "default": "",
+              "examples": [
+                "aa19555c-c9ce-42eb-bb11-87757225d535"
+              ],
+              "pattern": "^(.*)$"
+            }
+          }
+        }
+      }
+    },
+    "launch": {
+      "$id": "#/properties/launch",
+      "type": "object",
+      "title": "The Launch Schema",
+      "required": [
+        "name",
+        "description",
+        "debugMode",
+        "tags"
+      ],
+      "properties": {
+        "name": {
+          "$id": "#/properties/launch/properties/name",
+          "type": "string",
+          "title": "The Name Schema",
+          "default": "",
+          "examples": [
+            "NUnit 3 Demo Launch"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "description": {
+          "$id": "#/properties/launch/properties/description",
+          "type": "string",
+          "title": "The Description Schema",
+          "default": "",
+          "examples": [
+            "this is description"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "debugMode": {
+          "$id": "#/properties/launch/properties/debugMode",
+          "type": "boolean",
+          "title": "The Debugmode Schema",
+          "default": false,
+          "examples": [
+            true
+          ]
+        },
+        "tags": {
+          "$id": "#/properties/launch/properties/tags",
+          "type": "array",
+          "title": "The Tags Schema",
+          "items": {
+            "$id": "#/properties/launch/properties/tags/items",
+            "type": "string",
+            "title": "The Items Schema",
+            "default": "",
+            "examples": [
+              "t1",
+              "t2"
+            ],
+            "pattern": "^(.*)$"
+          }
+        }
+      }
+    }
+  }
+}

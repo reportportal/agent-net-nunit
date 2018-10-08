@@ -9,24 +9,15 @@
     <PackageTags>nunit addin reportportal testing</PackageTags>
     <PackageLicenseUrl>https://raw.githubusercontent.com/reportportal/agent-net-nunit/master/LICENSE</PackageLicenseUrl>
     <PackageIconUrl>https://raw.githubusercontent.com/reportportal/agent-net-nunit/master/Logo.png</PackageIconUrl>
+
+    <RepositoryType>GitHub</RepositoryType>
+    <RepositoryUrl>https://github.com/reportportal/agent-net-nunit</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="ReportPortal.conf">
-      <IncludeInPackage>true</IncludeInPackage>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <PackageCopyToOutput>true</PackageCopyToOutput>
-    </Content>
-    <None Update="Install.ps1">
-      <PackagePath>tools</PackagePath>
-      <Pack>true</Pack>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="NUnit" Version="3.5.0" />
-    <PackageReference Include="NUnit.Engine.Api" Version="3.5.0" />
-    <PackageReference Include="ReportPortal.Shared" Version="2.0.5" />
+    <PackageReference Include="NUnit" Version="3.11.0" />
+    <PackageReference Include="NUnit.Engine.Api" Version="3.9.0" />
+    <PackageReference Include="ReportPortal.Shared" Version="2.0.6" />
   </ItemGroup>
 
 </Project>

@@ -35,7 +35,8 @@ namespace ReportPortal.NUnitExtension
                 };
             }
 
-            NUnit.Framework.TestContext.Progress.WriteLine(ModelSerializer.Serialize<SharedLogMessage>(sharedMessage));
+            NUnit.Framework.Internal.TestExecutionContext.CurrentContext.SendMessage("ReportPortal", ModelSerializer.Serialize<SharedLogMessage>(sharedMessage));
+
             Handled = true;
         }
     }

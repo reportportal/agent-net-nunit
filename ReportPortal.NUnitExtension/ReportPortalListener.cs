@@ -3,7 +3,6 @@ using NUnit.Engine.Extensibility;
 using ReportPortal.Client;
 using ReportPortal.Client.Models;
 using ReportPortal.NUnitExtension.Configuration;
-using ReportPortal.NUnitExtension.EventArguments;
 using ReportPortal.Shared;
 using System;
 using System.Collections.Generic;
@@ -18,7 +17,7 @@ namespace ReportPortal.NUnitExtension
     {
         static ReportPortalListener()
         {
-            var configPath = Path.GetDirectoryName(new Uri(typeof(Config).Assembly.CodeBase).LocalPath) + "/ReportPortal.conf";
+            var configPath = Path.GetDirectoryName(new Uri(typeof(Config).Assembly.CodeBase).LocalPath) + "/ReportPortal.config.json";
             Config = Client.Converters.ModelSerializer.Deserialize<Config>(File.ReadAllText(configPath));
 
             Service rpService;
@@ -81,6 +80,11 @@ namespace ReportPortal.NUnitExtension
                 else if (xmlDoc.SelectSingleNode("/test-output") != null)
                 {
                     TestOutput(xmlDoc);
+                }
+
+                else if (xmlDoc.SelectSingleNode("/test-message") != null)
+                {
+                    TestMessage(xmlDoc);
                 }
             }
         }
