@@ -5,6 +5,7 @@ using ReportPortal.NUnitExtension.EventArguments;
 using ReportPortal.Shared;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
 
@@ -26,9 +27,11 @@ namespace ReportPortal.NUnitExtension
                 var name = xmlDoc.SelectSingleNode("/*/@name").Value;
                 var fullname = xmlDoc.SelectSingleNode("/*/@fullname").Value;
 
+                var startTime = DateTime.UtcNow;
+
                 var startTestRequest = new StartTestItemRequest
                 {
-                    StartTime = DateTime.UtcNow,
+                    StartTime = startTime,
                     Name = name,
                     Type = TestItemType.Step
                 };
@@ -45,16 +48,14 @@ namespace ReportPortal.NUnitExtension
                 }
                 if (!beforeTestEventArg.Canceled)
                 {
-                    var test = _suitesFlow[parentId].StartNewTestNode(startTestRequest);
+                    var testReporter = _flowItems[parentId].Reporter.StartNewTestNode(startTestRequest);
 
-                    _testFlowIds[id] = test;
-
-                    _testFlowNames[fullname] = test;
+                    _flowItems[id] = new FlowItemInfo(FlowItemInfo.FlowType.Test, fullname, testReporter, startTime);
 
                     try
                     {
                         if (AfterTestStarted != null)
-                            AfterTestStarted(this, new TestItemStartedEventArgs(Bridge.Service, startTestRequest, test));
+                            AfterTestStarted(this, new TestItemStartedEventArgs(Bridge.Service, startTestRequest, testReporter));
                     }
                     catch (Exception exp)
                     {
@@ -86,13 +87,14 @@ namespace ReportPortal.NUnitExtension
                 var id = xmlDoc.SelectSingleNode("/*/@id").Value;
                 var result = xmlDoc.SelectSingleNode("/*/@result").Value;
                 var parentId = xmlDoc.SelectSingleNode("/*/@parentId");
+                var duration = float.Parse(xmlDoc.SelectSingleNode("/*/@duration").Value);
 
-                if (!_testFlowIds.ContainsKey(id))
+                if (!_flowItems.ContainsKey(id))
                 {
                     StartTest(xmlDoc);
                 }
 
-                if (_testFlowIds.ContainsKey(id))
+                if (_flowItems.ContainsKey(id))
                 {
                     // adding console output
                     var outputNode = xmlDoc.SelectSingleNode("//output");
@@ -105,7 +107,7 @@ namespace ReportPortal.NUnitExtension
                             Text = "Test Output: " + Environment.NewLine + outputNode.InnerText
                         };
 
-                        var outputEventArgs = new TestItemOutputEventArgs(Bridge.Service, outputLogRequest, _testFlowIds[id]);
+                        var outputEventArgs = new TestItemOutputEventArgs(Bridge.Service, outputLogRequest, _flowItems[id].Reporter);
 
                         try
                         {
@@ -118,7 +120,7 @@ namespace ReportPortal.NUnitExtension
 
                         if (!outputEventArgs.Canceled)
                         {
-                            _testFlowIds[id].Log(outputLogRequest);
+                            _flowItems[id].Reporter.Log(outputLogRequest);
 
                             try
                             {
@@ -133,12 +135,12 @@ namespace ReportPortal.NUnitExtension
 
                     // adding attachments
                     var attachmentNodes = xmlDoc.SelectNodes("//attachments/attachment");
-                    foreach(XmlNode attachmentNode in attachmentNodes)
+                    foreach (XmlNode attachmentNode in attachmentNodes)
                     {
                         var filePath = attachmentNode.SelectSingleNode("./filePath").InnerText;
                         var fileDescription = attachmentNode.SelectSingleNode("./description")?.InnerText;
 
-                        _testFlowIds[id].Log(new AddLogItemRequest
+                        _flowItems[id].Reporter.Log(new AddLogItemRequest
                         {
                             Level = LogLevel.Info,
                             Time = DateTime.UtcNow,
@@ -159,7 +161,7 @@ namespace ReportPortal.NUnitExtension
                         var failureMessage = failureNode.SelectSingleNode("./message").InnerText;
                         var failureStacktrace = failureNode.SelectSingleNode("./stack-trace")?.InnerText;
 
-                        _testFlowIds[id].Log(new AddLogItemRequest
+                        _flowItems[id].Reporter.Log(new AddLogItemRequest
                         {
                             Level = LogLevel.Error,
                             Time = DateTime.UtcNow,
@@ -173,7 +175,7 @@ namespace ReportPortal.NUnitExtension
                     {
                         var reasonMessage = reasonNode.SelectSingleNode("./message").InnerText;
 
-                        _testFlowIds[id].Log(new AddLogItemRequest
+                        _flowItems[id].Reporter.Log(new AddLogItemRequest
                         {
                             Level = LogLevel.Error,
                             Time = DateTime.UtcNow,
@@ -184,7 +186,7 @@ namespace ReportPortal.NUnitExtension
                     // finishing test
                     var finishTestRequest = new FinishTestItemRequest
                     {
-                        EndTime = DateTime.UtcNow,
+                        EndTime = _flowItems[id].StartTime.AddMilliseconds(duration),
                         Status = _statusMap[result]
                     };
 
@@ -213,30 +215,26 @@ namespace ReportPortal.NUnitExtension
                         finishTestRequest.IsRetry = true;
                     }
 
-                    var eventArg = new TestItemFinishedEventArgs(Bridge.Service, finishTestRequest, _testFlowIds[id]);
+                    var eventArg = new TestItemFinishedEventArgs(Bridge.Service, finishTestRequest, _flowItems[id].Reporter);
 
                     try
                     {
-                        if (BeforeTestFinished != null) BeforeTestFinished(this, eventArg);
+                        BeforeTestFinished?.Invoke(this, eventArg);
                     }
                     catch (Exception exp)
                     {
-                        Console.WriteLine("Exception was thrown in 'BeforeTestFinished' subscriber." +
-                                          Environment.NewLine + exp);
+                        Console.WriteLine("Exception was thrown in 'BeforeTestFinished' subscriber." + Environment.NewLine + exp);
                     }
 
-                    _testFlowIds[id].Finish(finishTestRequest);
+                    _flowItems[id].Reporter.Finish(finishTestRequest);
 
                     try
                     {
-                        if (AfterTestFinished != null)
-                            AfterTestFinished(this,
-                                new TestItemFinishedEventArgs(Bridge.Service, finishTestRequest, _testFlowIds[id]));
+                        AfterTestFinished?.Invoke(this, new TestItemFinishedEventArgs(Bridge.Service, finishTestRequest, _flowItems[id].Reporter));
                     }
                     catch (Exception exp)
                     {
-                        Console.WriteLine("Exception was thrown in 'AfterTestFinished' subscriber." +
-                                          Environment.NewLine + exp);
+                        Console.WriteLine("Exception was thrown in 'AfterTestFinished' subscriber." + Environment.NewLine + exp);
                     }
                 }
 
@@ -254,7 +252,9 @@ namespace ReportPortal.NUnitExtension
                 var fullTestName = xmlDoc.SelectSingleNode("/test-output/@testname").Value;
                 var message = xmlDoc.SelectSingleNode("/test-output").InnerText;
 
-                if (_testFlowNames.ContainsKey(fullTestName))
+                var flowItem = _flowItems.Values.FirstOrDefault(fi => fi.FullName == fullTestName);
+
+                if (flowItem != null)
                 {
                     AddLogItemRequest logRequest = null;
                     try
@@ -285,11 +285,11 @@ namespace ReportPortal.NUnitExtension
 
                     if (logRequest != null)
                     {
-                        _testFlowNames[fullTestName].Log(logRequest);
+                        flowItem.Reporter.Log(logRequest);
                     }
                     else
                     {
-                        _testFlowNames[fullTestName].Log(new AddLogItemRequest { Level = LogLevel.Info, Time = DateTime.UtcNow, Text = message });
+                        flowItem.Reporter.Log(new AddLogItemRequest { Level = LogLevel.Info, Time = DateTime.UtcNow, Text = message });
                     }
 
                 }
@@ -307,7 +307,7 @@ namespace ReportPortal.NUnitExtension
                 var testId = xmlDoc.SelectSingleNode("/test-message/@testid").Value;
                 var message = xmlDoc.SelectSingleNode("/test-message").InnerText;
 
-                if (_testFlowIds.ContainsKey(testId))
+                if (_flowItems.ContainsKey(testId))
                 {
                     AddLogItemRequest logRequest = null;
                     try
@@ -338,11 +338,11 @@ namespace ReportPortal.NUnitExtension
 
                     if (logRequest != null)
                     {
-                        _testFlowIds[testId].Log(logRequest);
+                        _flowItems[testId].Reporter.Log(logRequest);
                     }
                     else
                     {
-                        _testFlowIds[testId].Log(new AddLogItemRequest { Level = LogLevel.Info, Time = DateTime.UtcNow, Text = message });
+                        _flowItems[testId].Reporter.Log(new AddLogItemRequest { Level = LogLevel.Info, Time = DateTime.UtcNow, Text = message });
                     }
                 }
             }

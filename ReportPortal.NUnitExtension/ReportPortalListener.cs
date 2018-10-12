@@ -41,9 +41,7 @@ namespace ReportPortal.NUnitExtension
 
         private static Dictionary<string, Status> _statusMap = new Dictionary<string, Status>();
 
-        private Dictionary<string, TestReporter> _suitesFlow = new Dictionary<string, TestReporter>();
-        private Dictionary<string, TestReporter> _testFlowIds = new Dictionary<string, TestReporter>();
-        private Dictionary<string, TestReporter> _testFlowNames = new Dictionary<string, TestReporter>();
+        private Dictionary<string, FlowItemInfo> _flowItems = new Dictionary<string, FlowItemInfo>();
 
         public static Config Config { get; private set; }
 
@@ -86,6 +84,31 @@ namespace ReportPortal.NUnitExtension
                 {
                     TestMessage(xmlDoc);
                 }
+            }
+        }
+
+        internal class FlowItemInfo
+        {
+            public FlowItemInfo(FlowType flowType, string fullName, TestReporter reporter, DateTime startTime)
+            {
+                FlowItemType = flowType;
+                FullName = fullName;
+                Reporter = reporter;
+                StartTime = startTime;
+            }
+
+            public FlowType FlowItemType { get; private set; }
+
+            public string FullName { get; private set; }
+
+            public TestReporter Reporter { get; private set; }
+
+            public DateTime StartTime { get; private set; }
+
+            internal enum FlowType
+            {
+                Suite,
+                Test
             }
         }
     }

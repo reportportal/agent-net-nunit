@@ -40,7 +40,7 @@ namespace ReportPortal.NUnitExtension
 
                 try
                 {
-                    if (BeforeRunStarted != null) BeforeRunStarted(this, eventArg);
+                    BeforeRunStarted?.Invoke(this, eventArg);
                 }
                 catch (Exception exp)
                 {
@@ -54,7 +54,7 @@ namespace ReportPortal.NUnitExtension
 
                     try
                     {
-                        if (AfterRunStarted != null) AfterRunStarted(this, new RunStartedEventArgs(Bridge.Service, startLaunchRequest, Bridge.Context.LaunchReporter));
+                        AfterRunStarted?.Invoke(this, new RunStartedEventArgs(Bridge.Service, startLaunchRequest, Bridge.Context.LaunchReporter));
                     }
                     catch (Exception exp)
                     {
@@ -85,7 +85,7 @@ namespace ReportPortal.NUnitExtension
                 var eventArg = new RunFinishedEventArgs(Bridge.Service, finishLaunchRequest, Bridge.Context.LaunchReporter);
                 try
                 {
-                    if (BeforeRunFinished != null) BeforeRunFinished(this, eventArg);
+                    BeforeRunFinished?.Invoke(this, eventArg);
                 }
                 catch (Exception exp)
                 {
@@ -104,7 +104,7 @@ namespace ReportPortal.NUnitExtension
 
                     try
                     {
-                        if (AfterRunFinished != null) AfterRunFinished(this, new RunFinishedEventArgs(Bridge.Service, finishLaunchRequest, Bridge.Context.LaunchReporter));
+                        AfterRunFinished?.Invoke(this, new RunFinishedEventArgs(Bridge.Service, finishLaunchRequest, Bridge.Context.LaunchReporter));
                     }
                     catch (Exception exp)
                     {
