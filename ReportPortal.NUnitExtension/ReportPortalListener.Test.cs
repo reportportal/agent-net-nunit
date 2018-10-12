@@ -249,12 +249,10 @@ namespace ReportPortal.NUnitExtension
         {
             try
             {
-                var fullTestName = xmlDoc.SelectSingleNode("/test-output/@testname").Value;
+                var id = xmlDoc.SelectSingleNode("/test-output/@testid").Value;
                 var message = xmlDoc.SelectSingleNode("/test-output").InnerText;
 
-                var flowItem = _flowItems.Values.FirstOrDefault(fi => fi.FullName == fullTestName);
-
-                if (flowItem != null)
+                if (_flowItems.ContainsKey(id))
                 {
                     AddLogItemRequest logRequest = null;
                     try
@@ -285,11 +283,11 @@ namespace ReportPortal.NUnitExtension
 
                     if (logRequest != null)
                     {
-                        flowItem.Reporter.Log(logRequest);
+                        _flowItems[id].Reporter.Log(logRequest);
                     }
                     else
                     {
-                        flowItem.Reporter.Log(new AddLogItemRequest { Level = LogLevel.Info, Time = DateTime.UtcNow, Text = message });
+                        _flowItems[id].Reporter.Log(new AddLogItemRequest { Level = LogLevel.Info, Time = DateTime.UtcNow, Text = message });
                     }
 
                 }
