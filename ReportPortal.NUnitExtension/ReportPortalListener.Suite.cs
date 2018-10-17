@@ -82,7 +82,7 @@ namespace ReportPortal.NUnitExtension
                 var id = xmlDoc.SelectSingleNode("/*/@id").Value;
                 var result = xmlDoc.SelectSingleNode("/*/@result").Value;
                 var parentId = xmlDoc.SelectSingleNode("/*/@parentId");
-                var duration = float.Parse(xmlDoc.SelectSingleNode("/*/@duration").Value);
+                var duration = float.Parse(xmlDoc.SelectSingleNode("/*/@duration").Value, System.Globalization.CultureInfo.InvariantCulture);
 
                 // at the end of execution nunit raises 2 the same events, we need only that which has 'parentId' xml tag
                 if (parentId != null)

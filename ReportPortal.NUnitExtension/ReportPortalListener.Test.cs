@@ -87,7 +87,7 @@ namespace ReportPortal.NUnitExtension
                 var id = xmlDoc.SelectSingleNode("/*/@id").Value;
                 var result = xmlDoc.SelectSingleNode("/*/@result").Value;
                 var parentId = xmlDoc.SelectSingleNode("/*/@parentId");
-                var duration = float.Parse(xmlDoc.SelectSingleNode("/*/@duration").Value);
+                var duration = float.Parse(xmlDoc.SelectSingleNode("/*/@duration").Value, System.Globalization.CultureInfo.InvariantCulture);
 
                 if (!_flowItems.ContainsKey(id))
                 {
