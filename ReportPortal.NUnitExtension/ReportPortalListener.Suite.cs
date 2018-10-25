@@ -120,7 +120,7 @@ namespace ReportPortal.NUnitExtension
                             finishSuiteRequest.Description = description.Attributes["value"].Value;
                         }
 
-                        var eventArg = new TestItemFinishedEventArgs(Bridge.Service, finishSuiteRequest, _flowItems[id].Reporter);
+                        var eventArg = new TestItemFinishedEventArgs(Bridge.Service, finishSuiteRequest, _flowItems[id].Reporter, xmlDoc.OuterXml);
 
                         try
                         {
@@ -135,7 +135,7 @@ namespace ReportPortal.NUnitExtension
 
                         try
                         {
-                            AfterSuiteFinished?.Invoke(this, new TestItemFinishedEventArgs(Bridge.Service, finishSuiteRequest, _flowItems[id].Reporter));
+                            AfterSuiteFinished?.Invoke(this, new TestItemFinishedEventArgs(Bridge.Service, finishSuiteRequest, _flowItems[id].Reporter, xmlDoc.OuterXml));
                         }
                         catch (Exception exp)
                         {

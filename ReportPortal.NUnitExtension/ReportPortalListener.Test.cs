@@ -215,7 +215,7 @@ namespace ReportPortal.NUnitExtension
                         finishTestRequest.IsRetry = true;
                     }
 
-                    var eventArg = new TestItemFinishedEventArgs(Bridge.Service, finishTestRequest, _flowItems[id].Reporter);
+                    var eventArg = new TestItemFinishedEventArgs(Bridge.Service, finishTestRequest, _flowItems[id].Reporter, xmlDoc.OuterXml);
 
                     try
                     {
@@ -230,7 +230,7 @@ namespace ReportPortal.NUnitExtension
 
                     try
                     {
-                        AfterTestFinished?.Invoke(this, new TestItemFinishedEventArgs(Bridge.Service, finishTestRequest, _flowItems[id].Reporter));
+                        AfterTestFinished?.Invoke(this, new TestItemFinishedEventArgs(Bridge.Service, finishTestRequest, _flowItems[id].Reporter, xmlDoc.OuterXml));
                     }
                     catch (Exception exp)
                     {
