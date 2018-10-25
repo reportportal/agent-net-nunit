@@ -9,6 +9,7 @@
     <PackageTags>nunit addin reportportal testing</PackageTags>
     <PackageLicenseUrl>https://raw.githubusercontent.com/reportportal/agent-net-nunit/master/LICENSE</PackageLicenseUrl>
     <PackageIconUrl>https://raw.githubusercontent.com/reportportal/agent-net-nunit/master/Logo.png</PackageIconUrl>
+    <PackageProjectUrl>http://reportportal.io</PackageProjectUrl>
 
     <RepositoryType>GitHub</RepositoryType>
     <RepositoryUrl>https://github.com/reportportal/agent-net-nunit</RepositoryUrl>
