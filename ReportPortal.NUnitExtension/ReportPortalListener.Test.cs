@@ -215,17 +215,7 @@ namespace ReportPortal.NUnitExtension
                         finishTestRequest.IsRetry = true;
                     }
 
-                    var properties = new Dictionary<string, string>();
-                    var propertiesNodes = xmlDoc.SelectNodes("//properties/property");
-                    if (propertiesNodes != null)
-                    {
-                        foreach (XmlNode propertyNode in propertiesNodes)
-                        {
-                            properties.Add(propertyNode.Attributes["name"].Value, propertyNode.Attributes["value"].Value);
-                        }
-                    }
-
-                    var eventArg = new TestItemFinishedEventArgs(Bridge.Service, finishTestRequest, _flowItems[id].Reporter, properties);
+                    var eventArg = new TestItemFinishedEventArgs(Bridge.Service, finishTestRequest, _flowItems[id].Reporter, xmlDoc.InnerXml);
 
                     try
                     {
@@ -240,7 +230,7 @@ namespace ReportPortal.NUnitExtension
 
                     try
                     {
-                        AfterTestFinished?.Invoke(this, new TestItemFinishedEventArgs(Bridge.Service, finishTestRequest, _flowItems[id].Reporter, properties));
+                        AfterTestFinished?.Invoke(this, new TestItemFinishedEventArgs(Bridge.Service, finishTestRequest, _flowItems[id].Reporter, xmlDoc.InnerXml));
                     }
                     catch (Exception exp)
                     {

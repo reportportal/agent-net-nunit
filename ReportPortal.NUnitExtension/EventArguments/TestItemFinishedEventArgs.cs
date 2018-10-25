@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Xml;
 using ReportPortal.Client;
 using ReportPortal.Client.Requests;
 using ReportPortal.Shared;
@@ -8,12 +9,12 @@ namespace ReportPortal.NUnitExtension.EventArguments
 {
     public class TestItemFinishedEventArgs : EventArgs
     {
-        public TestItemFinishedEventArgs(Service service, FinishTestItemRequest request, TestReporter testReporter, Dictionary<string, string> properties)
+        public TestItemFinishedEventArgs(Service service, FinishTestItemRequest request, TestReporter testReporter, string report)
         {
             Service = service;
             TestItem = request;
             TestReporter = testReporter;
-            Properties = properties;
+            Report = report;
         }
 
         public Service Service { get; }
@@ -22,7 +23,7 @@ namespace ReportPortal.NUnitExtension.EventArguments
         
         public TestReporter TestReporter { get; }
 
-        public Dictionary<string, string> Properties { get; }
+        public string Report { get; }
 
         public bool Canceled { get; set; }
     }

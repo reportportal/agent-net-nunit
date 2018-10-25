@@ -120,17 +120,7 @@ namespace ReportPortal.NUnitExtension
                             finishSuiteRequest.Description = description.Attributes["value"].Value;
                         }
 
-                        var properties = new Dictionary<string, string>();
-                        var propertiesNodes = xmlDoc.SelectNodes("//properties/property");
-                        if (propertiesNodes != null)
-                        {
-                            foreach (XmlNode propertyNode in propertiesNodes)
-                            {
-                                properties.Add(propertyNode.Attributes["name"].Value, propertyNode.Attributes["value"].Value);
-                            }
-                        }
-
-                        var eventArg = new TestItemFinishedEventArgs(Bridge.Service, finishSuiteRequest, _flowItems[id].Reporter, properties);
+                        var eventArg = new TestItemFinishedEventArgs(Bridge.Service, finishSuiteRequest, _flowItems[id].Reporter, xmlDoc.InnerXml);
 
                         try
                         {
@@ -145,7 +135,7 @@ namespace ReportPortal.NUnitExtension
 
                         try
                         {
-                            AfterSuiteFinished?.Invoke(this, new TestItemFinishedEventArgs(Bridge.Service, finishSuiteRequest, _flowItems[id].Reporter, properties));
+                            AfterSuiteFinished?.Invoke(this, new TestItemFinishedEventArgs(Bridge.Service, finishSuiteRequest, _flowItems[id].Reporter, xmlDoc.InnerXml));
                         }
                         catch (Exception exp)
                         {
