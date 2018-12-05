@@ -11,6 +11,7 @@
   ],
   "properties": {
     "enabled": {
+      "description":"enable/disable integration",
       "$id": "#/properties/enabled",
       "type": "boolean",
       "title": "The Enabled Schema",
@@ -30,6 +31,7 @@
       ],
       "properties": {
         "url": {
+          "description":"url to report portal api",
           "$id": "#/properties/server/properties/url",
           "type": "string",
           "title": "The Url Schema",
@@ -40,6 +42,7 @@
           "pattern": "^(.*)$"
         },
         "project": {
+          "description":"the name of project in reportportal",
           "$id": "#/properties/server/properties/project",
           "type": "string",
           "title": "The Project Schema",
@@ -58,6 +61,7 @@
           ],
           "properties": {
             "uuid": {
+               "description":"user identifier to access the reportportal",
               "$id": "#/properties/server/properties/authentication/properties/uuid",
               "type": "string",
               "title": "The Uuid Schema",
@@ -83,6 +87,7 @@
       ],
       "properties": {
         "name": {
+          "description":"the name of launch in reportportal",
           "$id": "#/properties/launch/properties/name",
           "type": "string",
           "title": "The Name Schema",
@@ -93,6 +98,7 @@
           "pattern": "^(.*)$"
         },
         "description": {
+          "description":"the description of launch in reportportal",
           "$id": "#/properties/launch/properties/description",
           "type": "string",
           "title": "The Description Schema",
@@ -103,6 +109,7 @@
           "pattern": "^(.*)$"
         },
         "debugMode": {
+          "description":"enable/disable debug mode",
           "$id": "#/properties/launch/properties/debugMode",
           "type": "boolean",
           "title": "The Debugmode Schema",
@@ -112,6 +119,7 @@
           ]
         },
         "tags": {
+          "description":"the list of tags for a launch",
           "$id": "#/properties/launch/properties/tags",
           "type": "array",
           "title": "The Tags Schema",
