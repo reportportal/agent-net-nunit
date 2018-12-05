@@ -61,7 +61,7 @@
           ],
           "properties": {
             "uuid": {
-               "description":"user identifier to access the reportportal",
+              "description":"user identifier to access the reportportal",
               "$id": "#/properties/server/properties/authentication/properties/uuid",
               "type": "string",
               "title": "The Uuid Schema",
