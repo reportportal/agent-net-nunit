@@ -2,6 +2,7 @@
 using ReportPortal.Client;
 using ReportPortal.Client.Requests;
 using ReportPortal.Shared;
+using ReportPortal.Shared.Reporter;
 
 namespace ReportPortal.NUnitExtension.EventArguments
 {
@@ -10,19 +11,19 @@ namespace ReportPortal.NUnitExtension.EventArguments
         public TestItemStartedEventArgs(Service service, StartTestItemRequest request)
         {
             Service = service;
-            TestItem = request;
+            StartTestItemRequest = request;
         }
 
-        public TestItemStartedEventArgs(Service service, StartTestItemRequest request, TestReporter testReporter) : this(service, request)
+        public TestItemStartedEventArgs(Service service, StartTestItemRequest request, ITestReporter testReporter) : this(service, request)
         {
             TestReporter = testReporter;
         }
 
         public Service Service { get; }
 
-        public StartTestItemRequest TestItem { get; }
+        public StartTestItemRequest StartTestItemRequest { get; }
 
-        public TestReporter TestReporter { get; set; }
+        public ITestReporter TestReporter { get; set; }
 
         public bool Canceled { get; set; }
     }

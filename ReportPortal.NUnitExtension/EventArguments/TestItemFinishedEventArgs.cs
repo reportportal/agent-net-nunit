@@ -1,27 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Xml;
 using ReportPortal.Client;
 using ReportPortal.Client.Requests;
-using ReportPortal.Shared;
+using ReportPortal.Shared.Reporter;
 
 namespace ReportPortal.NUnitExtension.EventArguments
 {
     public class TestItemFinishedEventArgs : EventArgs
     {
-        public TestItemFinishedEventArgs(Service service, FinishTestItemRequest request, TestReporter testReporter, string report)
+        public TestItemFinishedEventArgs(Service service, FinishTestItemRequest request, ITestReporter testReporter, string report)
         {
             Service = service;
-            TestItem = request;
+            FinishTestItemRequest = request;
             TestReporter = testReporter;
             Report = report;
         }
 
         public Service Service { get; }
 
-        public FinishTestItemRequest TestItem { get; }
+        public FinishTestItemRequest FinishTestItemRequest { get; }
         
-        public TestReporter TestReporter { get; }
+        public ITestReporter TestReporter { get; }
 
         public string Report { get; }
 

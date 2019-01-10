@@ -1,7 +1,7 @@
 ﻿using System;
 using ReportPortal.Client;
 using ReportPortal.Client.Requests;
-using ReportPortal.Shared;
+using ReportPortal.Shared.Reporter;
 
 namespace ReportPortal.NUnitExtension.EventArguments
 {
@@ -10,19 +10,19 @@ namespace ReportPortal.NUnitExtension.EventArguments
         public RunStartedEventArgs(Service service, StartLaunchRequest request)
         {
             Service = service;
-            Launch = request;
+            StartLaunchRequest = request;
         }
 
-        public RunStartedEventArgs(Service service, StartLaunchRequest request, LaunchReporter launchReporter) : this(service, request)
+        public RunStartedEventArgs(Service service, StartLaunchRequest request, ILaunchReporter launchReporter) : this(service, request)
         {
             LaunchReporter = launchReporter;
         }
 
         public Service Service { get; }
 
-        public StartLaunchRequest Launch { get; }
+        public StartLaunchRequest StartLaunchRequest { get; }
 
-        public LaunchReporter LaunchReporter { get; }
+        public ILaunchReporter LaunchReporter { get; }
 
         public bool Canceled { get; set; }
     }

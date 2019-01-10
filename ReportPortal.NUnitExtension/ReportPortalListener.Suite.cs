@@ -2,6 +2,7 @@
 using ReportPortal.Client.Requests;
 using ReportPortal.NUnitExtension.EventArguments;
 using ReportPortal.Shared;
+using ReportPortal.Shared.Reporter;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -43,14 +44,14 @@ namespace ReportPortal.NUnitExtension
                 }
                 if (!beforeSuiteEventArg.Canceled)
                 {
-                    TestReporter suiteReporter;
+                    ITestReporter suiteReporter;
                     if (string.IsNullOrEmpty(parentId) || !_flowItems.ContainsKey(parentId))
                     {
-                        suiteReporter = Bridge.Context.LaunchReporter.StartNewTestNode(startSuiteRequest);
+                        suiteReporter = Bridge.Context.LaunchReporter.StartChildTestReporter(startSuiteRequest);
                     }
                     else
                     {
-                        suiteReporter = _flowItems[parentId].Reporter.StartNewTestNode(startSuiteRequest);
+                        suiteReporter = _flowItems[parentId].TestReporter.StartChildTestReporter(startSuiteRequest);
                     }
 
                     _flowItems[id] = new FlowItemInfo(FlowItemInfo.FlowType.Suite, name, suiteReporter, startTime);
@@ -120,7 +121,7 @@ namespace ReportPortal.NUnitExtension
                             finishSuiteRequest.Description = description.Attributes["value"].Value;
                         }
 
-                        var eventArg = new TestItemFinishedEventArgs(Bridge.Service, finishSuiteRequest, _flowItems[id].Reporter, xmlDoc.OuterXml);
+                        var eventArg = new TestItemFinishedEventArgs(Bridge.Service, finishSuiteRequest, _flowItems[id].TestReporter, xmlDoc.OuterXml);
 
                         try
                         {
@@ -131,11 +132,11 @@ namespace ReportPortal.NUnitExtension
                             Console.WriteLine("Exception was thrown in 'BeforeSuiteFinished' subscriber." + Environment.NewLine + exp);
                         }
 
-                        _flowItems[id].Reporter.Finish(finishSuiteRequest);
+                        _flowItems[id].TestReporter.Finish(finishSuiteRequest);
 
                         try
                         {
-                            AfterSuiteFinished?.Invoke(this, new TestItemFinishedEventArgs(Bridge.Service, finishSuiteRequest, _flowItems[id].Reporter, xmlDoc.OuterXml));
+                            AfterSuiteFinished?.Invoke(this, new TestItemFinishedEventArgs(Bridge.Service, finishSuiteRequest, _flowItems[id].TestReporter, xmlDoc.OuterXml));
                         }
                         catch (Exception exp)
                         {

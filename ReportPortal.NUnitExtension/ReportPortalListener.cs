@@ -2,8 +2,10 @@
 using NUnit.Engine.Extensibility;
 using ReportPortal.Client;
 using ReportPortal.Client.Models;
-using ReportPortal.NUnitExtension.Configuration;
 using ReportPortal.Shared;
+using ReportPortal.Shared.Configuration;
+using ReportPortal.Shared.Configuration.Providers;
+using ReportPortal.Shared.Reporter;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,17 +19,23 @@ namespace ReportPortal.NUnitExtension
     {
         static ReportPortalListener()
         {
-            var configPath = Path.GetDirectoryName(new Uri(typeof(Config).Assembly.CodeBase).LocalPath) + "/ReportPortal.config.json";
-            Config = Client.Converters.ModelSerializer.Deserialize<Config>(File.ReadAllText(configPath));
+            var jsonPath = Path.GetDirectoryName(new Uri(typeof(ReportPortalListener).Assembly.CodeBase).LocalPath) + "/ReportPortal.config.json";
+            Config = new ConfigurationBuilder().AddJsonFile(jsonPath).AddEnvironmentVariables().Build();
 
             Service rpService;
-            if (Config.Server.Proxy != null)
+
+            var uri = Config.GetValue<string>(ConfigurationPath.ServerUrl);
+            var project = Config.GetValue<string>(ConfigurationPath.ServerProject);
+            var uuid = Config.GetValue<string>(ConfigurationPath.ServerAuthenticationUuid);
+
+            var proxyServer = Config.GetValue<string>("Server:Proxy", null);
+            if (!string.IsNullOrEmpty(proxyServer))
             {
-                rpService = new Service(Config.Server.Url, Config.Server.Project, Config.Server.Authentication.Uuid, new WebProxy(Config.Server.Proxy));
+                rpService = new Service(new Uri(uri), project, uuid, new WebProxy(proxyServer));
             }
             else
             {
-                rpService = new Service(Config.Server.Url, Config.Server.Project, Config.Server.Authentication.Uuid);
+                rpService = new Service(new Uri(uri), project, uuid);
             }
 
             Bridge.Service = rpService;
@@ -43,11 +51,11 @@ namespace ReportPortal.NUnitExtension
 
         private Dictionary<string, FlowItemInfo> _flowItems = new Dictionary<string, FlowItemInfo>();
 
-        public static Config Config { get; private set; }
+        public static IConfiguration Config { get; private set; }
 
         public void OnTestEvent(string report)
         {
-            if (Config.IsEnabled)
+            if (Config.GetValue("Enabled", true))
             {
                 var xmlDoc = new XmlDocument();
                 xmlDoc.LoadXml(report);
@@ -89,11 +97,11 @@ namespace ReportPortal.NUnitExtension
 
         internal class FlowItemInfo
         {
-            public FlowItemInfo(FlowType flowType, string fullName, TestReporter reporter, DateTime startTime)
+            public FlowItemInfo(FlowType flowType, string fullName, ITestReporter reporter, DateTime startTime)
             {
                 FlowItemType = flowType;
                 FullName = fullName;
-                Reporter = reporter;
+                TestReporter = reporter;
                 StartTime = startTime;
             }
 
@@ -101,7 +109,7 @@ namespace ReportPortal.NUnitExtension
 
             public string FullName { get; private set; }
 
-            public TestReporter Reporter { get; private set; }
+            public ITestReporter TestReporter { get; private set; }
 
             public DateTime StartTime { get; private set; }
 

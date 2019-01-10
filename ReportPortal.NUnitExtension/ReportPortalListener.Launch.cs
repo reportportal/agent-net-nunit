@@ -2,8 +2,12 @@
 using ReportPortal.Client.Requests;
 using ReportPortal.NUnitExtension.EventArguments;
 using ReportPortal.Shared;
+using ReportPortal.Shared.Configuration;
+using ReportPortal.Shared.Reporter;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Xml;
 
 namespace ReportPortal.NUnitExtension
@@ -19,7 +23,7 @@ namespace ReportPortal.NUnitExtension
             try
             {
                 LaunchMode launchMode;
-                if (Config.Launch.IsDebugMode)
+                if (Config.GetValue(ConfigurationPath.LaunchDebugMode, false))
                 {
                     launchMode = LaunchMode.Debug;
                 }
@@ -29,11 +33,11 @@ namespace ReportPortal.NUnitExtension
                 }
                 var startLaunchRequest = new StartLaunchRequest
                 {
-                    Name = Config.Launch.Name,
-                    Description = Config.Launch.Description,
+                    Name = Config.GetValue(ConfigurationPath.LaunchName, "NUnit Launch"),
+                    Description = Config.GetValue(ConfigurationPath.LaunchDescription, ""),
                     StartTime = DateTime.UtcNow,
                     Mode = launchMode,
-                    Tags = Config.Launch.Tags
+                    Tags = Config.GetValues(ConfigurationPath.LaunchTags, new List<string>()).ToList()
                 };
 
                 var eventArg = new RunStartedEventArgs(Bridge.Service, startLaunchRequest);
@@ -50,7 +54,7 @@ namespace ReportPortal.NUnitExtension
                 if (!eventArg.Canceled)
                 {
                     Bridge.Context.LaunchReporter = new LaunchReporter(Bridge.Service);
-                    Bridge.Context.LaunchReporter.Start(eventArg.Launch);
+                    Bridge.Context.LaunchReporter.Start(eventArg.StartLaunchRequest);
 
                     try
                     {
@@ -97,7 +101,7 @@ namespace ReportPortal.NUnitExtension
                     var sw = Stopwatch.StartNew();
                     Console.Write("Finishing to send the results to Report Portal... ");
 
-                    Bridge.Context.LaunchReporter.Finish(finishLaunchRequest, force: false);
+                    Bridge.Context.LaunchReporter.Finish(finishLaunchRequest);
                     Bridge.Context.LaunchReporter.FinishTask.Wait();
 
                     Console.WriteLine($"Elapsed: {sw.Elapsed}");

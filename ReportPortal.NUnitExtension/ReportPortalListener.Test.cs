@@ -48,7 +48,7 @@ namespace ReportPortal.NUnitExtension
                 }
                 if (!beforeTestEventArg.Canceled)
                 {
-                    var testReporter = _flowItems[parentId].Reporter.StartNewTestNode(startTestRequest);
+                    var testReporter = _flowItems[parentId].TestReporter.StartChildTestReporter(startTestRequest);
 
                     _flowItems[id] = new FlowItemInfo(FlowItemInfo.FlowType.Test, fullname, testReporter, startTime);
 
@@ -107,7 +107,7 @@ namespace ReportPortal.NUnitExtension
                             Text = "Test Output: " + Environment.NewLine + outputNode.InnerText
                         };
 
-                        var outputEventArgs = new TestItemOutputEventArgs(Bridge.Service, outputLogRequest, _flowItems[id].Reporter);
+                        var outputEventArgs = new TestItemOutputEventArgs(Bridge.Service, outputLogRequest, _flowItems[id].TestReporter);
 
                         try
                         {
@@ -120,7 +120,7 @@ namespace ReportPortal.NUnitExtension
 
                         if (!outputEventArgs.Canceled)
                         {
-                            _flowItems[id].Reporter.Log(outputLogRequest);
+                            _flowItems[id].TestReporter.Log(outputLogRequest);
 
                             try
                             {
@@ -140,7 +140,7 @@ namespace ReportPortal.NUnitExtension
                         var filePath = attachmentNode.SelectSingleNode("./filePath").InnerText;
                         var fileDescription = attachmentNode.SelectSingleNode("./description")?.InnerText;
 
-                        _flowItems[id].Reporter.Log(new AddLogItemRequest
+                        _flowItems[id].TestReporter.Log(new AddLogItemRequest
                         {
                             Level = LogLevel.Info,
                             Time = DateTime.UtcNow,
@@ -161,7 +161,7 @@ namespace ReportPortal.NUnitExtension
                         var failureMessage = failureNode.SelectSingleNode("./message").InnerText;
                         var failureStacktrace = failureNode.SelectSingleNode("./stack-trace")?.InnerText;
 
-                        _flowItems[id].Reporter.Log(new AddLogItemRequest
+                        _flowItems[id].TestReporter.Log(new AddLogItemRequest
                         {
                             Level = LogLevel.Error,
                             Time = DateTime.UtcNow,
@@ -175,7 +175,7 @@ namespace ReportPortal.NUnitExtension
                     {
                         var reasonMessage = reasonNode.SelectSingleNode("./message").InnerText;
 
-                        _flowItems[id].Reporter.Log(new AddLogItemRequest
+                        _flowItems[id].TestReporter.Log(new AddLogItemRequest
                         {
                             Level = LogLevel.Error,
                             Time = DateTime.UtcNow,
@@ -215,7 +215,7 @@ namespace ReportPortal.NUnitExtension
                         finishTestRequest.IsRetry = true;
                     }
 
-                    var eventArg = new TestItemFinishedEventArgs(Bridge.Service, finishTestRequest, _flowItems[id].Reporter, xmlDoc.OuterXml);
+                    var eventArg = new TestItemFinishedEventArgs(Bridge.Service, finishTestRequest, _flowItems[id].TestReporter, xmlDoc.OuterXml);
 
                     try
                     {
@@ -226,11 +226,11 @@ namespace ReportPortal.NUnitExtension
                         Console.WriteLine("Exception was thrown in 'BeforeTestFinished' subscriber." + Environment.NewLine + exp);
                     }
 
-                    _flowItems[id].Reporter.Finish(finishTestRequest);
+                    _flowItems[id].TestReporter.Finish(finishTestRequest);
 
                     try
                     {
-                        AfterTestFinished?.Invoke(this, new TestItemFinishedEventArgs(Bridge.Service, finishTestRequest, _flowItems[id].Reporter, xmlDoc.OuterXml));
+                        AfterTestFinished?.Invoke(this, new TestItemFinishedEventArgs(Bridge.Service, finishTestRequest, _flowItems[id].TestReporter, xmlDoc.OuterXml));
                     }
                     catch (Exception exp)
                     {
@@ -283,11 +283,11 @@ namespace ReportPortal.NUnitExtension
 
                     if (logRequest != null)
                     {
-                        _flowItems[id].Reporter.Log(logRequest);
+                        _flowItems[id].TestReporter.Log(logRequest);
                     }
                     else
                     {
-                        _flowItems[id].Reporter.Log(new AddLogItemRequest { Level = LogLevel.Info, Time = DateTime.UtcNow, Text = message });
+                        _flowItems[id].TestReporter.Log(new AddLogItemRequest { Level = LogLevel.Info, Time = DateTime.UtcNow, Text = message });
                     }
 
                 }
@@ -336,11 +336,11 @@ namespace ReportPortal.NUnitExtension
 
                     if (logRequest != null)
                     {
-                        _flowItems[testId].Reporter.Log(logRequest);
+                        _flowItems[testId].TestReporter.Log(logRequest);
                     }
                     else
                     {
-                        _flowItems[testId].Reporter.Log(new AddLogItemRequest { Level = LogLevel.Info, Time = DateTime.UtcNow, Text = message });
+                        _flowItems[testId].TestReporter.Log(new AddLogItemRequest { Level = LogLevel.Info, Time = DateTime.UtcNow, Text = message });
                     }
                 }
             }
