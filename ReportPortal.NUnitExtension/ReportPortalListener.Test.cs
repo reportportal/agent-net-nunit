@@ -158,14 +158,14 @@ namespace ReportPortal.NUnitExtension
                     var failureNode = xmlDoc.SelectSingleNode("//failure");
                     if (failureNode != null)
                     {
-                        var failureMessage = failureNode.SelectSingleNode("./message").InnerText;
+                        var failureMessage = failureNode.SelectSingleNode("./message")?.InnerText;
                         var failureStacktrace = failureNode.SelectSingleNode("./stack-trace")?.InnerText;
 
                         _flowItems[id].TestReporter.Log(new AddLogItemRequest
                         {
                             Level = LogLevel.Error,
                             Time = DateTime.UtcNow,
-                            Text = failureMessage + Environment.NewLine + failureStacktrace
+                            Text = string.Join(Environment.NewLine, new List<string> { failureMessage, failureStacktrace}.Where(m => !string.IsNullOrEmpty(m)))
                         });
                     }
 
@@ -173,13 +173,13 @@ namespace ReportPortal.NUnitExtension
                     var reasonNode = xmlDoc.SelectSingleNode("//reason");
                     if (reasonNode != null)
                     {
-                        var reasonMessage = reasonNode.SelectSingleNode("./message").InnerText;
+                        var reasonMessage = reasonNode.SelectSingleNode("./message")?.InnerText;
 
                         _flowItems[id].TestReporter.Log(new AddLogItemRequest
                         {
                             Level = LogLevel.Error,
                             Time = DateTime.UtcNow,
-                            Text = reasonMessage
+                            Text = $"Reason: {reasonMessage}"
                         });
                     }
 
