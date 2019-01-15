@@ -32,6 +32,8 @@ To verify installed extension just execute:
 nunit3-console.exe --list-extensions
 ```
 
+> Note: This is extensions for `nunit3-console.exe`, it doesn't work when you execute tests in Visual Studio Test Explorer. Vote [here](https://github.com/nunit/nunit3-vs-adapter/issues/222) to make it possible.
+
 # Configuration
 Add `ReportPortal.config.json` file with configuration of the integration.
 
