@@ -8,7 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Xml;
 
 namespace ReportPortal.NUnitExtension
@@ -151,7 +150,7 @@ namespace ReportPortal.NUnitExtension
                                 Text = fileDescription != null ? fileDescription : Path.GetFileName(filePath),
                                 Attach = new Client.Models.Attach
                                 {
-                                    Name = Path.GetFileName(filePath),
+                                    Name =Path.GetFileName(filePath),
                                     MimeType = Shared.MimeTypes.MimeTypeMap.GetMimeType(Path.GetExtension(filePath)),
                                     Data = File.ReadAllBytes(filePath)
                                 }
@@ -159,7 +158,12 @@ namespace ReportPortal.NUnitExtension
                         }
                         else
                         {
-                            Console.WriteLine($"WARN: Attachment file '{filePath}' doesn't exists.");
+                            _flowItems[id].TestReporter.Log(new AddLogItemRequest
+                            {
+                                Level = LogLevel.Warning,
+                                Time = DateTime.UtcNow,
+                                Text = $"Attachment file '{filePath}' doesn't exists.",
+                            });
                         }
                     }
 
@@ -174,7 +178,7 @@ namespace ReportPortal.NUnitExtension
                         {
                             Level = LogLevel.Error,
                             Time = DateTime.UtcNow,
-                            Text = string.Join(Environment.NewLine, new List<string> { failureMessage, failureStacktrace }.Where(m => !string.IsNullOrEmpty(m)))
+                            Text = string.Join(Environment.NewLine, new List<string> { failureMessage, failureStacktrace}.Where(m => !string.IsNullOrEmpty(m)))
                         });
                     }
 
