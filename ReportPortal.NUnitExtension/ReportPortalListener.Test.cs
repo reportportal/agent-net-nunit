@@ -6,6 +6,7 @@ using ReportPortal.NUnitExtension.EventArguments;
 using ReportPortal.Shared;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
@@ -141,18 +142,25 @@ namespace ReportPortal.NUnitExtension
                         var filePath = attachmentNode.SelectSingleNode("./filePath").InnerText;
                         var fileDescription = attachmentNode.SelectSingleNode("./description")?.InnerText;
 
-                        _flowItems[id].TestReporter.Log(new AddLogItemRequest
+                        if (File.Exists(filePath))
                         {
-                            Level = LogLevel.Info,
-                            Time = DateTime.UtcNow,
-                            Text = fileDescription != null ? fileDescription : System.IO.Path.GetFileName(filePath),
-                            Attach = new Client.Models.Attach
+                            _flowItems[id].TestReporter.Log(new AddLogItemRequest
                             {
-                                Name = System.IO.Path.GetFileName(filePath),
-                                MimeType = Shared.MimeTypes.MimeTypeMap.GetMimeType(System.IO.Path.GetExtension(filePath)),
-                                Data = System.IO.File.ReadAllBytes(filePath)
-                            }
-                        });
+                                Level = LogLevel.Info,
+                                Time = DateTime.UtcNow,
+                                Text = fileDescription != null ? fileDescription : Path.GetFileName(filePath),
+                                Attach = new Client.Models.Attach
+                                {
+                                    Name = Path.GetFileName(filePath),
+                                    MimeType = Shared.MimeTypes.MimeTypeMap.GetMimeType(Path.GetExtension(filePath)),
+                                    Data = File.ReadAllBytes(filePath)
+                                }
+                            });
+                        }
+                        else
+                        {
+                            Console.WriteLine($"WARN: Attachment file '{filePath}' doesn't exists.");
+                        }
                     }
 
                     // adding failure message
@@ -166,7 +174,7 @@ namespace ReportPortal.NUnitExtension
                         {
                             Level = LogLevel.Error,
                             Time = DateTime.UtcNow,
-                            Text = string.Join(Environment.NewLine, new List<string> { failureMessage, failureStacktrace}.Where(m => !string.IsNullOrEmpty(m)))
+                            Text = string.Join(Environment.NewLine, new List<string> { failureMessage, failureStacktrace }.Where(m => !string.IsNullOrEmpty(m)))
                         });
                     }
 
