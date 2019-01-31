@@ -3,6 +3,7 @@ using NUnit.Engine.Extensibility;
 using NUnit.Framework.Interfaces;
 using ReportPortal.Client;
 using ReportPortal.Client.Models;
+using ReportPortal.Client.Requests;
 using ReportPortal.Shared;
 using ReportPortal.Shared.Configuration;
 using ReportPortal.Shared.Configuration.Providers;
@@ -98,27 +99,38 @@ namespace ReportPortal.NUnitExtension
 
         internal class FlowItemInfo
         {
-            public FlowItemInfo(FlowType flowType, string fullName, ITestReporter reporter, DateTime startTime)
+            public FlowItemInfo(string id, string parentId, FlowType flowType, string fullName, ITestReporter reporter, DateTime startTime)
             {
+                Id = id;
+                ParentId = parentId;
                 FlowItemType = flowType;
                 FullName = fullName;
                 TestReporter = reporter;
                 StartTime = startTime;
             }
 
-            public FlowType FlowItemType { get; private set; }
+            public string Id { get; }
+            public string ParentId { get; }
 
-            public string FullName { get; private set; }
+            public FlowType FlowItemType { get; }
 
-            public ITestReporter TestReporter { get; private set; }
+            public string FullName { get; }
 
-            public DateTime StartTime { get; private set; }
+            public ITestReporter TestReporter { get; }
+
+            public DateTime StartTime { get; }
 
             internal enum FlowType
             {
                 Suite,
                 Test
             }
+
+            public FinishTestItemRequest FinishTestItemRequest { get; set; }
+
+            public string Report { get; set; }
+
+            public Action<string, FinishTestItemRequest, string, string> DeferredFinishAction { get; set; }
         }
     }
 }

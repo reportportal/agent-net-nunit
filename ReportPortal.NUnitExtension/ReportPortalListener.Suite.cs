@@ -6,6 +6,7 @@ using ReportPortal.Shared;
 using ReportPortal.Shared.Reporter;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
 
@@ -34,7 +35,7 @@ namespace ReportPortal.NUnitExtension
                     Type = TestItemType.Suite
                 };
 
-                var beforeSuiteEventArg = new TestItemStartedEventArgs(Bridge.Service, startSuiteRequest);
+                var beforeSuiteEventArg = new TestItemStartedEventArgs(Bridge.Service, startSuiteRequest, null, xmlDoc.OuterXml);
                 try
                 {
                     BeforeSuiteStarted?.Invoke(this, beforeSuiteEventArg);
@@ -55,7 +56,7 @@ namespace ReportPortal.NUnitExtension
                         suiteReporter = _flowItems[parentId].TestReporter.StartChildTestReporter(startSuiteRequest);
                     }
 
-                    _flowItems[id] = new FlowItemInfo(FlowItemInfo.FlowType.Suite, name, suiteReporter, startTime);
+                    _flowItems[id] = new FlowItemInfo(id, parentId, FlowItemInfo.FlowType.Suite, name, suiteReporter, startTime);
 
                     try
                     {
@@ -133,15 +134,38 @@ namespace ReportPortal.NUnitExtension
                             Console.WriteLine("Exception was thrown in 'BeforeSuiteFinished' subscriber." + Environment.NewLine + exp);
                         }
 
-                        _flowItems[id].TestReporter.Finish(finishSuiteRequest);
+                        Action<string, FinishTestItemRequest, string, string> finishSuiteAction = (__id, __finishSuiteRequest, __report, __parentstacktrace) =>
+                        {
+                            // find all defferred children test items to finish
+                            foreach (var deferredFlowItem in _flowItems.Where(fi => fi.Value.ParentId == __id && fi.Value.DeferredFinishAction != null).Select(fi => fi.Value))
+                            {
+                                deferredFlowItem.DeferredFinishAction.Invoke(deferredFlowItem.Id, deferredFlowItem.FinishTestItemRequest, deferredFlowItem.Report, __parentstacktrace);
+                            }
 
-                        try
+                            _flowItems[__id].TestReporter.Finish(__finishSuiteRequest);
+
+                            try
+                            {
+                                AfterSuiteFinished?.Invoke(this, new TestItemFinishedEventArgs(Bridge.Service, __finishSuiteRequest, _flowItems[__id].TestReporter, __report));
+                            }
+                            catch (Exception exp)
+                            {
+                                Console.WriteLine("Exception was thrown in 'AfterSuiteFinished' subscriber." + Environment.NewLine + exp);
+                            }
+                        };
+
+                        // understand whether finishing test suite should be defferred. Usually we need it to report stacktrace in case of OneTimeSetup method fails, and stacktrace is avalable later in "FinishSuite" method
+                        if (xmlDoc.SelectSingleNode("/*/@site")?.Value == "Parent")
                         {
-                            AfterSuiteFinished?.Invoke(this, new TestItemFinishedEventArgs(Bridge.Service, finishSuiteRequest, _flowItems[id].TestReporter, xmlDoc.OuterXml));
+                            _flowItems[id].FinishTestItemRequest = finishSuiteRequest;
+                            _flowItems[id].Report = xmlDoc.OuterXml;
+                            _flowItems[id].DeferredFinishAction = finishSuiteAction;
                         }
-                        catch (Exception exp)
+                        else
                         {
-                            Console.WriteLine("Exception was thrown in 'AfterSuiteFinished' subscriber." + Environment.NewLine + exp);
+                            var failurestacktrace = xmlDoc.SelectSingleNode("//failure/stack-trace")?.InnerText;
+
+                            finishSuiteAction.Invoke(id, finishSuiteRequest, xmlDoc.OuterXml, failurestacktrace);
                         }
                     }
                 }

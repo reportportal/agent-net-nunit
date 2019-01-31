@@ -37,10 +37,10 @@ namespace ReportPortal.NUnitExtension
                     Type = TestItemType.Step
                 };
 
-                var beforeTestEventArg = new TestItemStartedEventArgs(Bridge.Service, startTestRequest);
+                var beforeTestEventArg = new TestItemStartedEventArgs(Bridge.Service, startTestRequest, null, xmlDoc.OuterXml);
                 try
                 {
-                    if (BeforeTestStarted != null) BeforeTestStarted(this, beforeTestEventArg);
+                    BeforeTestStarted?.Invoke(this, beforeTestEventArg);
                 }
                 catch (Exception exp)
                 {
@@ -51,12 +51,11 @@ namespace ReportPortal.NUnitExtension
                 {
                     var testReporter = _flowItems[parentId].TestReporter.StartChildTestReporter(startTestRequest);
 
-                    _flowItems[id] = new FlowItemInfo(FlowItemInfo.FlowType.Test, fullname, testReporter, startTime);
+                    _flowItems[id] = new FlowItemInfo(id, parentId, FlowItemInfo.FlowType.Test, fullname, testReporter, startTime);
 
                     try
                     {
-                        if (AfterTestStarted != null)
-                            AfterTestStarted(this, new TestItemStartedEventArgs(Bridge.Service, startTestRequest, testReporter, xmlDoc.OuterXml));
+                        AfterTestStarted?.Invoke(this, new TestItemStartedEventArgs(Bridge.Service, startTestRequest, testReporter, xmlDoc.OuterXml));
                     }
                     catch (Exception exp)
                     {
@@ -239,18 +238,41 @@ namespace ReportPortal.NUnitExtension
                         Console.WriteLine("Exception was thrown in 'BeforeTestFinished' subscriber." + Environment.NewLine + exp);
                     }
 
-                    _flowItems[id].TestReporter.Finish(finishTestRequest);
+                    Action<string, FinishTestItemRequest, string, string> finishTestAction = (__id, __finishTestItemRequest, __report, __parentstacktrace) =>
+                    {
+                        if (!string.IsNullOrEmpty(__parentstacktrace))
+                        {
+                            _flowItems[__id].TestReporter.Log(new AddLogItemRequest
+                            {
+                                Level = LogLevel.Error,
+                                Time = DateTime.UtcNow,
+                                Text = __parentstacktrace
+                            });
+                        }
 
-                    try
+                        _flowItems[__id].TestReporter.Finish(__finishTestItemRequest);
+
+                        try
+                        {
+                            AfterTestFinished?.Invoke(this, new TestItemFinishedEventArgs(Bridge.Service, __finishTestItemRequest, _flowItems[__id].TestReporter, __report));
+                        }
+                        catch (Exception exp)
+                        {
+                            Console.WriteLine("Exception was thrown in 'AfterTestFinished' subscriber." + Environment.NewLine + exp);
+                        }
+                    };
+                    // understand whether finishing test item should be deferred. Usually we need it to report stacktrace in case of OneTimeSetup method fails, and stacktrace is avalable later in "FinishSuite" method
+                    if (xmlDoc.SelectSingleNode("/*/@site")?.Value == "Parent")
                     {
-                        AfterTestFinished?.Invoke(this, new TestItemFinishedEventArgs(Bridge.Service, finishTestRequest, _flowItems[id].TestReporter, xmlDoc.OuterXml));
+                        _flowItems[id].FinishTestItemRequest = finishTestRequest;
+                        _flowItems[id].Report = xmlDoc.OuterXml;
+                        _flowItems[id].DeferredFinishAction = finishTestAction;
                     }
-                    catch (Exception exp)
+                    else
                     {
-                        Console.WriteLine("Exception was thrown in 'AfterTestFinished' subscriber." + Environment.NewLine + exp);
+                        finishTestAction.Invoke(id, finishTestRequest, xmlDoc.OuterXml, null);
                     }
                 }
-
             }
             catch (Exception exception)
             {
