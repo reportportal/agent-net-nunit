@@ -13,9 +13,10 @@ namespace ReportPortal.NUnitExtension.EventArguments
             StartLaunchRequest = request;
         }
 
-        public RunStartedEventArgs(Service service, StartLaunchRequest request, ILaunchReporter launchReporter) : this(service, request)
+        public RunStartedEventArgs(Service service, StartLaunchRequest request, ILaunchReporter launchReporter, string report) : this(service, request)
         {
             LaunchReporter = launchReporter;
+            Report = report;
         }
 
         public Service Service { get; }
@@ -23,6 +24,8 @@ namespace ReportPortal.NUnitExtension.EventArguments
         public StartLaunchRequest StartLaunchRequest { get; }
 
         public ILaunchReporter LaunchReporter { get; }
+
+        public string Report { get; }
 
         public bool Canceled { get; set; }
     }

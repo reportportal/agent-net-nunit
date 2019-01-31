@@ -58,7 +58,7 @@ namespace ReportPortal.NUnitExtension
 
                     try
                     {
-                        AfterRunStarted?.Invoke(this, new RunStartedEventArgs(Bridge.Service, startLaunchRequest, Bridge.Context.LaunchReporter));
+                        AfterRunStarted?.Invoke(this, new RunStartedEventArgs(Bridge.Service, startLaunchRequest, Bridge.Context.LaunchReporter, xmlDoc.OuterXml));
                     }
                     catch (Exception exp)
                     {
@@ -86,7 +86,7 @@ namespace ReportPortal.NUnitExtension
 
                 };
 
-                var eventArg = new RunFinishedEventArgs(Bridge.Service, finishLaunchRequest, Bridge.Context.LaunchReporter);
+                var eventArg = new RunFinishedEventArgs(Bridge.Service, finishLaunchRequest, Bridge.Context.LaunchReporter, xmlDoc.OuterXml);
                 try
                 {
                     BeforeRunFinished?.Invoke(this, eventArg);
@@ -108,7 +108,7 @@ namespace ReportPortal.NUnitExtension
 
                     try
                     {
-                        AfterRunFinished?.Invoke(this, new RunFinishedEventArgs(Bridge.Service, finishLaunchRequest, Bridge.Context.LaunchReporter));
+                        AfterRunFinished?.Invoke(this, new RunFinishedEventArgs(Bridge.Service, finishLaunchRequest, Bridge.Context.LaunchReporter, xmlDoc.OuterXml));
                     }
                     catch (Exception exp)
                     {

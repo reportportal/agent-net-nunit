@@ -56,7 +56,7 @@ namespace ReportPortal.NUnitExtension
                     try
                     {
                         if (AfterTestStarted != null)
-                            AfterTestStarted(this, new TestItemStartedEventArgs(Bridge.Service, startTestRequest, testReporter));
+                            AfterTestStarted(this, new TestItemStartedEventArgs(Bridge.Service, startTestRequest, testReporter, xmlDoc.OuterXml));
                     }
                     catch (Exception exp)
                     {
@@ -108,7 +108,7 @@ namespace ReportPortal.NUnitExtension
                             Text = "Test Output: " + Environment.NewLine + outputNode.InnerText
                         };
 
-                        var outputEventArgs = new TestItemOutputEventArgs(Bridge.Service, outputLogRequest, _flowItems[id].TestReporter);
+                        var outputEventArgs = new TestItemOutputEventArgs(Bridge.Service, outputLogRequest, _flowItems[id].TestReporter, xmlDoc.OuterXml);
 
                         try
                         {
@@ -150,7 +150,7 @@ namespace ReportPortal.NUnitExtension
                                 Text = fileDescription != null ? fileDescription : Path.GetFileName(filePath),
                                 Attach = new Client.Models.Attach
                                 {
-                                    Name =Path.GetFileName(filePath),
+                                    Name = Path.GetFileName(filePath),
                                     MimeType = Shared.MimeTypes.MimeTypeMap.GetMimeType(Path.GetExtension(filePath)),
                                     Data = File.ReadAllBytes(filePath)
                                 }
@@ -178,7 +178,7 @@ namespace ReportPortal.NUnitExtension
                         {
                             Level = LogLevel.Error,
                             Time = DateTime.UtcNow,
-                            Text = string.Join(Environment.NewLine, new List<string> { failureMessage, failureStacktrace}.Where(m => !string.IsNullOrEmpty(m)))
+                            Text = string.Join(Environment.NewLine, new List<string> { failureMessage, failureStacktrace }.Where(m => !string.IsNullOrEmpty(m)))
                         });
                     }
 

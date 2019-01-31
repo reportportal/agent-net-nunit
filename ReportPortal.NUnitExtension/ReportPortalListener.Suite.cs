@@ -59,7 +59,7 @@ namespace ReportPortal.NUnitExtension
 
                     try
                     {
-                        AfterSuiteStarted?.Invoke(this, new TestItemStartedEventArgs(Bridge.Service, startSuiteRequest, suiteReporter));
+                        AfterSuiteStarted?.Invoke(this, new TestItemStartedEventArgs(Bridge.Service, startSuiteRequest, suiteReporter, xmlDoc.OuterXml));
                     }
                     catch (Exception exp)
                     {

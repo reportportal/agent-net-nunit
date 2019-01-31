@@ -14,9 +14,10 @@ namespace ReportPortal.NUnitExtension.EventArguments
             StartTestItemRequest = request;
         }
 
-        public TestItemStartedEventArgs(Service service, StartTestItemRequest request, ITestReporter testReporter) : this(service, request)
+        public TestItemStartedEventArgs(Service service, StartTestItemRequest request, ITestReporter testReporter, string report) : this(service, request)
         {
             TestReporter = testReporter;
+            Report = report;
         }
 
         public Service Service { get; }
@@ -24,6 +25,8 @@ namespace ReportPortal.NUnitExtension.EventArguments
         public StartTestItemRequest StartTestItemRequest { get; }
 
         public ITestReporter TestReporter { get; set; }
+
+        public string Report { get; }
 
         public bool Canceled { get; set; }
     }
