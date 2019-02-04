@@ -152,6 +152,8 @@ namespace ReportPortal.NUnitExtension
                             {
                                 Console.WriteLine("Exception was thrown in 'AfterSuiteFinished' subscriber." + Environment.NewLine + exp);
                             }
+
+                            _flowItems.Remove(__id);
                         };
 
                         // understand whether finishing test suite should be defferred. Usually we need it to report stacktrace in case of OneTimeSetup method fails, and stacktrace is avalable later in "FinishSuite" method

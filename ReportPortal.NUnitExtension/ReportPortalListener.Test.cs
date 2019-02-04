@@ -260,6 +260,8 @@ namespace ReportPortal.NUnitExtension
                         {
                             Console.WriteLine("Exception was thrown in 'AfterTestFinished' subscriber." + Environment.NewLine + exp);
                         }
+
+                        _flowItems.Remove(__id);
                     };
                     // understand whether finishing test item should be deferred. Usually we need it to report stacktrace in case of OneTimeSetup method fails, and stacktrace is avalable later in "FinishSuite" method
                     if (xmlDoc.SelectSingleNode("/*/@site")?.Value == "Parent")
