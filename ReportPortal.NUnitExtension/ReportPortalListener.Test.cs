@@ -198,7 +198,7 @@ namespace ReportPortal.NUnitExtension
                     // finishing test
                     var finishTestRequest = new FinishTestItemRequest
                     {
-                        EndTime = _flowItems[id].StartTime.AddMilliseconds(duration),
+                        EndTime = _flowItems[id].StartTime.AddSeconds(duration),
                         Status = _statusMap[result]
                     };
 
