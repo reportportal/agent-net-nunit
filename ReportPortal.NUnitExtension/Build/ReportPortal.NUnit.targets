@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+
+    <_ReportPortal_NUnit_Runtime Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">net45</_ReportPortal_NUnit_Runtime>
+    <_ReportPortal_NUnit_Runtime_Path>$(MSBuildThisFileDirectory)\..\lib\$(_ReportPortal_NUnit_Runtime)\ReportPortal.NUnitExtension.dll</_ReportPortal_NUnit_Runtime_Path>
+
+    <_ReportPortal_AddinsFile_Path>$(MSBuildThisFileDirectory)\..\ReportPortal.addins</_ReportPortal_AddinsFile_Path>
+
+  </PropertyGroup>
+
+</Project>

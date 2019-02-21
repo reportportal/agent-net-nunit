@@ -21,4 +21,10 @@
     <PackageReference Include="ReportPortal.Shared" Version="2.1.4" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="Build\**" Pack="true" PackagePath="build\" />
+    <None Include="ReportPortal.addins" Pack="true" PackagePath="." />
+  </ItemGroup>
+
+
 </Project>
