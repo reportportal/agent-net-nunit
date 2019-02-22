@@ -53,7 +53,16 @@ namespace ReportPortal.NUnitExtension
 
                 if (!eventArg.Canceled)
                 {
-                    Bridge.Context.LaunchReporter = new LaunchReporter(Bridge.Service);
+                    var launchId = Config.GetValue<string>("Launch:Id", "");
+                    if (string.IsNullOrEmpty(launchId))
+                    {
+                        Bridge.Context.LaunchReporter = Bridge.Context.LaunchReporter ?? new LaunchReporter(Bridge.Service);
+                    }
+                    else
+                    {
+                        Bridge.Context.LaunchReporter = Bridge.Context.LaunchReporter ?? new LaunchReporter(Bridge.Service, launchId);
+                    }
+
                     Bridge.Context.LaunchReporter.Start(eventArg.StartLaunchRequest);
 
                     try
