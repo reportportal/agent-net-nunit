@@ -17,9 +17,11 @@
 
   <ItemGroup>
     <PackageReference Include="NUnit" Version="3.11.0" />
-    <PackageReference Include="NUnit.Engine.Api" Version="3.9.0" />
+    <PackageReference Include="NUnit.Engine.Api" Version="3.9.0">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="ReportPortal.Shared" Version="2.1.4">
-      <PrivateAssets>contentfiles;analyzers;</PrivateAssets>
+      <PrivateAssets>contentfiles; analyzers;</PrivateAssets>
     </PackageReference>
   </ItemGroup>
 
