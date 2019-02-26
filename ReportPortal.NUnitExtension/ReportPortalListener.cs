@@ -1,6 +1,5 @@
 ﻿using NUnit.Engine;
 using NUnit.Engine.Extensibility;
-using NUnit.Framework.Interfaces;
 using ReportPortal.Client;
 using ReportPortal.Client.Models;
 using ReportPortal.Client.Requests;
@@ -42,14 +41,14 @@ namespace ReportPortal.NUnitExtension
 
             Bridge.Service = rpService;
 
-            _statusMap[TestStatus.Passed] = Status.Passed;
-            _statusMap[TestStatus.Failed] = Status.Failed;
-            _statusMap[TestStatus.Skipped] = Status.Skipped;
-            _statusMap[TestStatus.Inconclusive] = Status.Skipped;
-            _statusMap[TestStatus.Warning] = Status.Failed;
+            _statusMap["Passed"] = Status.Passed;
+            _statusMap["Failed"] = Status.Failed;
+            _statusMap["Skipped"] = Status.Skipped;
+            _statusMap["Inconclusive"] = Status.Skipped;
+            _statusMap["Warning"] = Status.Failed;
         }
 
-        private static Dictionary<TestStatus, Status> _statusMap = new Dictionary<TestStatus, Status>();
+        private static Dictionary<string, Status> _statusMap = new Dictionary<string, Status>();
 
         private Dictionary<string, FlowItemInfo> _flowItems = new Dictionary<string, FlowItemInfo>();
 

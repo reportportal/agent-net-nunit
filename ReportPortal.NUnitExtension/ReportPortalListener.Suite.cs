@@ -1,5 +1,4 @@
-﻿using NUnit.Framework.Interfaces;
-using ReportPortal.Client.Models;
+﻿using ReportPortal.Client.Models;
 using ReportPortal.Client.Requests;
 using ReportPortal.NUnitExtension.EventArguments;
 using ReportPortal.Shared;
@@ -7,7 +6,6 @@ using ReportPortal.Shared.Reporter;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Xml;
 
 namespace ReportPortal.NUnitExtension
@@ -83,7 +81,7 @@ namespace ReportPortal.NUnitExtension
             try
             {
                 var id = xmlDoc.SelectSingleNode("/*/@id").Value;
-                var result = (TestStatus)Enum.Parse(typeof(TestStatus), xmlDoc.SelectSingleNode("/*/@result").Value);
+                var result = xmlDoc.SelectSingleNode("/*/@result").Value;
                 var parentId = xmlDoc.SelectSingleNode("/*/@parentId");
                 var duration = float.Parse(xmlDoc.SelectSingleNode("/*/@duration").Value, System.Globalization.CultureInfo.InvariantCulture);
 
