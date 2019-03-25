@@ -13,6 +13,8 @@
 
     <RepositoryType>GitHub</RepositoryType>
     <RepositoryUrl>https://github.com/reportportal/agent-net-nunit</RepositoryUrl>
+
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,8 +30,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Build\**" Pack="true" PackagePath="build\" />
-    <None Include="ReportPortal.addins" Pack="true" PackagePath="." />
+    <None Include="..\*.props" Pack="true" PackagePath="build\" Visible="false" />
+    <None Include="..\*.targets" Pack="true" PackagePath="build\" Visible="false" />
+    <None Include="ReportPortal.addins" Pack="true" PackagePath="." Visible="false" />
   </ItemGroup>
 
 
