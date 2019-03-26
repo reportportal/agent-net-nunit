@@ -20,18 +20,6 @@
       <Visible>False</Visible>
     </None>
 
-    <None Include="$(_ReportPortal_Shared_Runtime_Path)" >
-      <Link>%(Filename)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>False</Visible>
-    </None>
-
-    <None Include="$(_ReportPortal_Client_Runtime_Path)" >
-      <Link>%(Filename)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>False</Visible>
-    </None>
-
   </ItemGroup>
 
 </Project>
