@@ -6,7 +6,7 @@ Install **ReportPortal.NUnit** NuGet package into your project with tests.
 
 > PS> Install-Package ReportPortal.NUnit
 
-> Note: Skip this section if you execute tests in Visual Studio Test Explorer with `NUnit3TestAdapter` package. `.netcore` not yet supported.
+> Note: Skip this section if you execute tests in Visual Studio Test Explorer with `NUnit3TestAdapter` package. `NUnit3TestAdapter 3.13.0` and `ReportPortal.NUnit 3.7.0` starts to support `.net core 2`. Execute your netcore tests in Visual Studio Test Explorer, or via `dotnet test` or `dotnet vstest`.
 
 To enable NUnit extension you have to add `ReportPortal.addins` file in the folder where NUnit Runner is located. The content of the file should contain line with relative path to the `ReportPortal.NUnitExtension.dll`. To read more about how NUnit is locating extensions please follow [this](https://github.com/nunit/docs/wiki/Engine-Extensibility#locating-addins).
 
