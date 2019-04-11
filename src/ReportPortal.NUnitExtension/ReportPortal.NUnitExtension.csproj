@@ -24,7 +24,7 @@
     <PackageReference Include="NUnit.Engine.Api" Version="3.10.0">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="ReportPortal.Shared" Version="2.1.4">
+    <PackageReference Include="ReportPortal.Shared" Version="2.1.5">
       <PrivateAssets>contentfiles; analyzers;</PrivateAssets>
     </PackageReference>
   </ItemGroup>
