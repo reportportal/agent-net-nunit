@@ -38,6 +38,12 @@ namespace ReportPortal.NUnitExtension
 
                 var beforeSuiteEventArg = new TestItemStartedEventArgs(Bridge.Service, startSuiteRequest, null, xmlDoc.OuterXml);
 
+                var rootNamespaces = Config.GetValues<string>("rootNamespaces", null);
+                if (rootNamespaces != null && rootNamespaces.Any(n => n.StartsWith(fullname)))
+                {
+                    beforeSuiteEventArg.Canceled = true;
+                }
+
                 if (!beforeSuiteEventArg.Canceled)
                 {
                     try
