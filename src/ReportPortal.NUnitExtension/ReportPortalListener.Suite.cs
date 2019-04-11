@@ -20,9 +20,12 @@ namespace ReportPortal.NUnitExtension
         {
             try
             {
+                var type = xmlDoc.SelectSingleNode("/*/@type").Value;
+
                 var id = xmlDoc.SelectSingleNode("/*/@id").Value;
                 var parentId = xmlDoc.SelectSingleNode("/*/@parentId").Value;
                 var name = xmlDoc.SelectSingleNode("/*/@name").Value;
+                var fullname = xmlDoc.SelectSingleNode("/*/@fullname").Value;
 
                 var startTime = DateTime.UtcNow;
 
@@ -34,24 +37,38 @@ namespace ReportPortal.NUnitExtension
                 };
 
                 var beforeSuiteEventArg = new TestItemStartedEventArgs(Bridge.Service, startSuiteRequest, null, xmlDoc.OuterXml);
-                try
+
+                if (!beforeSuiteEventArg.Canceled)
                 {
-                    BeforeSuiteStarted?.Invoke(this, beforeSuiteEventArg);
+                    try
+                    {
+                        BeforeSuiteStarted?.Invoke(this, beforeSuiteEventArg);
+                    }
+                    catch (Exception exp)
+                    {
+                        Console.WriteLine("Exception was thrown in 'BeforeSuiteStarted' subscriber." + Environment.NewLine + exp);
+                    }
                 }
-                catch (Exception exp)
-                {
-                    Console.WriteLine("Exception was thrown in 'BeforeSuiteStarted' subscriber." + Environment.NewLine + exp);
-                }
+
                 if (!beforeSuiteEventArg.Canceled)
                 {
                     ITestReporter suiteReporter;
+
                     if (string.IsNullOrEmpty(parentId) || !_flowItems.ContainsKey(parentId))
                     {
                         suiteReporter = Bridge.Context.LaunchReporter.StartChildTestReporter(startSuiteRequest);
                     }
                     else
                     {
-                        suiteReporter = _flowItems[parentId].TestReporter.StartChildTestReporter(startSuiteRequest);
+                        var parentFlowItem = FindReportedParentFlowItem(parentId);
+                        if (parentFlowItem == null)
+                        {
+                            suiteReporter = Bridge.Context.LaunchReporter.StartChildTestReporter(startSuiteRequest);
+                        }
+                        else
+                        {
+                            suiteReporter = parentFlowItem.TestReporter.StartChildTestReporter(startSuiteRequest);
+                        }
                     }
 
                     _flowItems[id] = new FlowItemInfo(id, parentId, FlowItemInfo.FlowType.Suite, name, suiteReporter, startTime);
@@ -65,11 +82,28 @@ namespace ReportPortal.NUnitExtension
                         Console.WriteLine("Exception was thrown in 'AfterSuiteStarted' subscriber." + Environment.NewLine + exp);
                     }
                 }
+                else
+                {
+                    _flowItems[id] = new FlowItemInfo(id, parentId, FlowItemInfo.FlowType.Suite, name, null, startTime);
+                }
             }
             catch (Exception exception)
             {
                 Console.WriteLine("ReportPortal exception was thrown." + Environment.NewLine + exception);
             }
+        }
+
+        private FlowItemInfo FindReportedParentFlowItem(string id)
+        {
+            if (_flowItems[id].TestReporter != null)
+            {
+                return _flowItems[id];
+            }
+            else if (!string.IsNullOrEmpty(_flowItems[id].ParentId))
+            {
+                return FindReportedParentFlowItem(_flowItems[id].ParentId);
+            }
+            else return null;
         }
 
         public delegate void SuiteFinishedHandler(object sender, TestItemFinishedEventArgs e);
@@ -80,6 +114,8 @@ namespace ReportPortal.NUnitExtension
         {
             try
             {
+                var type = xmlDoc.SelectSingleNode("/*/@type").Value;
+
                 var id = xmlDoc.SelectSingleNode("/*/@id").Value;
                 var result = xmlDoc.SelectSingleNode("/*/@result").Value;
                 var parentId = xmlDoc.SelectSingleNode("/*/@parentId");
@@ -134,14 +170,14 @@ namespace ReportPortal.NUnitExtension
 
                         Action<string, FinishTestItemRequest, string, string> finishSuiteAction = (__id, __finishSuiteRequest, __report, __parentstacktrace) =>
                         {
-                            // find all defferred children test items to finish
-                            var deferredFlowItems = _flowItems.Where(fi => fi.Value.ParentId == __id && fi.Value.DeferredFinishAction != null).Select(fi => fi.Value).ToList();
+                                // find all defferred children test items to finish
+                                var deferredFlowItems = _flowItems.Where(fi => fi.Value.ParentId == __id && fi.Value.DeferredFinishAction != null).Select(fi => fi.Value).ToList();
                             foreach (var deferredFlowItem in deferredFlowItems)
                             {
                                 deferredFlowItem.DeferredFinishAction.Invoke(deferredFlowItem.Id, deferredFlowItem.FinishTestItemRequest, deferredFlowItem.Report, __parentstacktrace);
                             }
 
-                            _flowItems[__id].TestReporter.Finish(__finishSuiteRequest);
+                            _flowItems[__id].TestReporter?.Finish(__finishSuiteRequest);
 
                             try
                             {
@@ -170,6 +206,7 @@ namespace ReportPortal.NUnitExtension
                         }
                     }
                 }
+
             }
             catch (Exception exception)
             {

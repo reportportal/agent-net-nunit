@@ -130,6 +130,11 @@ namespace ReportPortal.NUnitExtension
             public string Report { get; set; }
 
             public Action<string, FinishTestItemRequest, string, string> DeferredFinishAction { get; set; }
+
+            public override string ToString()
+            {
+                return $"{FullName}";
+            }
         }
     }
 }
