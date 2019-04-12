@@ -67,7 +67,7 @@ You can customize a test run in order to have a user-friendly report. Following 
 
 Please note, test categories are added to tags and test description is added to description by default
 
-Add a class that implements NUnit.Engine.ITestEventListener to a project. Assume the class is implemented within the YourProject.Tests project. To enable your extension you need to add path to the project assembly to `ReportPortal.addins` file in the `NUnitRunner` folder with the following content (see folder structure above):  
+Add a class that implements `NUnit.Engine.ITestEventListener` (from NUnit.Engine.Api package) to a project. Assume the class is implemented within the YourProject.Tests project. To enable your extension you need to add path to the project assembly to `ReportPortal.addins` file in the `NUnitRunner` folder with the following content (see folder structure above):  
 
 ```
 ../YourProject/bin/Debug/YourProject.Tests.dll
