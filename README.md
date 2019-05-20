@@ -52,7 +52,7 @@ Example of config file:
   "launch": {
     "name": "NUnit 3 Demo Launch",
     "description": "this is description",
-    "debugMode": true,
+    "debugMode": false,
     "tags": [ "t1", "t2" ]
   }
 }
