@@ -39,7 +39,7 @@ namespace ReportPortal.NUnitExtension
                 var beforeSuiteEventArg = new TestItemStartedEventArgs(Bridge.Service, startSuiteRequest, null, xmlDoc.OuterXml);
 
                 var rootNamespaces = Config.GetValues<string>("rootNamespaces", null);
-                if (rootNamespaces != null && rootNamespaces.Any(n => n.StartsWith(fullname)))
+                if (rootNamespaces != null && rootNamespaces.Any(n => n == name))
                 {
                     beforeSuiteEventArg.Canceled = true;
                 }
@@ -176,8 +176,8 @@ namespace ReportPortal.NUnitExtension
 
                         Action<string, FinishTestItemRequest, string, string> finishSuiteAction = (__id, __finishSuiteRequest, __report, __parentstacktrace) =>
                         {
-                                // find all defferred children test items to finish
-                                var deferredFlowItems = _flowItems.Where(fi => fi.Value.ParentId == __id && fi.Value.DeferredFinishAction != null).Select(fi => fi.Value).ToList();
+                            // find all defferred children test items to finish
+                            var deferredFlowItems = _flowItems.Where(fi => fi.Value.ParentId == __id && fi.Value.DeferredFinishAction != null).Select(fi => fi.Value).ToList();
                             foreach (var deferredFlowItem in deferredFlowItems)
                             {
                                 deferredFlowItem.DeferredFinishAction.Invoke(deferredFlowItem.Id, deferredFlowItem.FinishTestItemRequest, deferredFlowItem.Report, __parentstacktrace);
