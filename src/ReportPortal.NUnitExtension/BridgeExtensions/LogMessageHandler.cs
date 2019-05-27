@@ -1,16 +1,14 @@
-﻿using ReportPortal.Shared;
-using ReportPortal.Client.Requests;
+﻿using ReportPortal.Client.Requests;
 using ReportPortal.Client.Converters;
+using ReportPortal.Shared.Extensibility;
 
 namespace ReportPortal.NUnitExtension.BridgeExtensions
 {
-    public class LogMessageRedirector : IBridgeExtension
+    public class LogMessageHandler : ILogHandler
     {
-        public bool Handled { get; set; }
+        public int Order => 100;
 
-        public int Order => int.MaxValue;
-
-        public void FormatLog(ref AddLogItemRequest logRequest)
+        public bool Handle(AddLogItemRequest logRequest)
         {
             var sharedMessage = new SharedLogMessage()
             {
@@ -31,7 +29,7 @@ namespace ReportPortal.NUnitExtension.BridgeExtensions
 
             NUnit.Framework.Internal.TestExecutionContext.CurrentContext.SendMessage("ReportPortal", ModelSerializer.Serialize<SharedLogMessage>(sharedMessage));
 
-            Handled = true;
+            return true;
         }
     }
 }
