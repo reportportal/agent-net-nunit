@@ -58,6 +58,15 @@ Example of config file:
 }
 ```
 
+# Environment variables
+It's possible to override parameters via environment variables.
+```cmd
+set reportportal_launch_name="My new launch name"
+# execute tests
+```
+
+`reportportal_` prefix is used for naming variables, and `_` is used as delimeter. For example to override `Server.Authentication.Uuid` parameter, we need specify `ReportPortal_Server_Authentication_Uuid` in environment variables. To override launch tags we need specify `ReportPortal_Launch_Tags` with `tag1;tag2` value (`;` used as separator for list of values).
+
 # Customization
 
 You can customize a test run in order to have a user-friendly report. Following customization is supported:
