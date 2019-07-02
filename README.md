@@ -95,5 +95,5 @@ Follow [reportportal example-net-nunit](https://github.com/reportportal/example-
 - [Serilog](https://github.com/reportportal/logger-net-serilog)
 - [System.Diagnostics.TraceListener](https://github.com/reportportal/logger-net-tracelistener)
 
-# Usefull extensions
+# Useful extensions
 - [SourceBack](https://github.com/nvborisenko/reportportal-extensions-sourceback)
