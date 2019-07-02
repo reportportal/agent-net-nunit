@@ -178,6 +178,23 @@ namespace ReportPortal.NUnitExtension
                             Time = DateTime.UtcNow,
                             Text = string.Join(Environment.NewLine, new List<string> { failureMessage, failureStacktrace }.Where(m => !string.IsNullOrEmpty(m)))
                         });
+
+                        // walk through assertions
+                        foreach(XmlNode assertionNode in xmlDoc.SelectNodes("test-case/assertions/assertion"))
+                        {
+                            var assertionMessage = assertionNode.SelectSingleNode("message")?.InnerText;
+                            var assertionStacktrace = assertionNode.SelectSingleNode("stack-trace")?.InnerText;
+
+                            if (assertionMessage != failureMessage && assertionStacktrace != failureStacktrace)
+                            {
+                                _flowItems[id].TestReporter.Log(new AddLogItemRequest
+                                {
+                                    Level = LogLevel.Error,
+                                    Time = DateTime.UtcNow,
+                                    Text = string.Join(Environment.NewLine, new List<string> { assertionMessage, assertionStacktrace }.Where(m => !string.IsNullOrEmpty(m)))
+                                });
+                            }
+                        }
                     }
 
                     // adding reason message
