@@ -88,3 +88,12 @@ See deatils of the customization in the [example](https://github.com/reportporta
 
 # Example
 Follow [reportportal example-net-nunit](https://github.com/reportportal/example-net-nunit) repo to see the source of test project with Report Portal integration.
+
+# Integrate logger framework
+- [NLog](https://github.com/reportportal/logger-net-nlog)
+- [log4net](https://github.com/reportportal/logger-net-log4net)
+- [Serilog](https://github.com/reportportal/logger-net-serilog)
+- [System.Diagnostics.TraceListener](https://github.com/reportportal/logger-net-tracelistener)
+
+# Usefull extensions
+- [SourceBack](https://github.com/nvborisenko/reportportal-extensions-sourceback)
