@@ -32,8 +32,6 @@
   <ItemGroup>
     <None Include="..\*.props" Pack="true" PackagePath="build\" Visible="false" />
     <None Include="..\*.targets" Pack="true" PackagePath="build\" Visible="false" />
-    <None Include="ReportPortal.addins" Pack="true" PackagePath="." Visible="false" />
   </ItemGroup>
-
 
 </Project>

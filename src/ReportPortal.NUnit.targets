@@ -9,8 +9,11 @@
     <_ReportPortal_NUnit_Runtime_Path>$(MSBuildThisFileDirectory)\..\lib\$(_ReportPortal_NUnit_Runtime)\ReportPortal.NUnitExtension.dll</_ReportPortal_NUnit_Runtime_Path>
     <_ReportPortal_NUnit_Runtime_Pdb_Path>$(MSBuildThisFileDirectory)\..\lib\$(_ReportPortal_NUnit_Runtime)\ReportPortal.NUnitExtension.pdb</_ReportPortal_NUnit_Runtime_Pdb_Path>
 
-    <_ReportPortal_AddinsFile_Path>$(MSBuildThisFileDirectory)\..\ReportPortal.addins</_ReportPortal_AddinsFile_Path>
-
   </PropertyGroup>
+
+  <Target Name="ReportPortal_GenerateNUnitAddinsFile" AfterTargets="AfterBuild">
+    <WriteLinesToFile File="$(OutputPath)ReportPortal.addins" Lines="ReportPortal.NUnitExtension.dll" Overwrite="true" />
+    <WriteLinesToFile File="$(OutputPath)ReportPortal.addins" Lines="$(AssemblyName).dll" />
+  </Target>
 
 </Project>

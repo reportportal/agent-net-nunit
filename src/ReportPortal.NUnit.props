@@ -3,17 +3,12 @@
 
   <ItemGroup>
 
-    <None Include="$(_ReportPortal_AddinsFile_Path)" >
-      <Link>%(Filename)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>False</Visible>
-    </None>
-    
     <None Include="$(_ReportPortal_NUnit_Runtime_Path)" >
       <Link>%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>False</Visible>
     </None>
+    
     <None Include="$(_ReportPortal_NUnit_Runtime_Pdb_Path)" >
       <Link>%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
