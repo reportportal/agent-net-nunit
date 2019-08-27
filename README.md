@@ -40,7 +40,7 @@ Add `ReportPortal.config.json` file with configuration of the integration.
 Example of config file:
 ```json
 {
-  "$schema": "https://raw.githubusercontent.com/reportportal/agent-net-nunit/master/ReportPortal.NUnitExtension/ReportPortal.config.schema",
+  "$schema": "https://raw.githubusercontent.com/reportportal/agent-net-nunit/master/src/ReportPortal.NUnitExtension/ReportPortal.config.schema",
   "enabled": true,
   "server": {
     "url": "https://rp.epam.com/api/v1/",
