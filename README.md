@@ -35,7 +35,7 @@ nunit3-console.exe --list-extensions
 ```
 
 # Configuration
-Add `ReportPortal.config.json` file with configuration of the integration.
+Add `ReportPortal.config.json` file with configuration of the integration to test project. This file will be copied automatically to output folder during project building.
 
 Example of config file:
 ```json
