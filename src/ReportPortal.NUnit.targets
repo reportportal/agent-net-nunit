@@ -23,5 +23,13 @@
     	<FileWrites Include="$(OutputPath)$(_ReportPortal_AddinsFileName)" />
     </ItemGroup>
   </Target>
+  <Target Name="CopyDocumentationFile"
+          AfterTargets="ComputeFilesToPublish">
+    <ItemGroup>
+      <ResolvedFileToPublish Include="$(OutputPath)$(_ReportPortal_AddinsFileName)"
+                             RelativePath="$(_ReportPortal_AddinsFileName)" />
+    </ItemGroup>
+  </Target>
+
 
 </Project>
