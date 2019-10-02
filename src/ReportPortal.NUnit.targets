@@ -11,16 +11,21 @@
 
   </PropertyGroup>
 
-  <Target Name="ReportPortal_GenerateNUnitAddinsFile" AfterTargets="Compile">
+  <Target Name="ReportPortal_GenerateNUnitAddinsFile" BeforeTargets="BeforeBuild">
   	<PropertyGroup>
   		<_ReportPortal_AddinsFileName>ReportPortal.addins</_ReportPortal_AddinsFileName>
   	</PropertyGroup>
 
-    <WriteLinesToFile File="$(OutputPath)$(_ReportPortal_AddinsFileName)" Lines="ReportPortal.NUnitExtension.dll" Overwrite="true" />
-    <WriteLinesToFile File="$(OutputPath)$(_ReportPortal_AddinsFileName)" Lines="$(AssemblyName).dll" />
+    <WriteLinesToFile File="$(IntermediateOutputPath)$(_ReportPortal_AddinsFileName)" Lines="ReportPortal.NUnitExtension.dll" Overwrite="true" />
+    <WriteLinesToFile File="$(IntermediateOutputPath)$(_ReportPortal_AddinsFileName)" Lines="$(AssemblyName).dll" />
 
     <ItemGroup>
-    	<FileWrites Include="$(OutputPath)$(_ReportPortal_AddinsFileName)" />
+    	<None Include="$(IntermediateOutputPath)$(_ReportPortal_AddinsFileName)">
+    		<Link>$(_ReportPortal_AddinsFileName)</Link>
+      		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      		<Visible>False</Visible>
+    	</None>
+    	
     </ItemGroup>
   </Target>
 
