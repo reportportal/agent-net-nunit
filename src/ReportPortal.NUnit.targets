@@ -7,6 +7,7 @@
     <_ReportPortal_NUnit_Runtime Condition=" '$(TargetFrameworkIdentifier)' == '.NETCoreApp' ">netstandard2.0</_ReportPortal_NUnit_Runtime>
 
     <_ReportPortal_NUnit_Runtime_Path>$(MSBuildThisFileDirectory)\..\lib\$(_ReportPortal_NUnit_Runtime)\ReportPortal.NUnitExtension.dll</_ReportPortal_NUnit_Runtime_Path>
+    <_ReportPortal_NUnit_LogHandler_Runtime_Path>$(MSBuildThisFileDirectory)\..\dep\$(_ReportPortal_NUnit_Runtime)\ReportPortal.NUnitExtension.LogHandler.dll</_ReportPortal_NUnit_LogHandler_Runtime_Path>
     <_ReportPortal_NUnit_Runtime_Pdb_Path>$(MSBuildThisFileDirectory)\..\lib\$(_ReportPortal_NUnit_Runtime)\ReportPortal.NUnitExtension.pdb</_ReportPortal_NUnit_Runtime_Pdb_Path>
 
   </PropertyGroup>

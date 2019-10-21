@@ -18,20 +18,25 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NUnit" Version="3.11.0">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
     <PackageReference Include="NUnit.Engine.Api" Version="3.10.0">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="ReportPortal.Shared" Version="2.3.2">
+    <PackageReference Include="ReportPortal.Shared" Version="2.4.4">
       <PrivateAssets>contentfiles; analyzers;</PrivateAssets>
     </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\*.props" Pack="true" PackagePath="build\" Visible="false" />
-    <None Include="..\*.targets" Pack="true" PackagePath="build\" Visible="false" />
+    <ProjectReference Include="..\ReportPortal.NUnitExtension.LogHandler\ReportPortal.NUnitExtension.LogHandler.csproj">
+      <PrivateAssets>All</PrivateAssets>
+    </ProjectReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\*.props" Pack="true" PackagePath="build\" Visible="false" />
+    <None Include="..\*.targets" Pack="true" PackagePath="build\" Visible="false" />
+
+    <None Include="$(MSBuildProjectDirectory)\..\ReportPortal.NUnitExtension.LogHandler\bin\$(Configuration)\net45\ReportPortal.NUnitExtension.LogHandler.dll" Pack="true" PackagePath="dep\net45" Visible="false" />
+    <None Include="$(MSBuildProjectDirectory)\..\ReportPortal.NUnitExtension.LogHandler\bin\$(Configuration)\netstandard2.0\ReportPortal.NUnitExtension.LogHandler.dll" Pack="true" PackagePath="dep\netstandard2.0" Visible="false" />
+  </ItemGroup>
 </Project>

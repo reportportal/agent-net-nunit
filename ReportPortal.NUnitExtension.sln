@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26730.15
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29411.108
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B554C8A5-928C-4149-9321-5327FEC20E42}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReportPortal.NUnitExtension", "src\ReportPortal.NUnitExtension\ReportPortal.NUnitExtension.csproj", "{8CA8E8FA-F961-48C9-96A2-04F8D8DE90DD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReportPortal.NUnitExtension.LogHandler", "src\ReportPortal.NUnitExtension.LogHandler\ReportPortal.NUnitExtension.LogHandler.csproj", "{2204CFCF-C2B9-4726-8315-86B7B8DF87A0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,12 +19,17 @@ Global
 		{8CA8E8FA-F961-48C9-96A2-04F8D8DE90DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8CA8E8FA-F961-48C9-96A2-04F8D8DE90DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8CA8E8FA-F961-48C9-96A2-04F8D8DE90DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2204CFCF-C2B9-4726-8315-86B7B8DF87A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2204CFCF-C2B9-4726-8315-86B7B8DF87A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2204CFCF-C2B9-4726-8315-86B7B8DF87A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2204CFCF-C2B9-4726-8315-86B7B8DF87A0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{8CA8E8FA-F961-48C9-96A2-04F8D8DE90DD} = {B554C8A5-928C-4149-9321-5327FEC20E42}
+		{2204CFCF-C2B9-4726-8315-86B7B8DF87A0} = {B554C8A5-928C-4149-9321-5327FEC20E42}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1BAF40BE-11A9-46C3-8306-3CAE3C432A5B}
