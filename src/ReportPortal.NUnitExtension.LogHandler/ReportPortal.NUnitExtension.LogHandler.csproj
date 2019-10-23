@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="NUnit" Version="3.11.0" />
-    <PackageReference Include="ReportPortal.Shared" Version="2.4.4" />
+    <PackageReference Include="ReportPortal.Shared" Version="2.4.5" />
   </ItemGroup>
 
 </Project>
