@@ -12,7 +12,7 @@
 
   </PropertyGroup>
 
-  <Target Name="ReportPortal_GenerateNUnitAddinsFile" BeforeTargets="BeforeBuild">
+  <Target Name="ReportPortal_GenerateNUnitAddinsFile" AfterTargets="PrepareForBuild">
   	<PropertyGroup>
   		<_ReportPortal_AddinsFileName>ReportPortal.addins</_ReportPortal_AddinsFileName>
   	</PropertyGroup>
