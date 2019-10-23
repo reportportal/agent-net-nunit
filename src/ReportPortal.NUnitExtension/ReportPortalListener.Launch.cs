@@ -111,7 +111,7 @@ namespace ReportPortal.NUnitExtension
                     Console.Write("Finishing to send the results to Report Portal... ");
 
                     Bridge.Context.LaunchReporter.Finish(finishLaunchRequest);
-                    Bridge.Context.LaunchReporter.FinishTask.Wait();
+                    Bridge.Context.LaunchReporter.Sync();
 
                     Console.WriteLine($"Elapsed: {sw.Elapsed}");
 
