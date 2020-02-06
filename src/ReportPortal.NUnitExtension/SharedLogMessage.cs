@@ -1,10 +1,6 @@
-﻿using ReportPortal.Client.Models;
+﻿using ReportPortal.Client.Abstractions.Responses;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ReportPortal.NUnitExtension
 {
@@ -15,7 +11,7 @@ namespace ReportPortal.NUnitExtension
         /// ID of test item to add new logs.
         /// </summary>
         [DataMember]
-        public string TestItemId { get; set; }
+        public string TestItemUuid { get; set; }
 
         /// <summary>
         /// Date time of log item.

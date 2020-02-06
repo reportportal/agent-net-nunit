@@ -1,8 +1,8 @@
 ﻿using NUnit.Engine;
 using NUnit.Engine.Extensibility;
 using ReportPortal.Client;
-using ReportPortal.Client.Models;
-using ReportPortal.Client.Requests;
+using ReportPortal.Client.Abstractions.Requests;
+using ReportPortal.Client.Abstractions.Responses;
 using ReportPortal.Shared;
 using ReportPortal.Shared.Configuration;
 using ReportPortal.Shared.Configuration.Providers;

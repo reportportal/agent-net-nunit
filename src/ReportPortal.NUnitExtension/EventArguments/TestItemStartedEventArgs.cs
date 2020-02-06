@@ -1,26 +1,25 @@
 ﻿using System;
-using ReportPortal.Client;
-using ReportPortal.Client.Requests;
-using ReportPortal.Shared;
+using ReportPortal.Client.Abstractions;
+using ReportPortal.Client.Abstractions.Requests;
 using ReportPortal.Shared.Reporter;
 
 namespace ReportPortal.NUnitExtension.EventArguments
 {
     public class TestItemStartedEventArgs : EventArgs
     {
-        public TestItemStartedEventArgs(Service service, StartTestItemRequest request)
+        public TestItemStartedEventArgs(IClientService service, StartTestItemRequest request)
         {
             Service = service;
             StartTestItemRequest = request;
         }
 
-        public TestItemStartedEventArgs(Service service, StartTestItemRequest request, ITestReporter testReporter, string report) : this(service, request)
+        public TestItemStartedEventArgs(IClientService service, StartTestItemRequest request, ITestReporter testReporter, string report) : this(service, request)
         {
             TestReporter = testReporter;
             Report = report;
         }
 
-        public Service Service { get; }
+        public IClientService Service { get; }
 
         public StartTestItemRequest StartTestItemRequest { get; }
 

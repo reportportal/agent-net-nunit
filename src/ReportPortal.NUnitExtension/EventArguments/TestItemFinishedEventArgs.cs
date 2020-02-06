@@ -1,13 +1,13 @@
 ﻿using System;
-using ReportPortal.Client;
-using ReportPortal.Client.Requests;
+using ReportPortal.Client.Abstractions;
+using ReportPortal.Client.Abstractions.Requests;
 using ReportPortal.Shared.Reporter;
 
 namespace ReportPortal.NUnitExtension.EventArguments
 {
     public class TestItemFinishedEventArgs : EventArgs
     {
-        public TestItemFinishedEventArgs(Service service, FinishTestItemRequest request, ITestReporter testReporter, string report)
+        public TestItemFinishedEventArgs(IClientService service, FinishTestItemRequest request, ITestReporter testReporter, string report)
         {
             Service = service;
             FinishTestItemRequest = request;
@@ -15,7 +15,7 @@ namespace ReportPortal.NUnitExtension.EventArguments
             Report = report;
         }
 
-        public Service Service { get; }
+        public IClientService Service { get; }
 
         public FinishTestItemRequest FinishTestItemRequest { get; }
         

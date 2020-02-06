@@ -1,6 +1,6 @@
-﻿using ReportPortal.Client.Converters;
-using ReportPortal.Client.Models;
-using ReportPortal.Client.Requests;
+﻿using ReportPortal.Client.Abstractions.Requests;
+using ReportPortal.Client.Abstractions.Responses;
+using ReportPortal.Client.Converters;
 using ReportPortal.NUnitExtension.EventArguments;
 using ReportPortal.Shared;
 using System;
@@ -99,7 +99,7 @@ namespace ReportPortal.NUnitExtension
                     var outputNode = xmlDoc.SelectSingleNode("//output");
                     if (outputNode != null)
                     {
-                        var outputLogRequest = new AddLogItemRequest
+                        var outputLogRequest = new CreateLogItemRequest
                         {
                             Level = LogLevel.Trace,
                             Time = DateTime.UtcNow,
@@ -141,12 +141,12 @@ namespace ReportPortal.NUnitExtension
 
                         if (File.Exists(filePath))
                         {
-                            _flowItems[id].TestReporter.Log(new AddLogItemRequest
+                            _flowItems[id].TestReporter.Log(new CreateLogItemRequest
                             {
                                 Level = LogLevel.Info,
                                 Time = DateTime.UtcNow,
                                 Text = fileDescription != null ? fileDescription : Path.GetFileName(filePath),
-                                Attach = new Client.Models.Attach
+                                Attach = new Client.Abstractions.Responses.Attach
                                 {
                                     Name = Path.GetFileName(filePath),
                                     MimeType = Shared.MimeTypes.MimeTypeMap.GetMimeType(Path.GetExtension(filePath)),
@@ -156,7 +156,7 @@ namespace ReportPortal.NUnitExtension
                         }
                         else
                         {
-                            _flowItems[id].TestReporter.Log(new AddLogItemRequest
+                            _flowItems[id].TestReporter.Log(new CreateLogItemRequest
                             {
                                 Level = LogLevel.Warning,
                                 Time = DateTime.UtcNow,
@@ -172,7 +172,7 @@ namespace ReportPortal.NUnitExtension
                         var failureMessage = failureNode.SelectSingleNode("./message")?.InnerText;
                         var failureStacktrace = failureNode.SelectSingleNode("./stack-trace")?.InnerText;
 
-                        _flowItems[id].TestReporter.Log(new AddLogItemRequest
+                        _flowItems[id].TestReporter.Log(new CreateLogItemRequest
                         {
                             Level = LogLevel.Error,
                             Time = DateTime.UtcNow,
@@ -187,7 +187,7 @@ namespace ReportPortal.NUnitExtension
 
                             if (assertionMessage != failureMessage && assertionStacktrace != failureStacktrace)
                             {
-                                _flowItems[id].TestReporter.Log(new AddLogItemRequest
+                                _flowItems[id].TestReporter.Log(new CreateLogItemRequest
                                 {
                                     Level = LogLevel.Error,
                                     Time = DateTime.UtcNow,
@@ -203,7 +203,7 @@ namespace ReportPortal.NUnitExtension
                     {
                         var reasonMessage = reasonNode.SelectSingleNode("./message")?.InnerText;
 
-                        _flowItems[id].TestReporter.Log(new AddLogItemRequest
+                        _flowItems[id].TestReporter.Log(new CreateLogItemRequest
                         {
                             Level = LogLevel.Error,
                             Time = DateTime.UtcNow,
@@ -258,7 +258,7 @@ namespace ReportPortal.NUnitExtension
                     {
                         if (!string.IsNullOrEmpty(__parentstacktrace))
                         {
-                            _flowItems[__id].TestReporter.Log(new AddLogItemRequest
+                            _flowItems[__id].TestReporter.Log(new CreateLogItemRequest
                             {
                                 Level = LogLevel.Error,
                                 Time = DateTime.UtcNow,
@@ -307,21 +307,21 @@ namespace ReportPortal.NUnitExtension
 
                 if (_flowItems.ContainsKey(id))
                 {
-                    AddLogItemRequest logRequest = null;
+                    CreateLogItemRequest logRequest = null;
                     try
                     {
                         var sharedMessage = ModelSerializer.Deserialize<SharedLogMessage>(message);
 
-                        logRequest = new AddLogItemRequest
+                        logRequest = new CreateLogItemRequest
                         {
                             Level = sharedMessage.Level,
                             Time = sharedMessage.Time,
-                            TestItemId = sharedMessage.TestItemId,
+                            TestItemUuid = sharedMessage.TestItemUuid,
                             Text = sharedMessage.Text
                         };
                         if (sharedMessage.Attach != null)
                         {
-                            logRequest.Attach = new Client.Models.Attach
+                            logRequest.Attach = new Client.Abstractions.Responses.Attach
                             {
                                 Name = sharedMessage.Attach.Name,
                                 MimeType = sharedMessage.Attach.MimeType,
@@ -340,7 +340,7 @@ namespace ReportPortal.NUnitExtension
                     }
                     else
                     {
-                        _flowItems[id].TestReporter.Log(new AddLogItemRequest { Level = LogLevel.Info, Time = DateTime.UtcNow, Text = message });
+                        _flowItems[id].TestReporter.Log(new CreateLogItemRequest { Level = LogLevel.Info, Time = DateTime.UtcNow, Text = message });
                     }
 
                 }
@@ -360,21 +360,21 @@ namespace ReportPortal.NUnitExtension
 
                 if (_flowItems.ContainsKey(testId))
                 {
-                    AddLogItemRequest logRequest = null;
+                    CreateLogItemRequest logRequest = null;
                     try
                     {
                         var sharedMessage = ModelSerializer.Deserialize<SharedLogMessage>(message);
 
-                        logRequest = new AddLogItemRequest
+                        logRequest = new CreateLogItemRequest
                         {
                             Level = sharedMessage.Level,
                             Time = sharedMessage.Time,
-                            TestItemId = sharedMessage.TestItemId,
+                            TestItemUuid = sharedMessage.TestItemUuid,
                             Text = sharedMessage.Text
                         };
                         if (sharedMessage.Attach != null)
                         {
-                            logRequest.Attach = new Client.Models.Attach
+                            logRequest.Attach = new Client.Abstractions.Responses.Attach
                             {
                                 Name = sharedMessage.Attach.Name,
                                 MimeType = sharedMessage.Attach.MimeType,
@@ -393,7 +393,7 @@ namespace ReportPortal.NUnitExtension
                     }
                     else
                     {
-                        _flowItems[testId].TestReporter.Log(new AddLogItemRequest { Level = LogLevel.Info, Time = DateTime.UtcNow, Text = message });
+                        _flowItems[testId].TestReporter.Log(new CreateLogItemRequest { Level = LogLevel.Info, Time = DateTime.UtcNow, Text = message });
                     }
                 }
             }

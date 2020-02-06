@@ -1,5 +1,5 @@
-﻿using ReportPortal.Client.Converters;
-using ReportPortal.Client.Requests;
+﻿using ReportPortal.Client.Abstractions.Requests;
+using ReportPortal.Client.Converters;
 using ReportPortal.Shared.Extensibility;
 using System;
 using System.Linq;
@@ -27,11 +27,11 @@ namespace ReportPortal.NUnitExtension.LogHandler
 
         public int Order => 100;
 
-        public bool Handle(AddLogItemRequest logRequest)
+        public bool Handle(CreateLogItemRequest logRequest)
         {
             var sharedMessage = new SharedLogMessage()
             {
-                TestItemId = logRequest.TestItemId,
+                TestItemUuid = logRequest.TestItemUuid,
                 Time = logRequest.Time,
                 Text = logRequest.Text,
                 Level = logRequest.Level
