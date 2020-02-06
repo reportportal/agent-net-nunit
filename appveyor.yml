@@ -7,7 +7,7 @@ configuration:
 
 dotnet_csproj:
   patch: true
-  version: '$(GitVersion_NuGetVersion)'
+  version: '$(GitVersion_SemVersion)'
 
 build_script:
   - cmd: dotnet build
