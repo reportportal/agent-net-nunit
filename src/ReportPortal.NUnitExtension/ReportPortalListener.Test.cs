@@ -143,18 +143,32 @@ namespace ReportPortal.NUnitExtension
                         {
                             try
                             {
-                                _flowItems[id].TestReporter.Log(new AddLogItemRequest
+                                var attachmentLogItemRequest = new AddLogItemRequest
                                 {
                                     Level = LogLevel.Info,
                                     Time = DateTime.UtcNow,
-                                    Text = fileDescription != null ? fileDescription : Path.GetFileName(filePath),
-                                    Attach = new Client.Models.Attach
+                                    Text = fileDescription != null ? fileDescription : Path.GetFileName(filePath)
+                                };
+
+                                byte[] bytes;
+
+                                using (var fileStream = File.Open(filePath, FileMode.Open, FileAccess.Read))
+                                {
+                                    using (var memoryStream = new MemoryStream())
                                     {
-                                        Name = Path.GetFileName(filePath),
-                                        MimeType = Shared.MimeTypes.MimeTypeMap.GetMimeType(Path.GetExtension(filePath)),
-                                        Data = File.ReadAllBytes(filePath)
+                                        fileStream.CopyTo(memoryStream);
+                                        bytes = memoryStream.ToArray();
                                     }
-                                });
+                                }
+
+                                attachmentLogItemRequest.Attach = new Client.Models.Attach
+                                {
+                                    Name = Path.GetFileName(filePath),
+                                    MimeType = Shared.MimeTypes.MimeTypeMap.GetMimeType(Path.GetExtension(filePath)),
+                                    Data = File.ReadAllBytes(filePath)
+                                };
+
+                                _flowItems[id].TestReporter.Log(attachmentLogItemRequest);
                             }
                             catch (Exception attachmentExp)
                             {
@@ -162,7 +176,7 @@ namespace ReportPortal.NUnitExtension
                                 {
                                     Level = LogLevel.Warning,
                                     Time = DateTime.UtcNow,
-                                    Text = $"Cannot read '{filePath}': {attachmentExp}"
+                                    Text = $"Cannot read '{filePath}' file: {attachmentExp}"
                                 });
                             }
                         }
