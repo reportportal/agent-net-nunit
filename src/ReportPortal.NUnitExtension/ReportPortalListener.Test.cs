@@ -141,18 +141,44 @@ namespace ReportPortal.NUnitExtension
 
                         if (File.Exists(filePath))
                         {
-                            _flowItems[id].TestReporter.Log(new AddLogItemRequest
+                            try
                             {
-                                Level = LogLevel.Info,
-                                Time = DateTime.UtcNow,
-                                Text = fileDescription != null ? fileDescription : Path.GetFileName(filePath),
-                                Attach = new Client.Models.Attach
+                                var attachmentLogItemRequest = new AddLogItemRequest
+                                {
+                                    Level = LogLevel.Info,
+                                    Time = DateTime.UtcNow,
+                                    Text = fileDescription != null ? fileDescription : Path.GetFileName(filePath)
+                                };
+
+                                byte[] bytes;
+
+                                using (var fileStream = File.Open(filePath, FileMode.Open, FileAccess.Read))
+                                {
+                                    using (var memoryStream = new MemoryStream())
+                                    {
+                                        fileStream.CopyTo(memoryStream);
+                                        bytes = memoryStream.ToArray();
+                                    }
+                                }
+
+                                attachmentLogItemRequest.Attach = new Client.Models.Attach
                                 {
                                     Name = Path.GetFileName(filePath),
                                     MimeType = Shared.MimeTypes.MimeTypeMap.GetMimeType(Path.GetExtension(filePath)),
                                     Data = File.ReadAllBytes(filePath)
-                                }
-                            });
+                                };
+
+                                _flowItems[id].TestReporter.Log(attachmentLogItemRequest);
+                            }
+                            catch (Exception attachmentExp)
+                            {
+                                _flowItems[id].TestReporter.Log(new AddLogItemRequest
+                                {
+                                    Level = LogLevel.Warning,
+                                    Time = DateTime.UtcNow,
+                                    Text = $"Cannot read '{filePath}' file: {attachmentExp}"
+                                });
+                            }
                         }
                         else
                         {
@@ -160,7 +186,7 @@ namespace ReportPortal.NUnitExtension
                             {
                                 Level = LogLevel.Warning,
                                 Time = DateTime.UtcNow,
-                                Text = $"Attachment file '{filePath}' doesn't exists.",
+                                Text = $"Attachment file '{filePath}' doesn't exists."
                             });
                         }
                     }
@@ -180,7 +206,7 @@ namespace ReportPortal.NUnitExtension
                         });
 
                         // walk through assertions
-                        foreach(XmlNode assertionNode in xmlDoc.SelectNodes("test-case/assertions/assertion"))
+                        foreach (XmlNode assertionNode in xmlDoc.SelectNodes("test-case/assertions/assertion"))
                         {
                             var assertionMessage = assertionNode.SelectSingleNode("message")?.InnerText;
                             var assertionStacktrace = assertionNode.SelectSingleNode("stack-trace")?.InnerText;
