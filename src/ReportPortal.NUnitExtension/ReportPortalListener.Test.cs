@@ -165,7 +165,7 @@ namespace ReportPortal.NUnitExtension
                                 {
                                     Name = Path.GetFileName(filePath),
                                     MimeType = Shared.MimeTypes.MimeTypeMap.GetMimeType(Path.GetExtension(filePath)),
-                                    Data = File.ReadAllBytes(filePath)
+                                    Data = bytes
                                 };
 
                                 _flowItems[id].TestReporter.Log(attachmentLogItemRequest);
