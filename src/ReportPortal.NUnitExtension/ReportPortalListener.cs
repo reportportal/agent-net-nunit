@@ -6,6 +6,7 @@ using ReportPortal.Client.Abstractions.Responses;
 using ReportPortal.Shared;
 using ReportPortal.Shared.Configuration;
 using ReportPortal.Shared.Configuration.Providers;
+using ReportPortal.Shared.Internal.Logging;
 using ReportPortal.Shared.Reporter;
 using System;
 using System.Collections.Generic;
@@ -15,9 +16,11 @@ using System.Xml;
 
 namespace ReportPortal.NUnitExtension
 {
-    [Extension(Description = "Report Portal extension point")]
+    [Extension(Description = "ReportPortal extension to send test results")]
     public partial class ReportPortalListener : ITestEventListener
     {
+        private static ITraceLogger TraceLogger => TraceLogManager.GetLogger(typeof(ReportPortalListener));
+
         static ReportPortalListener()
         {
             var jsonPath = Path.GetDirectoryName(new Uri(typeof(ReportPortalListener).Assembly.CodeBase).LocalPath) + "/ReportPortal.config.json";
@@ -56,6 +59,8 @@ namespace ReportPortal.NUnitExtension
 
         public void OnTestEvent(string report)
         {
+            TraceLogger.Verbose($"Agent got an event:{Environment.NewLine}{report}");
+
             if (Config.GetValue("Enabled", true))
             {
                 var xmlDoc = new XmlDocument();
