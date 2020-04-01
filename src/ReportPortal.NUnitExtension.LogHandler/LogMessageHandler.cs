@@ -1,6 +1,7 @@
 ﻿using ReportPortal.Client.Abstractions.Requests;
 using ReportPortal.Client.Converters;
 using ReportPortal.Shared.Extensibility;
+using ReportPortal.Shared.Logging;
 using System;
 using System.Linq;
 
@@ -27,7 +28,7 @@ namespace ReportPortal.NUnitExtension.LogHandler
 
         public int Order => 100;
 
-        public bool Handle(CreateLogItemRequest logRequest)
+        public bool Handle(ILogScope logScope, CreateLogItemRequest logRequest)
         {
             var sharedMessage = new SharedLogMessage()
             {
@@ -49,6 +50,16 @@ namespace ReportPortal.NUnitExtension.LogHandler
             NUnit.Framework.Internal.TestExecutionContext.CurrentContext.SendMessage("ReportPortal", ModelSerializer.Serialize<SharedLogMessage>(sharedMessage));
 
             return true;
+        }
+
+        public void BeginScope(ILogScope logScope)
+        {
+
+        }
+
+        public void EndScope(ILogScope logScope)
+        {
+
         }
     }
 }

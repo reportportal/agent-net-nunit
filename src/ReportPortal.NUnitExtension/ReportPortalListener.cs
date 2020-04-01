@@ -1,8 +1,8 @@
 ﻿using NUnit.Engine;
 using NUnit.Engine.Extensibility;
 using ReportPortal.Client;
+using ReportPortal.Client.Abstractions.Models;
 using ReportPortal.Client.Abstractions.Requests;
-using ReportPortal.Client.Abstractions.Responses;
 using ReportPortal.Shared;
 using ReportPortal.Shared.Configuration;
 using ReportPortal.Shared.Configuration.Providers;
@@ -19,7 +19,7 @@ namespace ReportPortal.NUnitExtension
     [Extension(Description = "ReportPortal extension to send test results")]
     public partial class ReportPortalListener : ITestEventListener
     {
-        private static ITraceLogger TraceLogger => TraceLogManager.GetLogger(typeof(ReportPortalListener));
+        private static ITraceLogger TraceLogger => TraceLogManager.Instance.GetLogger(typeof(ReportPortalListener));
 
         static ReportPortalListener()
         {
@@ -32,15 +32,7 @@ namespace ReportPortal.NUnitExtension
             var project = Config.GetValue<string>(ConfigurationPath.ServerProject);
             var uuid = Config.GetValue<string>(ConfigurationPath.ServerAuthenticationUuid);
 
-            var proxyServer = Config.GetValue<string>("Server:Proxy", null);
-            if (!string.IsNullOrEmpty(proxyServer))
-            {
-                rpService = new Service(new Uri(uri), project, uuid, new WebProxy(proxyServer));
-            }
-            else
-            {
-                rpService = new Service(new Uri(uri), project, uuid);
-            }
+            rpService = new Service(new Uri(uri), project, uuid);
 
             Bridge.Service = rpService;
 

@@ -21,7 +21,7 @@
     <PackageReference Include="NUnit.Engine.Api" Version="3.10.0">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="ReportPortal.Shared" Version="3.0.0-beta.1">
+    <PackageReference Include="ReportPortal.Shared" Version="3.0.0-alpha.50">
       <PrivateAssets>contentfiles; analyzers;</PrivateAssets>
     </PackageReference>
   </ItemGroup>
@@ -36,6 +36,7 @@
     <None Include="Build\**\*.props" Pack="true" PackagePath="build\" />
     <None Include="Build\**\*.targets" Pack="true" PackagePath="build\" />
 
-    <None Include="$(OutputPath)\**\ReportPortal.NUnitExtension.LogHandler.dll" Pack="true" PackagePath="lib\" Visible="false" />
+    <None Include="$(MSBuildProjectDirectory)\..\ReportPortal.NUnitExtension.LogHandler\bin\$(Configuration)\net45\ReportPortal.NUnitExtension.LogHandler.dll" Pack="true" PackagePath="dep\net45" Visible="false" />
+    <None Include="$(MSBuildProjectDirectory)\..\ReportPortal.NUnitExtension.LogHandler\bin\$(Configuration)\netstandard2.0\ReportPortal.NUnitExtension.LogHandler.dll" Pack="true" PackagePath="dep\netstandard2.0" Visible="false" />
   </ItemGroup>
 </Project>
