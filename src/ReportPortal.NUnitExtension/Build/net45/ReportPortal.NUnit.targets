@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+
+    <_ReportPortal_NUnit_Runtime_Path>$(MSBuildThisFileDirectory)..\..\lib\net45\ReportPortal.NUnitExtension.dll</_ReportPortal_NUnit_Runtime_Path>
+    <_ReportPortal_NUnit_LogHandler_Runtime_Path>$(MSBuildThisFileDirectory)..\..\lib\net45\ReportPortal.NUnitExtension.LogHandler.dll</_ReportPortal_NUnit_LogHandler_Runtime_Path>
+    <_ReportPortal_NUnit_Runtime_Pdb_Path>$(MSBuildThisFileDirectory)..\..\lib\net45\ReportPortal.NUnitExtension.pdb</_ReportPortal_NUnit_Runtime_Pdb_Path>
+
+  </PropertyGroup>
+
+  <Target Name="ReportPortal_GenerateNUnitAddinsFile" AfterTargets="PrepareForBuild">
+  	<PropertyGroup>
+  		<_ReportPortal_AddinsFileName>ReportPortal.addins</_ReportPortal_AddinsFileName>
+  	</PropertyGroup>
+
+    <WriteLinesToFile File="$(IntermediateOutputPath)$(_ReportPortal_AddinsFileName)" Lines="ReportPortal.NUnitExtension.dll" Overwrite="true" />
+    <WriteLinesToFile File="$(IntermediateOutputPath)$(_ReportPortal_AddinsFileName)" Lines="$(AssemblyName).dll" />
+
+    <ItemGroup>
+    	<None Include="$(IntermediateOutputPath)$(_ReportPortal_AddinsFileName)">
+    		<Link>$(_ReportPortal_AddinsFileName)</Link>
+      		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      		<Visible>False</Visible>
+    	</None>
+    	
+    </ItemGroup>
+  </Target>
+
+</Project>
