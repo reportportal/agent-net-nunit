@@ -384,7 +384,7 @@ namespace ReportPortal.NUnitExtension
             try
             {
                 var message = xmlDoc.SelectSingleNode("/test-message").InnerText;
-                var action = xmlDoc.SelectSingleNode("/destination").Value;
+                var action = xmlDoc.SelectSingleNode("/test-message/@destination").Value;
 
                 switch (action)
                 {
