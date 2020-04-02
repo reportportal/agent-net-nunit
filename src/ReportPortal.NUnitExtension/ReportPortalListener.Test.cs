@@ -475,7 +475,8 @@ namespace ReportPortal.NUnitExtension
 
             nestedStep.Finish(new FinishTestItemRequest
             {
-                EndTime = message.EndTime
+                EndTime = message.EndTime,
+                Status = message.Status
             });
 
             _nestedSteps.Remove(message.Id);

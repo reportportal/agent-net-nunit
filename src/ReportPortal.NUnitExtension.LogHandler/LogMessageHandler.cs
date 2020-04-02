@@ -71,7 +71,8 @@ namespace ReportPortal.NUnitExtension.LogHandler
             var communicationMessage = new EndScopeCommunicationMessage
             {
                 Id = logScope.Id,
-                EndTime = logScope.EndTime.Value
+                EndTime = logScope.EndTime.Value,
+                Status = logScope.Status
             };
 
             NUnit.Framework.Internal.TestExecutionContext.CurrentContext.SendMessage("ReportPortal", ModelSerializer.Serialize<EndScopeCommunicationMessage>(communicationMessage));

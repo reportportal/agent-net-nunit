@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ReportPortal.Client.Abstractions.Models;
+using System;
 using System.Runtime.Serialization;
 
 namespace ReportPortal.NUnitExtension.LogHandler.Messages
@@ -12,5 +13,8 @@ namespace ReportPortal.NUnitExtension.LogHandler.Messages
 
         [DataMember]
         public DateTime EndTime { get; set; }
+
+        [DataMember]
+        public Status Status { get; set; }
     }
 }
