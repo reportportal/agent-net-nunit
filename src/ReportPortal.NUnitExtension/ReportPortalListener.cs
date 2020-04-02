@@ -20,7 +20,7 @@ namespace ReportPortal.NUnitExtension
 
         private Client.Abstractions.IClientService _rpService;
 
-        ReportPortalListener()
+        public ReportPortalListener()
         {
             var jsonPath = Path.GetDirectoryName(new Uri(typeof(ReportPortalListener).Assembly.CodeBase).LocalPath) + "/ReportPortal.config.json";
             Config = new ConfigurationBuilder().AddJsonFile(jsonPath).AddEnvironmentVariables().Build();
