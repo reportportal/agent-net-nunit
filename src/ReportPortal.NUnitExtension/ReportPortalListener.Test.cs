@@ -469,6 +469,13 @@ namespace ReportPortal.NUnitExtension
             _nestedSteps[message.Id] = nestedStep;
         }
 
+        private Dictionary<Shared.Logging.LogScopeStatus, Status> _nestedStepStatusMap = new Dictionary<Shared.Logging.LogScopeStatus, Status> {
+            { Shared.Logging.LogScopeStatus.InProgress, Status.InProgress },
+            { Shared.Logging.LogScopeStatus.Passed, Status.Passed },
+            { Shared.Logging.LogScopeStatus.Failed, Status.Failed },
+            { Shared.Logging.LogScopeStatus.Skipped,Status.Skipped }
+        };
+
         private void HandleEndScopeCommunicationMessage(EndScopeCommunicationMessage message)
         {
             var nestedStep = _nestedSteps[message.Id];
@@ -476,7 +483,7 @@ namespace ReportPortal.NUnitExtension
             nestedStep.Finish(new FinishTestItemRequest
             {
                 EndTime = message.EndTime,
-                Status = message.Status
+                Status = _nestedStepStatusMap[message.Status]
             });
 
             _nestedSteps.Remove(message.Id);

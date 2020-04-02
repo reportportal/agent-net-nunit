@@ -1,4 +1,4 @@
-﻿using ReportPortal.Client.Abstractions.Models;
+﻿using ReportPortal.Shared.Logging;
 using System;
 using System.Runtime.Serialization;
 
@@ -15,6 +15,6 @@ namespace ReportPortal.NUnitExtension.LogHandler.Messages
         public DateTime EndTime { get; set; }
 
         [DataMember]
-        public Status Status { get; set; }
+        public LogScopeStatus Status { get; set; }
     }
 }
