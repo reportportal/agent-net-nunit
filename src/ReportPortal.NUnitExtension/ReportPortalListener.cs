@@ -16,13 +16,18 @@ namespace ReportPortal.NUnitExtension
     [Extension(Description = "ReportPortal extension to send test results")]
     public partial class ReportPortalListener : ITestEventListener
     {
-        private readonly ITraceLogger _traceLogger = TraceLogManager.Instance.GetLogger(typeof(ReportPortalListener));
+        private readonly ITraceLogger _traceLogger;
 
         private Client.Abstractions.IClientService _rpService;
 
         public ReportPortalListener()
         {
-            var jsonPath = Path.GetDirectoryName(new Uri(typeof(ReportPortalListener).Assembly.CodeBase).LocalPath) + "/ReportPortal.config.json";
+            var baseDir = Path.GetDirectoryName(new Uri(typeof(ReportPortalListener).Assembly.CodeBase).LocalPath);
+
+            // first invocation of internal logger so setting base dir
+            _traceLogger = TraceLogManager.Instance.WithBaseDir(baseDir).GetLogger(typeof(ReportPortalListener));
+
+            var jsonPath = Path.Combine(baseDir, "ReportPortal.config.json");
             Config = new ConfigurationBuilder().AddJsonFile(jsonPath).AddEnvironmentVariables().Build();
 
             var uri = Config.GetValue<string>(ConfigurationPath.ServerUrl);

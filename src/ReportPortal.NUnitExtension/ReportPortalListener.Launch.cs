@@ -39,7 +39,7 @@ namespace ReportPortal.NUnitExtension
                     Description = Config.GetValue(ConfigurationPath.LaunchDescription, ""),
                     StartTime = DateTime.UtcNow,
                     Mode = launchMode,
-                    Attributes = Config.GetKeyValues("Launch:Attributes", new List<KeyValuePair<string, string>>()).Select(a => new ItemAttribute { Key = a.Key, Value = a.Value })
+                    Attributes = Config.GetKeyValues("Launch:Attributes", new List<KeyValuePair<string, string>>()).Select(a => new ItemAttribute { Key = a.Key, Value = a.Value }).ToList()
                 };
 
                 var eventArg = new RunStartedEventArgs(_rpService, startLaunchRequest);

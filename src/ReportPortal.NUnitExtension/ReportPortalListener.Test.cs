@@ -2,8 +2,11 @@
 using ReportPortal.Client.Abstractions.Requests;
 using ReportPortal.Client.Converters;
 using ReportPortal.NUnitExtension.EventArguments;
+using ReportPortal.NUnitExtension.LogHandler.Messages;
 using ReportPortal.Shared;
+using ReportPortal.Shared.Reporter;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -336,13 +339,12 @@ namespace ReportPortal.NUnitExtension
                     CreateLogItemRequest logRequest = null;
                     try
                     {
-                        var sharedMessage = ModelSerializer.Deserialize<SharedLogMessage>(message);
+                        var sharedMessage = ModelSerializer.Deserialize<AddLogCommunicationMessage>(message);
 
                         logRequest = new CreateLogItemRequest
                         {
                             Level = sharedMessage.Level,
                             Time = sharedMessage.Time,
-                            TestItemUuid = sharedMessage.TestItemUuid,
                             Text = sharedMessage.Text
                         };
                         if (sharedMessage.Attach != null)
@@ -381,52 +383,102 @@ namespace ReportPortal.NUnitExtension
         {
             try
             {
-                var testId = xmlDoc.SelectSingleNode("/test-message/@testid").Value;
                 var message = xmlDoc.SelectSingleNode("/test-message").InnerText;
 
-                if (_flowItems.ContainsKey(testId))
+                var baseCommunicationMessage = ModelSerializer.Deserialize<AddLogCommunicationMessage>(message);
+
+                switch (baseCommunicationMessage.Action)
                 {
-                    CreateLogItemRequest logRequest = null;
-                    try
-                    {
-                        var sharedMessage = ModelSerializer.Deserialize<SharedLogMessage>(message);
-
-                        logRequest = new CreateLogItemRequest
-                        {
-                            Level = sharedMessage.Level,
-                            Time = sharedMessage.Time,
-                            TestItemUuid = sharedMessage.TestItemUuid,
-                            Text = sharedMessage.Text
-                        };
-                        if (sharedMessage.Attach != null)
-                        {
-                            logRequest.Attach = new Client.Abstractions.Responses.Attach
-                            {
-                                Name = sharedMessage.Attach.Name,
-                                MimeType = sharedMessage.Attach.MimeType,
-                                Data = sharedMessage.Attach.Data
-                            };
-                        }
-                    }
-                    catch (Exception)
-                    {
-
-                    }
-
-                    if (logRequest != null)
-                    {
-                        _flowItems[testId].TestReporter.Log(logRequest);
-                    }
-                    else
-                    {
-                        _flowItems[testId].TestReporter.Log(new CreateLogItemRequest { Level = LogLevel.Info, Time = DateTime.UtcNow, Text = message });
-                    }
+                    case CommunicationAction.AddLog:
+                        var addLogCommunicationMessage = ModelSerializer.Deserialize<AddLogCommunicationMessage>(message);
+                        HandleLogCommunicationMessage(xmlDoc, addLogCommunicationMessage);
+                        break;
+                    case CommunicationAction.BeginLogScope:
+                        var beginScopeCommunicationMessage = ModelSerializer.Deserialize<BeginScopeCommunicationMessage>(message);
+                        HandleBeginScopeCommunicationMessage(xmlDoc, beginScopeCommunicationMessage);
+                        break;
+                    case CommunicationAction.EndLogScope:
+                        var endScopeCommunicationAction = ModelSerializer.Deserialize<EndScopeCommunicationMessage>(message);
+                        HandleEndScopeCommunicationMessage(endScopeCommunicationAction);
+                        break;
                 }
             }
             catch (Exception exception)
             {
-                Console.WriteLine("ReportPortal exception was thrown." + Environment.NewLine + exception);
+                var errorMessage = "ReportPortal exception was thrown." + Environment.NewLine + exception;
+                Console.WriteLine(errorMessage);
+                _traceLogger.Error(errorMessage);
             }
+        }
+
+        private void HandleLogCommunicationMessage(XmlDocument xmlDoc, AddLogCommunicationMessage message)
+        {
+            var testId = xmlDoc.SelectSingleNode("/test-message/@testid").Value;
+
+            var logRequest = new CreateLogItemRequest
+            {
+                Level = message.Level,
+                Time = message.Time,
+                Text = message.Text
+            };
+
+            if (message.Attach != null)
+            {
+                logRequest.Attach = new Client.Abstractions.Responses.Attach
+                {
+                    Name = message.Attach.Name,
+                    MimeType = message.Attach.MimeType,
+                    Data = message.Attach.Data
+                };
+            }
+
+            var testItemReporter = _flowItems[testId].TestReporter;
+
+            if (message.ParentScopeId != null)
+            {
+                testItemReporter = _nestedSteps[message.ParentScopeId];
+            }
+
+            testItemReporter.Log(logRequest);
+        }
+
+        // key: id of logging scope, value: according test item reporter
+        private Dictionary<string, ITestReporter> _nestedSteps = new Dictionary<string, ITestReporter>();
+
+        private void HandleBeginScopeCommunicationMessage(XmlDocument xmlDoc, BeginScopeCommunicationMessage message)
+        {
+            var testId = xmlDoc.SelectSingleNode("/test-message/@testid").Value;
+
+            var startTestItemRequest = new StartTestItemRequest
+            {
+                Name = message.Name,
+                StartTime = message.BeginTime,
+                Type = TestItemType.Step,
+                HasStats = false
+            };
+
+            var parentTestItem = _flowItems[testId].TestReporter;
+
+            if (message.ParentScopeId != null)
+            {
+                parentTestItem = _nestedSteps[message.ParentScopeId];
+            }
+
+            var nestedStep = parentTestItem.StartChildTestReporter(startTestItemRequest);
+
+            _nestedSteps[message.Id] = nestedStep;
+        }
+
+        private void HandleEndScopeCommunicationMessage(EndScopeCommunicationMessage message)
+        {
+            var nestedStep = _nestedSteps[message.Id];
+
+            nestedStep.Finish(new FinishTestItemRequest
+            {
+                EndTime = message.EndTime
+            });
+
+            _nestedSteps.Remove(message.Id);
         }
     }
 }

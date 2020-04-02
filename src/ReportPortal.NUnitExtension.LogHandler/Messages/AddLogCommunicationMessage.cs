@@ -2,19 +2,18 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace ReportPortal.NUnitExtension.LogHandler
+namespace ReportPortal.NUnitExtension.LogHandler.Messages
 {
     /// <summary>
     /// LogHandler serializes this class to be handled later in nunit extension
     /// </summary>
     [DataContract]
-    class SharedLogMessage
+    public class AddLogCommunicationMessage : BaseCommunicationMessage
     {
-        /// <summary>
-        /// ID of test item to add new logs.
-        /// </summary>
+        public override CommunicationAction Action { get; set; } = CommunicationAction.AddLog;
+
         [DataMember]
-        public string TestItemUuid { get; set; }
+        public string ParentScopeId { get; set; }
 
         /// <summary>
         /// Date time of log item.

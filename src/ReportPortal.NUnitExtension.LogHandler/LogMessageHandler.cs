@@ -1,5 +1,6 @@
 ﻿using ReportPortal.Client.Abstractions.Requests;
 using ReportPortal.Client.Converters;
+using ReportPortal.NUnitExtension.LogHandler.Messages;
 using ReportPortal.Shared.Extensibility;
 using ReportPortal.Shared.Logging;
 using System;
@@ -30,16 +31,16 @@ namespace ReportPortal.NUnitExtension.LogHandler
 
         public bool Handle(ILogScope logScope, CreateLogItemRequest logRequest)
         {
-            var sharedMessage = new SharedLogMessage()
+            var communicationMessage = new AddLogCommunicationMessage()
             {
-                TestItemUuid = logRequest.TestItemUuid,
+                ParentScopeId = logScope?.Id,
                 Time = logRequest.Time,
                 Text = logRequest.Text,
                 Level = logRequest.Level
             };
             if (logRequest.Attach != null)
             {
-                sharedMessage.Attach = new Attach
+                communicationMessage.Attach = new Attach
                 {
                     Name = logRequest.Attach.Name,
                     MimeType = logRequest.Attach.MimeType,
@@ -47,18 +48,33 @@ namespace ReportPortal.NUnitExtension.LogHandler
                 };
             }
 
-            NUnit.Framework.Internal.TestExecutionContext.CurrentContext.SendMessage("ReportPortal", ModelSerializer.Serialize<SharedLogMessage>(sharedMessage));
+            NUnit.Framework.Internal.TestExecutionContext.CurrentContext.SendMessage("ReportPortal", ModelSerializer.Serialize<AddLogCommunicationMessage>(communicationMessage));
 
             return true;
         }
 
         public void BeginScope(ILogScope logScope)
         {
+            var communicationMessage = new BeginScopeCommunicationMessage
+            {
+                Id = logScope.Id,
+                ParentScopeId = logScope.Parent?.Id,
+                Name = logScope.Name,
+                BeginTime = logScope.BeginTime
+            };
 
+            NUnit.Framework.Internal.TestExecutionContext.CurrentContext.SendMessage("ReportPortal", ModelSerializer.Serialize<BeginScopeCommunicationMessage>(communicationMessage));
         }
 
         public void EndScope(ILogScope logScope)
         {
+            var communicationMessage = new EndScopeCommunicationMessage
+            {
+                Id = logScope.Id,
+                EndTime = logScope.EndTime.Value
+            };
+
+            NUnit.Framework.Internal.TestExecutionContext.CurrentContext.SendMessage("ReportPortal", ModelSerializer.Serialize<EndScopeCommunicationMessage>(communicationMessage));
 
         }
     }
