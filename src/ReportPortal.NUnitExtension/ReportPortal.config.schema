@@ -83,7 +83,7 @@
         "name",
         "description",
         "debugMode",
-        "tags"
+        "attributes"
       ],
       "properties": {
         "name": {
@@ -118,19 +118,20 @@
             true
           ]
         },
-        "tags": {
-          "description":"the list of tags for a launch",
-          "$id": "#/properties/launch/properties/tags",
+        "attributes": {
+          "description":"the list of attributes for a launch",
+          "$id": "#/properties/launch/properties/attributes",
           "type": "array",
-          "title": "The Tags Schema",
+          "title": "The Attributes Schema",
           "items": {
-            "$id": "#/properties/launch/properties/tags/items",
+            "$id": "#/properties/launch/properties/attributes/items",
             "type": "string",
             "title": "The Items Schema",
             "default": "",
             "examples": [
               "t1",
-              "t2"
+              "t2",
+              "platform:x64"
             ],
             "pattern": "^(.*)$"
           }

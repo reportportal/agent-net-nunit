@@ -36,7 +36,7 @@ namespace ReportPortal.NUnitExtension
                     Type = TestItemType.Step
                 };
 
-                var beforeTestEventArg = new TestItemStartedEventArgs(Bridge.Service, startTestRequest, null, xmlDoc.OuterXml);
+                var beforeTestEventArg = new TestItemStartedEventArgs(_rpService, startTestRequest, null, xmlDoc.OuterXml);
                 try
                 {
                     BeforeTestStarted?.Invoke(this, beforeTestEventArg);
@@ -54,7 +54,7 @@ namespace ReportPortal.NUnitExtension
 
                     try
                     {
-                        AfterTestStarted?.Invoke(this, new TestItemStartedEventArgs(Bridge.Service, startTestRequest, testReporter, xmlDoc.OuterXml));
+                        AfterTestStarted?.Invoke(this, new TestItemStartedEventArgs(_rpService, startTestRequest, testReporter, xmlDoc.OuterXml));
                     }
                     catch (Exception exp)
                     {
@@ -106,7 +106,7 @@ namespace ReportPortal.NUnitExtension
                             Text = "Test Output: " + Environment.NewLine + outputNode.InnerText
                         };
 
-                        var outputEventArgs = new TestItemOutputEventArgs(Bridge.Service, outputLogRequest, _flowItems[id].TestReporter, xmlDoc.OuterXml);
+                        var outputEventArgs = new TestItemOutputEventArgs(_rpService, outputLogRequest, _flowItems[id].TestReporter, xmlDoc.OuterXml);
 
                         try
                         {
@@ -269,7 +269,7 @@ namespace ReportPortal.NUnitExtension
                         finishTestRequest.IsRetry = true;
                     }
 
-                    var eventArg = new TestItemFinishedEventArgs(Bridge.Service, finishTestRequest, _flowItems[id].TestReporter, xmlDoc.OuterXml);
+                    var eventArg = new TestItemFinishedEventArgs(_rpService, finishTestRequest, _flowItems[id].TestReporter, xmlDoc.OuterXml);
 
                     try
                     {
@@ -296,7 +296,7 @@ namespace ReportPortal.NUnitExtension
 
                         try
                         {
-                            AfterTestFinished?.Invoke(this, new TestItemFinishedEventArgs(Bridge.Service, __finishTestItemRequest, _flowItems[__id].TestReporter, __report));
+                            AfterTestFinished?.Invoke(this, new TestItemFinishedEventArgs(_rpService, __finishTestItemRequest, _flowItems[__id].TestReporter, __report));
                         }
                         catch (Exception exp)
                         {

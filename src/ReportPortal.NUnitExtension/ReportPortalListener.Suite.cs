@@ -36,7 +36,7 @@ namespace ReportPortal.NUnitExtension
                     Type = TestItemType.Suite
                 };
 
-                var beforeSuiteEventArg = new TestItemStartedEventArgs(Bridge.Service, startSuiteRequest, null, xmlDoc.OuterXml);
+                var beforeSuiteEventArg = new TestItemStartedEventArgs(_rpService, startSuiteRequest, null, xmlDoc.OuterXml);
 
                 var rootNamespaces = Config.GetValues<string>("rootNamespaces", null);
                 if (rootNamespaces != null && rootNamespaces.Any(n => n == name))
@@ -62,14 +62,14 @@ namespace ReportPortal.NUnitExtension
 
                     if (string.IsNullOrEmpty(parentId) || !_flowItems.ContainsKey(parentId))
                     {
-                        suiteReporter = Bridge.Context.LaunchReporter.StartChildTestReporter(startSuiteRequest);
+                        suiteReporter = _launchReporter.StartChildTestReporter(startSuiteRequest);
                     }
                     else
                     {
                         var parentFlowItem = FindReportedParentFlowItem(parentId);
                         if (parentFlowItem == null)
                         {
-                            suiteReporter = Bridge.Context.LaunchReporter.StartChildTestReporter(startSuiteRequest);
+                            suiteReporter = _launchReporter.StartChildTestReporter(startSuiteRequest);
                         }
                         else
                         {
@@ -81,7 +81,7 @@ namespace ReportPortal.NUnitExtension
 
                     try
                     {
-                        AfterSuiteStarted?.Invoke(this, new TestItemStartedEventArgs(Bridge.Service, startSuiteRequest, suiteReporter, xmlDoc.OuterXml));
+                        AfterSuiteStarted?.Invoke(this, new TestItemStartedEventArgs(_rpService, startSuiteRequest, suiteReporter, xmlDoc.OuterXml));
                     }
                     catch (Exception exp)
                     {
@@ -163,7 +163,7 @@ namespace ReportPortal.NUnitExtension
                             finishSuiteRequest.Description = description.Attributes["value"].Value;
                         }
 
-                        var eventArg = new TestItemFinishedEventArgs(Bridge.Service, finishSuiteRequest, _flowItems[id].TestReporter, xmlDoc.OuterXml);
+                        var eventArg = new TestItemFinishedEventArgs(_rpService, finishSuiteRequest, _flowItems[id].TestReporter, xmlDoc.OuterXml);
 
                         try
                         {
@@ -187,7 +187,7 @@ namespace ReportPortal.NUnitExtension
 
                             try
                             {
-                                AfterSuiteFinished?.Invoke(this, new TestItemFinishedEventArgs(Bridge.Service, __finishSuiteRequest, _flowItems[__id].TestReporter, __report));
+                                AfterSuiteFinished?.Invoke(this, new TestItemFinishedEventArgs(_rpService, __finishSuiteRequest, _flowItems[__id].TestReporter, __report));
                             }
                             catch (Exception exp)
                             {

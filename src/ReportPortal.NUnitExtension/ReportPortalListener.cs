@@ -3,15 +3,12 @@ using NUnit.Engine.Extensibility;
 using ReportPortal.Client;
 using ReportPortal.Client.Abstractions.Models;
 using ReportPortal.Client.Abstractions.Requests;
-using ReportPortal.Shared;
 using ReportPortal.Shared.Configuration;
-using ReportPortal.Shared.Configuration.Providers;
 using ReportPortal.Shared.Internal.Logging;
 using ReportPortal.Shared.Reporter;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net;
 using System.Xml;
 
 namespace ReportPortal.NUnitExtension
@@ -19,22 +16,20 @@ namespace ReportPortal.NUnitExtension
     [Extension(Description = "ReportPortal extension to send test results")]
     public partial class ReportPortalListener : ITestEventListener
     {
-        private static ITraceLogger TraceLogger => TraceLogManager.Instance.GetLogger(typeof(ReportPortalListener));
+        private readonly ITraceLogger _traceLogger = TraceLogManager.Instance.GetLogger(typeof(ReportPortalListener));
 
-        static ReportPortalListener()
+        private Client.Abstractions.IClientService _rpService;
+
+        ReportPortalListener()
         {
             var jsonPath = Path.GetDirectoryName(new Uri(typeof(ReportPortalListener).Assembly.CodeBase).LocalPath) + "/ReportPortal.config.json";
             Config = new ConfigurationBuilder().AddJsonFile(jsonPath).AddEnvironmentVariables().Build();
-
-            Service rpService;
 
             var uri = Config.GetValue<string>(ConfigurationPath.ServerUrl);
             var project = Config.GetValue<string>(ConfigurationPath.ServerProject);
             var uuid = Config.GetValue<string>(ConfigurationPath.ServerAuthenticationUuid);
 
-            rpService = new Service(new Uri(uri), project, uuid);
-
-            Bridge.Service = rpService;
+            _rpService = new Service(new Uri(uri), project, uuid);
 
             _statusMap["Passed"] = Status.Passed;
             _statusMap["Failed"] = Status.Failed;
@@ -51,7 +46,7 @@ namespace ReportPortal.NUnitExtension
 
         public void OnTestEvent(string report)
         {
-            TraceLogger.Verbose($"Agent got an event:{Environment.NewLine}{report}");
+            _traceLogger.Verbose($"Agent got an event:{Environment.NewLine}{report}");
 
             if (Config.GetValue("Enabled", true))
             {

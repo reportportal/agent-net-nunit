@@ -14,6 +14,8 @@ namespace ReportPortal.NUnitExtension
 {
     public partial class ReportPortalListener
     {
+        private ILaunchReporter _launchReporter;
+
         public delegate void RunStartedHandler(object sender, RunStartedEventArgs e);
         public static event RunStartedHandler BeforeRunStarted;
         public static event RunStartedHandler AfterRunStarted;
@@ -37,10 +39,10 @@ namespace ReportPortal.NUnitExtension
                     Description = Config.GetValue(ConfigurationPath.LaunchDescription, ""),
                     StartTime = DateTime.UtcNow,
                     Mode = launchMode,
-                    Tags = Config.GetValues(ConfigurationPath.LaunchTags, new List<string>()).ToList()
+                    Attributes = Config.GetKeyValues("Launch:Attributes", new List<KeyValuePair<string, string>>()).Select(a => new ItemAttribute { Key = a.Key, Value = a.Value })
                 };
 
-                var eventArg = new RunStartedEventArgs(Bridge.Service, startLaunchRequest);
+                var eventArg = new RunStartedEventArgs(_rpService, startLaunchRequest);
 
                 try
                 {
@@ -53,13 +55,13 @@ namespace ReportPortal.NUnitExtension
 
                 if (!eventArg.Canceled)
                 {
-                    Bridge.Context.LaunchReporter = Bridge.Context.LaunchReporter ?? new LaunchReporter(Bridge.Service, Config, null);
+                    _launchReporter = new LaunchReporter(_rpService, Config, null);
 
-                    Bridge.Context.LaunchReporter.Start(eventArg.StartLaunchRequest);
+                    _launchReporter.Start(eventArg.StartLaunchRequest);
 
                     try
                     {
-                        AfterRunStarted?.Invoke(this, new RunStartedEventArgs(Bridge.Service, startLaunchRequest, Bridge.Context.LaunchReporter, xmlDoc.OuterXml));
+                        AfterRunStarted?.Invoke(this, new RunStartedEventArgs(_rpService, startLaunchRequest, _launchReporter, xmlDoc.OuterXml));
                     }
                     catch (Exception exp)
                     {
@@ -87,7 +89,7 @@ namespace ReportPortal.NUnitExtension
 
                 };
 
-                var eventArg = new RunFinishedEventArgs(Bridge.Service, finishLaunchRequest, Bridge.Context.LaunchReporter, xmlDoc.OuterXml);
+                var eventArg = new RunFinishedEventArgs(_rpService, finishLaunchRequest, _launchReporter, xmlDoc.OuterXml);
                 try
                 {
                     BeforeRunFinished?.Invoke(this, eventArg);
@@ -102,14 +104,14 @@ namespace ReportPortal.NUnitExtension
                     var sw = Stopwatch.StartNew();
                     Console.Write("Finishing to send the results to Report Portal... ");
 
-                    Bridge.Context.LaunchReporter.Finish(finishLaunchRequest);
-                    Bridge.Context.LaunchReporter.Sync();
+                    _launchReporter.Finish(finishLaunchRequest);
+                    _launchReporter.Sync();
 
                     Console.WriteLine($"Elapsed: {sw.Elapsed}");
 
                     try
                     {
-                        AfterRunFinished?.Invoke(this, new RunFinishedEventArgs(Bridge.Service, finishLaunchRequest, Bridge.Context.LaunchReporter, xmlDoc.OuterXml));
+                        AfterRunFinished?.Invoke(this, new RunFinishedEventArgs(_rpService, finishLaunchRequest, _launchReporter, xmlDoc.OuterXml));
                     }
                     catch (Exception exp)
                     {
