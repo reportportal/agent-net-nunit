@@ -8,10 +8,8 @@ namespace ReportPortal.NUnitExtension.LogHandler.Messages
     /// LogHandler serializes this class to be handled later in nunit extension
     /// </summary>
     [DataContract]
-    public class AddLogCommunicationMessage : BaseCommunicationMessage
+    public class AddLogCommunicationMessage
     {
-        public override CommunicationAction Action { get; set; } = CommunicationAction.AddLog;
-
         [DataMember]
         public string ParentScopeId { get; set; }
 

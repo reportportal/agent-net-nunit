@@ -384,20 +384,19 @@ namespace ReportPortal.NUnitExtension
             try
             {
                 var message = xmlDoc.SelectSingleNode("/test-message").InnerText;
+                var action = xmlDoc.SelectSingleNode("/destination").Value;
 
-                var baseCommunicationMessage = ModelSerializer.Deserialize<AddLogCommunicationMessage>(message);
-
-                switch (baseCommunicationMessage.Action)
+                switch (action)
                 {
-                    case CommunicationAction.AddLog:
+                    case LogHandler.LogMessageHandler.ReportPortal_AddLogMessage:
                         var addLogCommunicationMessage = ModelSerializer.Deserialize<AddLogCommunicationMessage>(message);
                         HandleLogCommunicationMessage(xmlDoc, addLogCommunicationMessage);
                         break;
-                    case CommunicationAction.BeginLogScope:
+                    case LogHandler.LogMessageHandler.ReportPortal_BeginLogScopeMessage:
                         var beginScopeCommunicationMessage = ModelSerializer.Deserialize<BeginScopeCommunicationMessage>(message);
                         HandleBeginScopeCommunicationMessage(xmlDoc, beginScopeCommunicationMessage);
                         break;
-                    case CommunicationAction.EndLogScope:
+                    case LogHandler.LogMessageHandler.ReportPortal_EndLogScopeMessage:
                         var endScopeCommunicationAction = ModelSerializer.Deserialize<EndScopeCommunicationMessage>(message);
                         HandleEndScopeCommunicationMessage(endScopeCommunicationAction);
                         break;

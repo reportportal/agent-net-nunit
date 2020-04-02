@@ -10,6 +10,10 @@ namespace ReportPortal.NUnitExtension.LogHandler
 {
     public class LogMessageHandler : ILogHandler
     {
+        public const string ReportPortal_AddLogMessage = "ReportPortal-AddLogMessage";
+        public const string ReportPortal_BeginLogScopeMessage = "ReportPortal-BeginLogScopeMessage";
+        public const string ReportPortal_EndLogScopeMessage = "ReportPortal-EndLogScopeMessage";
+
         static LogMessageHandler()
         {
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
@@ -48,7 +52,7 @@ namespace ReportPortal.NUnitExtension.LogHandler
                 };
             }
 
-            NUnit.Framework.Internal.TestExecutionContext.CurrentContext.SendMessage("ReportPortal", ModelSerializer.Serialize<AddLogCommunicationMessage>(communicationMessage));
+            NUnit.Framework.Internal.TestExecutionContext.CurrentContext.SendMessage(ReportPortal_AddLogMessage, ModelSerializer.Serialize<AddLogCommunicationMessage>(communicationMessage));
 
             return true;
         }
@@ -63,7 +67,7 @@ namespace ReportPortal.NUnitExtension.LogHandler
                 BeginTime = logScope.BeginTime
             };
 
-            NUnit.Framework.Internal.TestExecutionContext.CurrentContext.SendMessage("ReportPortal", ModelSerializer.Serialize<BeginScopeCommunicationMessage>(communicationMessage));
+            NUnit.Framework.Internal.TestExecutionContext.CurrentContext.SendMessage(ReportPortal_BeginLogScopeMessage, ModelSerializer.Serialize<BeginScopeCommunicationMessage>(communicationMessage));
         }
 
         public void EndScope(ILogScope logScope)
@@ -75,7 +79,7 @@ namespace ReportPortal.NUnitExtension.LogHandler
                 Status = logScope.Status
             };
 
-            NUnit.Framework.Internal.TestExecutionContext.CurrentContext.SendMessage("ReportPortal", ModelSerializer.Serialize<EndScopeCommunicationMessage>(communicationMessage));
+            NUnit.Framework.Internal.TestExecutionContext.CurrentContext.SendMessage(ReportPortal_EndLogScopeMessage, ModelSerializer.Serialize<EndScopeCommunicationMessage>(communicationMessage));
 
         }
     }
