@@ -8,7 +8,7 @@
     <Authors>Nikolay Borisenko, Report Portal Community</Authors>
     <PackageTags>report nunit addin reportportal testing</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <PackageIconUrl>https://raw.githubusercontent.com/reportportal/agent-net-nunit/master/Logo.png</PackageIconUrl>
+    <PackageIcon>Logo.png</PackageIcon>
     <PackageProjectUrl>http://reportportal.io</PackageProjectUrl>
 
     <RepositoryType>GitHub</RepositoryType>
@@ -35,6 +35,8 @@
   <ItemGroup>
     <None Include="Build\**\*.props" Pack="true" PackagePath="build\" />
     <None Include="Build\**\*.targets" Pack="true" PackagePath="build\" />
+
+    <None Include="..\..\Logo.png" Pack="true" PackagePath="\" Visible="false" />
 
     <None Include="$(MSBuildProjectDirectory)\..\ReportPortal.NUnitExtension.LogHandler\bin\$(Configuration)\net45\ReportPortal.NUnitExtension.LogHandler.dll" Pack="true" PackagePath="lib\net45" Visible="false" />
     <None Include="$(MSBuildProjectDirectory)\..\ReportPortal.NUnitExtension.LogHandler\bin\$(Configuration)\netstandard2.0\ReportPortal.NUnitExtension.LogHandler.dll" Pack="true" PackagePath="lib\netstandard2.0" Visible="false" />
