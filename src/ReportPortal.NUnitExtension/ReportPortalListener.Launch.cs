@@ -1,8 +1,8 @@
 ﻿using ReportPortal.Client.Abstractions.Models;
 using ReportPortal.Client.Abstractions.Requests;
 using ReportPortal.NUnitExtension.EventArguments;
-using ReportPortal.Shared;
 using ReportPortal.Shared.Configuration;
+using ReportPortal.Shared.Extensibility;
 using ReportPortal.Shared.Reporter;
 using System;
 using System.Collections.Generic;
@@ -55,7 +55,7 @@ namespace ReportPortal.NUnitExtension
 
                 if (!eventArg.Canceled)
                 {
-                    _launchReporter = new LaunchReporter(_rpService, Config, null);
+                    _launchReporter = new LaunchReporter(_rpService, Config, null, _extensionManager);
 
                     _launchReporter.Start(eventArg.StartLaunchRequest);
 

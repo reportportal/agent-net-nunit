@@ -23,7 +23,7 @@ namespace ReportPortal.NUnitExtension.LogHandler
         {
             // since this assembly has deep link to "nunit.framework", use any already loaded "nunit.framework" assembly from test app domain
 
-            if (args.Name.Contains("nunit.framework"))
+            if (args.Name.ToLowerInvariant().Contains("nunit.framework"))
             {
                 return AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == "nunit.framework");
             }

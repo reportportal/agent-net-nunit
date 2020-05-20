@@ -4,6 +4,7 @@ using ReportPortal.Client;
 using ReportPortal.Client.Abstractions.Models;
 using ReportPortal.Client.Abstractions.Requests;
 using ReportPortal.Shared.Configuration;
+using ReportPortal.Shared.Extensibility;
 using ReportPortal.Shared.Internal.Logging;
 using ReportPortal.Shared.Reporter;
 using System;
@@ -20,6 +21,8 @@ namespace ReportPortal.NUnitExtension
 
         private Client.Abstractions.IClientService _rpService;
 
+        private IExtensionManager _extensionManager = new ExtensionManager();
+
         public ReportPortalListener()
         {
             var baseDir = Path.GetDirectoryName(new Uri(typeof(ReportPortalListener).Assembly.CodeBase).LocalPath);
@@ -35,6 +38,8 @@ namespace ReportPortal.NUnitExtension
             var uuid = Config.GetValue<string>(ConfigurationPath.ServerAuthenticationUuid);
 
             _rpService = new Service(new Uri(uri), project, uuid);
+
+            _extensionManager.Explore(baseDir);
 
             _statusMap["Passed"] = Status.Passed;
             _statusMap["Failed"] = Status.Failed;
