@@ -2,6 +2,7 @@
 using ReportPortal.Client.Converters;
 using ReportPortal.NUnitExtension.LogHandler.Messages;
 using ReportPortal.Shared.Extensibility;
+using ReportPortal.Shared.Internal.Logging;
 using ReportPortal.Shared.Logging;
 using System;
 using System.Linq;
@@ -13,6 +14,8 @@ namespace ReportPortal.NUnitExtension.LogHandler
         public const string ReportPortal_AddLogMessage = "ReportPortal-AddLogMessage";
         public const string ReportPortal_BeginLogScopeMessage = "ReportPortal-BeginLogScopeMessage";
         public const string ReportPortal_EndLogScopeMessage = "ReportPortal-EndLogScopeMessage";
+
+        private static ITraceLogger TraceLogger = TraceLogManager.Instance.GetLogger<LogMessageHandler>();
 
         static LogMessageHandler()
         {
@@ -52,7 +55,7 @@ namespace ReportPortal.NUnitExtension.LogHandler
                 };
             }
 
-            NUnit.Framework.Internal.TestExecutionContext.CurrentContext.SendMessage(ReportPortal_AddLogMessage, ModelSerializer.Serialize<AddLogCommunicationMessage>(communicationMessage));
+            SendMessage(ReportPortal_AddLogMessage, ModelSerializer.Serialize<AddLogCommunicationMessage>(communicationMessage));
 
             return true;
         }
@@ -67,7 +70,7 @@ namespace ReportPortal.NUnitExtension.LogHandler
                 BeginTime = logScope.BeginTime
             };
 
-            NUnit.Framework.Internal.TestExecutionContext.CurrentContext.SendMessage(ReportPortal_BeginLogScopeMessage, ModelSerializer.Serialize<BeginScopeCommunicationMessage>(communicationMessage));
+            SendMessage(ReportPortal_BeginLogScopeMessage, ModelSerializer.Serialize<BeginScopeCommunicationMessage>(communicationMessage));
         }
 
         public void EndScope(ILogScope logScope)
@@ -79,8 +82,19 @@ namespace ReportPortal.NUnitExtension.LogHandler
                 Status = logScope.Status
             };
 
-            NUnit.Framework.Internal.TestExecutionContext.CurrentContext.SendMessage(ReportPortal_EndLogScopeMessage, ModelSerializer.Serialize<EndScopeCommunicationMessage>(communicationMessage));
+            SendMessage(ReportPortal_EndLogScopeMessage, ModelSerializer.Serialize<EndScopeCommunicationMessage>(communicationMessage));
+        }
 
+        private void SendMessage(string command, string message)
+        {
+            try
+            {
+                NUnit.Framework.Internal.TestExecutionContext.CurrentContext.SendMessage(command, message);
+            }
+            catch (Exception exp)
+            {
+                TraceLogger.Error($"Error while sending test communication message to nunit engine. {exp}");
+            }
         }
     }
 }
