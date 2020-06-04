@@ -1,7 +1,8 @@
 ﻿image: Visual Studio 2019
 
 install:
-  - ps: gitversion /l console /output buildserver
+  - gitversion /l console /output buildserver
+  - dotnet tool install -g codecov.tool
 
 configuration:
   - Release
@@ -11,10 +12,14 @@ dotnet_csproj:
   version: '$(GitVersion_SemVer)'
 
 build_script:
-  - cmd: dotnet build
-  - cmd: dotnet pack
+  - dotnet build
+  - dotnet pack
 
-test: off
+test_script:
+  - dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=OpenCover /p:CoverletOutput=./Coverage.xml
 
 artifacts:
   - path: '**\*.nupkg'
+
+after_test:
+  - codecov -f test\ReportPortal.NUnitExtension.Tests\Coverage.*.xml
