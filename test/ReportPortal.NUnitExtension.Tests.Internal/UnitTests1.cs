@@ -7,17 +7,37 @@ namespace ReportPortal.NUnitExtension.Tests.Internal
     {
         [Test]
         [Category("smoke")]
-        public void Test1()
+        [Description("desc")]
+        public void PassedTest()
         {
             Assert.Pass();
         }
 
         [Test]
+        public void FailedTest()
+        {
+            Assert.IsTrue(false);
+        }
+
+        [Test]
+        public void WithAttachment()
+        {
+            TestContext.AddTestAttachment("ReportPortal.NUnitExtension.Tests.Internal.dll");
+        }
+
+        [Test]
         public void TestWithOutput()
         {
+            TestContext.Out.WriteLine("a");
+
             Console.WriteLine("a");
 
-            ReportPortal.Shared.Log.Info("q");
+            Shared.Log.Info("q");
+
+            using (var scope = Shared.Log.BeginScope("s"))
+            {
+
+            }
         }
     }
 }
