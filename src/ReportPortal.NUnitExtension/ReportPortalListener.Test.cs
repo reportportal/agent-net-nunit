@@ -251,11 +251,11 @@ namespace ReportPortal.NUnitExtension
                     var categories = xmlDoc.SelectNodes("//properties/property[@name='Category']");
                     if (categories != null)
                     {
-                        finishTestRequest.Tags = new List<string>();
+                        finishTestRequest.Attributes = new List<ItemAttribute>();
 
                         foreach (XmlNode category in categories)
                         {
-                            finishTestRequest.Tags.Add(category.Attributes["value"].Value);
+                            finishTestRequest.Attributes.Add(new ItemAttribute { Value = category.Attributes["value"].Value });
                         }
                     }
 
