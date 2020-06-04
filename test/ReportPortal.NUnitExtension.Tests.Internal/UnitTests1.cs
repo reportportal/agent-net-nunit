@@ -19,9 +19,19 @@ namespace ReportPortal.NUnitExtension.Tests.Internal
             Assert.IsTrue(false);
         }
 
+        [Test, Ignore("this is reason")]
+        public void SkippedTest()
+        {
+
+        }
+
         [Test]
         public void WithAttachment()
         {
+            // valid file
+            TestContext.AddTestAttachment("nunit_random_seed.tmp");
+
+            // cannot read this file
             TestContext.AddTestAttachment("ReportPortal.NUnitExtension.Tests.Internal.dll");
         }
 
