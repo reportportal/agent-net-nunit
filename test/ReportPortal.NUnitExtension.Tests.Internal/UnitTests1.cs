@@ -46,7 +46,7 @@ namespace ReportPortal.NUnitExtension.Tests.Internal
 
             using (var scope = Shared.Log.BeginScope("s"))
             {
-
+                scope.Info("q");
             }
         }
     }
