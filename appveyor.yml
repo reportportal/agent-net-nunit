@@ -22,4 +22,4 @@ artifacts:
   - path: '**\*.nupkg'
 
 after_test:
-  - codecov -f test\ReportPortal.NUnitExtension.Tests\Coverage.*.xml
+  - codecov -f test\ReportPortal.NUnitExtension.Tests\Coverage.xml
