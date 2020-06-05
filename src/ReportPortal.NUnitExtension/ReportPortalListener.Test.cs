@@ -3,10 +3,8 @@ using ReportPortal.Client.Abstractions.Requests;
 using ReportPortal.Client.Converters;
 using ReportPortal.NUnitExtension.EventArguments;
 using ReportPortal.NUnitExtension.LogHandler.Messages;
-using ReportPortal.Shared;
 using ReportPortal.Shared.Reporter;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -251,11 +249,11 @@ namespace ReportPortal.NUnitExtension
                     var categories = xmlDoc.SelectNodes("//properties/property[@name='Category']");
                     if (categories != null)
                     {
-                        finishTestRequest.Tags = new List<string>();
+                        finishTestRequest.Attributes = new List<ItemAttribute>();
 
                         foreach (XmlNode category in categories)
                         {
-                            finishTestRequest.Tags.Add(category.Attributes["value"].Value);
+                            finishTestRequest.Attributes.Add(new ItemAttribute { Key = "Category", Value = category.Attributes["value"].Value });
                         }
                     }
 

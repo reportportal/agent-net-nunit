@@ -30,8 +30,7 @@ namespace ReportPortal.NUnitExtension
             // first invocation of internal logger so setting base dir
             _traceLogger = TraceLogManager.Instance.WithBaseDir(baseDir).GetLogger(typeof(ReportPortalListener));
 
-            var jsonPath = Path.Combine(baseDir, "ReportPortal.config.json");
-            Config = new ConfigurationBuilder().AddJsonFile(jsonPath).AddEnvironmentVariables().Build();
+            Config = new ConfigurationBuilder().AddDefaults(baseDir).Build();
 
             var uri = Config.GetValue<string>(ConfigurationPath.ServerUrl);
             var project = Config.GetValue<string>(ConfigurationPath.ServerProject);
