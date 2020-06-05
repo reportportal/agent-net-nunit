@@ -253,7 +253,7 @@ namespace ReportPortal.NUnitExtension
 
                         foreach (XmlNode category in categories)
                         {
-                            finishTestRequest.Attributes.Add(new ItemAttribute { Value = category.Attributes["value"].Value });
+                            finishTestRequest.Attributes.Add(new ItemAttribute { Key = "Category", Value = category.Attributes["value"].Value });
                         }
                     }
 
