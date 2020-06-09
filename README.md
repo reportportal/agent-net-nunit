@@ -1,6 +1,7 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/q4l1kw3xrbi79m7i/branch/master?svg=true)](https://ci.appveyor.com/project/nvborisenko/agent-net-nunit/branch/master)
 [![NuGet Badge](https://buildstats.info/nuget/reportportal.nunit)](https://www.nuget.org/packages/reportportal.nunit)
 
+
 # Installation
 Install **ReportPortal.NUnit** NuGet package into your project with tests.
 
@@ -34,7 +35,9 @@ To verify installed extension just execute:
 nunit3-console.exe --list-extensions
 ```
 
+
 # Configuration
+
 Add `ReportPortal.config.json` file with configuration of the integration to test project. This file will be copied automatically to output folder during project building.
 
 Example of config file:
@@ -58,14 +61,8 @@ Example of config file:
 }
 ```
 
-# Environment variables
-It's possible to override parameters via environment variables.
-```cmd
-set reportportal_launch_name="My new launch name"
-# execute tests
-```
+Discover [more](https://github.com/reportportal/commons-net/blob/master/docs/Configuration.md) about configuration.
 
-`reportportal_` prefix is used for naming variables, and `_` is used as delimeter. For example to override `Server.Authentication.Uuid` parameter, we need specify `ReportPortal_Server_Authentication_Uuid` in environment variables. To override launch tags we need specify `ReportPortal_Launch_Attributes` with `tag1;os:win10` value (`;` used as separator for list of values).
 
 # Customization
 
@@ -86,8 +83,6 @@ Twelve handlers are available for event subscription that can be represented wit
 
 See deatils of the customization in the [example](https://github.com/reportportal/example-net-nunit/blob/master/src/Example/ReportPortalCustomization/Customization.cs)
 
-# Example
-Follow [reportportal example-net-nunit](https://github.com/reportportal/example-net-nunit) repo to see the source of test project with Report Portal integration.
 
 # Integrate logger framework
 - [NLog](https://github.com/reportportal/logger-net-nlog)
@@ -95,5 +90,12 @@ Follow [reportportal example-net-nunit](https://github.com/reportportal/example-
 - [Serilog](https://github.com/reportportal/logger-net-serilog)
 - [System.Diagnostics.TraceListener](https://github.com/reportportal/logger-net-tracelistener)
 
+And [how](https://github.com/reportportal/commons-net/blob/master/docs/Logging.md) you can improve your logging experience.
+
+
 # Useful extensions
 - [SourceBack](https://github.com/nvborisenko/reportportal-extensions-sourceback)
+
+
+# Example
+Follow [reportportal example-net-nunit](https://github.com/reportportal/example-net-nunit) repo to see the source of test project with Report Portal integration.
