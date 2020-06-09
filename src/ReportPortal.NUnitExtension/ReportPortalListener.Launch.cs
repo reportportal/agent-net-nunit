@@ -51,7 +51,7 @@ namespace ReportPortal.NUnitExtension
                 }
                 catch (Exception exp)
                 {
-                    Console.WriteLine("Exception was thrown in 'BeforeRunStarted' subscriber." + Environment.NewLine + exp);
+                    _traceLogger.Error("Exception was thrown in 'BeforeRunStarted' subscriber." + Environment.NewLine + exp);
                 }
 
                 if (!eventArg.Canceled)
@@ -66,13 +66,13 @@ namespace ReportPortal.NUnitExtension
                     }
                     catch (Exception exp)
                     {
-                        Console.WriteLine("Exception was thrown in 'AfterRunStarted' subscriber." + Environment.NewLine + exp);
+                        _traceLogger.Error("Exception was thrown in 'AfterRunStarted' subscriber." + Environment.NewLine + exp);
                     }
                 }
             }
             catch (Exception exception)
             {
-                Console.WriteLine("ReportPortal exception was thrown." + Environment.NewLine + exception);
+                _traceLogger.Error("ReportPortal exception was thrown." + Environment.NewLine + exception);
             }
         }
 
@@ -99,7 +99,7 @@ namespace ReportPortal.NUnitExtension
                 }
                 catch (Exception exp)
                 {
-                    Console.WriteLine("Exception was thrown in 'BeforeRunFinished' subscriber." + Environment.NewLine + exp);
+                    _traceLogger.Error("Exception was thrown in 'BeforeRunFinished' subscriber." + Environment.NewLine + exp);
                 }
 
                 if (!eventArg.Canceled)
@@ -118,14 +118,15 @@ namespace ReportPortal.NUnitExtension
                     }
                     catch (Exception exp)
                     {
-                        Console.WriteLine("Exception was thrown in 'AfterRunFinished' subscriber." + Environment.NewLine + exp);
+                        _traceLogger.Error("Exception was thrown in 'AfterRunFinished' subscriber." + Environment.NewLine + exp);
                     }
-
                 }
             }
             catch (Exception exception)
             {
-                Console.WriteLine("ReportPortal exception was thrown." + Environment.NewLine + exception);
+                var errorMessage = "ReportPortal exception was thrown." + Environment.NewLine + exception;
+                _traceLogger.Error(errorMessage);
+                Console.WriteLine(errorMessage);
             }
         }
     }

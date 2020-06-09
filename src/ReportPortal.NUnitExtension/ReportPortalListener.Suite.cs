@@ -54,7 +54,7 @@ namespace ReportPortal.NUnitExtension
                     }
                     catch (Exception exp)
                     {
-                        Console.WriteLine("Exception was thrown in 'BeforeSuiteStarted' subscriber." + Environment.NewLine + exp);
+                        _traceLogger.Error("Exception was thrown in 'BeforeSuiteStarted' subscriber." + Environment.NewLine + exp);
                     }
                 }
 
@@ -87,7 +87,7 @@ namespace ReportPortal.NUnitExtension
                     }
                     catch (Exception exp)
                     {
-                        Console.WriteLine("Exception was thrown in 'AfterSuiteStarted' subscriber." + Environment.NewLine + exp);
+                        _traceLogger.Error("Exception was thrown in 'AfterSuiteStarted' subscriber." + Environment.NewLine + exp);
                     }
                 }
                 else
@@ -97,7 +97,7 @@ namespace ReportPortal.NUnitExtension
             }
             catch (Exception exception)
             {
-                Console.WriteLine("ReportPortal exception was thrown." + Environment.NewLine + exception);
+                _traceLogger.Error("ReportPortal exception was thrown." + Environment.NewLine + exception);
             }
         }
 
@@ -175,7 +175,7 @@ namespace ReportPortal.NUnitExtension
                         }
                         catch (Exception exp)
                         {
-                            Console.WriteLine("Exception was thrown in 'BeforeSuiteFinished' subscriber." + Environment.NewLine + exp);
+                            _traceLogger.Error("Exception was thrown in 'BeforeSuiteFinished' subscriber." + Environment.NewLine + exp);
                         }
 
                         Action<string, FinishTestItemRequest, string, string> finishSuiteAction = (__id, __finishSuiteRequest, __report, __parentstacktrace) =>
@@ -195,7 +195,7 @@ namespace ReportPortal.NUnitExtension
                             }
                             catch (Exception exp)
                             {
-                                Console.WriteLine("Exception was thrown in 'AfterSuiteFinished' subscriber." + Environment.NewLine + exp);
+                                _traceLogger.Error("Exception was thrown in 'AfterSuiteFinished' subscriber." + Environment.NewLine + exp);
                             }
 
                             _flowItems.Remove(__id);
@@ -220,7 +220,7 @@ namespace ReportPortal.NUnitExtension
             }
             catch (Exception exception)
             {
-                Console.WriteLine("ReportPortal exception was thrown." + Environment.NewLine + exception);
+                _traceLogger.Error("ReportPortal exception was thrown." + Environment.NewLine + exception);
             }
         }
     }
