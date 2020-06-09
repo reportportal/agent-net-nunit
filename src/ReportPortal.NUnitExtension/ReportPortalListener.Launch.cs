@@ -2,13 +2,12 @@
 using ReportPortal.Client.Abstractions.Requests;
 using ReportPortal.NUnitExtension.EventArguments;
 using ReportPortal.Shared.Configuration;
-using ReportPortal.Shared.Extensibility;
 using ReportPortal.Shared.Reporter;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Xml;
+using System.Xml.Linq;
 
 namespace ReportPortal.NUnitExtension
 {
@@ -20,8 +19,10 @@ namespace ReportPortal.NUnitExtension
         public static event RunStartedHandler BeforeRunStarted;
         public static event RunStartedHandler AfterRunStarted;
 
-        private void StartRun(XmlDocument xmlDoc)
+        private void StartRun(string report)
         {
+            var xElement = XElement.Parse(report);
+
             try
             {
                 LaunchMode launchMode;
@@ -61,7 +62,7 @@ namespace ReportPortal.NUnitExtension
 
                     try
                     {
-                        AfterRunStarted?.Invoke(this, new RunStartedEventArgs(_rpService, startLaunchRequest, _launchReporter, xmlDoc.OuterXml));
+                        AfterRunStarted?.Invoke(this, new RunStartedEventArgs(_rpService, startLaunchRequest, _launchReporter, report));
                     }
                     catch (Exception exp)
                     {
@@ -79,8 +80,10 @@ namespace ReportPortal.NUnitExtension
         public static event RunFinishedHandler BeforeRunFinished;
         public static event RunFinishedHandler AfterRunFinished;
 
-        private void FinishRun(XmlDocument xmlDoc)
+        private void FinishRun(string report)
         {
+            var xElement = XElement.Parse(report);
+
             try
             {
                 var finishLaunchRequest = new FinishLaunchRequest
@@ -89,7 +92,7 @@ namespace ReportPortal.NUnitExtension
 
                 };
 
-                var eventArg = new RunFinishedEventArgs(_rpService, finishLaunchRequest, _launchReporter, xmlDoc.OuterXml);
+                var eventArg = new RunFinishedEventArgs(_rpService, finishLaunchRequest, _launchReporter, report);
                 try
                 {
                     BeforeRunFinished?.Invoke(this, eventArg);
@@ -111,7 +114,7 @@ namespace ReportPortal.NUnitExtension
 
                     try
                     {
-                        AfterRunFinished?.Invoke(this, new RunFinishedEventArgs(_rpService, finishLaunchRequest, _launchReporter, xmlDoc.OuterXml));
+                        AfterRunFinished?.Invoke(this, new RunFinishedEventArgs(_rpService, finishLaunchRequest, _launchReporter, report));
                     }
                     catch (Exception exp)
                     {

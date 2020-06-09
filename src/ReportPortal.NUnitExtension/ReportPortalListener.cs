@@ -61,38 +61,39 @@ namespace ReportPortal.NUnitExtension
             {
                 var xmlDoc = new XmlDocument();
                 xmlDoc.LoadXml(report);
-                if (xmlDoc.SelectSingleNode("/start-run") != null)
+
+                if (report.StartsWith("<start-run"))
                 {
-                    StartRun(xmlDoc);
+                    StartRun(report);
                 }
-                else if (xmlDoc.SelectSingleNode("/test-run") != null)
+                else if (report.StartsWith("<test-run"))
                 {
-                    FinishRun(xmlDoc);
+                    FinishRun(report);
                 }
-                else if (xmlDoc.SelectSingleNode("/start-suite") != null)
+                else if (report.StartsWith("<start-suite"))
                 {
-                    StartSuite(xmlDoc);
+                    StartSuite(report);
                 }
-                else if (xmlDoc.SelectSingleNode("/test-suite") != null)
+                else if (report.StartsWith("<test-suite"))
                 {
-                    FinishSuite(xmlDoc);
+                    FinishSuite(report);
                 }
-                else if (xmlDoc.SelectSingleNode("/start-test") != null)
+                else if (report.StartsWith("<start-test"))
                 {
-                    StartTest(xmlDoc);
+                    StartTest(report);
                 }
-                else if (xmlDoc.SelectSingleNode("/test-case") != null)
+                else if (report.StartsWith("<test-case"))
                 {
-                    FinishTest(xmlDoc);
+                    FinishTest(report);
                 }
-                else if (xmlDoc.SelectSingleNode("/test-output") != null)
+                else if (report.StartsWith("<test-output"))
                 {
-                    TestOutput(xmlDoc);
+                    TestOutput(report);
                 }
 
-                else if (xmlDoc.SelectSingleNode("/test-message") != null)
+                else if (report.StartsWith("<test-message"))
                 {
-                    TestMessage(xmlDoc);
+                    TestMessage(report);
                 }
             }
         }

@@ -1,12 +1,12 @@
 ﻿using ReportPortal.Client.Abstractions.Models;
 using ReportPortal.Client.Abstractions.Requests;
 using ReportPortal.NUnitExtension.EventArguments;
-using ReportPortal.Shared;
 using ReportPortal.Shared.Reporter;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml;
+using System.Xml.Linq;
+using System.Xml.XPath;
 
 namespace ReportPortal.NUnitExtension
 {
@@ -16,16 +16,18 @@ namespace ReportPortal.NUnitExtension
         public static event SuiteStartedHandler BeforeSuiteStarted;
         public static event SuiteStartedHandler AfterSuiteStarted;
 
-        private void StartSuite(XmlDocument xmlDoc)
+        private void StartSuite(string report)
         {
+            var xElement = XElement.Parse(report);
+
             try
             {
-                var type = xmlDoc.SelectSingleNode("/*/@type").Value;
+                var type = xElement.Attribute("type").Value;
 
-                var id = xmlDoc.SelectSingleNode("/*/@id").Value;
-                var parentId = xmlDoc.SelectSingleNode("/*/@parentId").Value;
-                var name = xmlDoc.SelectSingleNode("/*/@name").Value;
-                var fullname = xmlDoc.SelectSingleNode("/*/@fullname").Value;
+                var id = xElement.Attribute("id").Value;
+                var parentId = xElement.Attribute("parentId").Value;
+                var name = xElement.Attribute("name").Value;
+                var fullname = xElement.Attribute("fullname").Value;
 
                 var startTime = DateTime.UtcNow;
 
@@ -36,7 +38,7 @@ namespace ReportPortal.NUnitExtension
                     Type = TestItemType.Suite
                 };
 
-                var beforeSuiteEventArg = new TestItemStartedEventArgs(_rpService, startSuiteRequest, null, xmlDoc.OuterXml);
+                var beforeSuiteEventArg = new TestItemStartedEventArgs(_rpService, startSuiteRequest, null, report);
 
                 var rootNamespaces = Config.GetValues<string>("rootNamespaces", null);
                 if (rootNamespaces != null && rootNamespaces.Any(n => n == name))
@@ -81,7 +83,7 @@ namespace ReportPortal.NUnitExtension
 
                     try
                     {
-                        AfterSuiteStarted?.Invoke(this, new TestItemStartedEventArgs(_rpService, startSuiteRequest, suiteReporter, xmlDoc.OuterXml));
+                        AfterSuiteStarted?.Invoke(this, new TestItemStartedEventArgs(_rpService, startSuiteRequest, suiteReporter, report));
                     }
                     catch (Exception exp)
                     {
@@ -116,23 +118,25 @@ namespace ReportPortal.NUnitExtension
         public static event SuiteFinishedHandler BeforeSuiteFinished;
         public static event SuiteFinishedHandler AfterSuiteFinished;
 
-        private void FinishSuite(XmlDocument xmlDoc)
+        private void FinishSuite(string report)
         {
+            var xElement = XElement.Parse(report);
+
             try
             {
-                var type = xmlDoc.SelectSingleNode("/*/@type").Value;
+                var type = xElement.Attribute("type").Value;
 
-                var id = xmlDoc.SelectSingleNode("/*/@id").Value;
-                var result = xmlDoc.SelectSingleNode("/*/@result").Value;
-                var parentId = xmlDoc.SelectSingleNode("/*/@parentId");
-                var duration = float.Parse(xmlDoc.SelectSingleNode("/*/@duration").Value, System.Globalization.CultureInfo.InvariantCulture);
+                var id = xElement.Attribute("id").Value;
+                var result = xElement.Attribute("result").Value;
+                var parentId = xElement.Attribute("parentId");
+                var duration = float.Parse(xElement.Attribute("duration").Value, System.Globalization.CultureInfo.InvariantCulture);
 
                 // at the end of execution nunit raises 2 the same events, we need only that which has 'parentId' xml tag
                 if (parentId != null)
                 {
                     if (!_flowItems.ContainsKey(id))
                     {
-                        StartSuite(xmlDoc);
+                        StartSuite(report);
                     }
 
                     if (_flowItems.ContainsKey(id))
@@ -145,25 +149,25 @@ namespace ReportPortal.NUnitExtension
                         };
 
                         // adding categories to suite
-                        var categories = xmlDoc.SelectNodes("//properties/property[@name='Category']");
+                        var categories = xElement.XPathSelectElements("//properties/property[@name='Category']");
                         if (categories != null)
                         {
                             finishSuiteRequest.Attributes = new List<ItemAttribute>();
 
-                            foreach (XmlNode category in categories)
+                            foreach (XElement category in categories)
                             {
-                                finishSuiteRequest.Attributes.Add(new ItemAttribute { Key = "Category", Value = category.Attributes["value"].Value });
+                                finishSuiteRequest.Attributes.Add(new ItemAttribute { Key = "Category", Value = category.Attribute("value").Value });
                             }
                         }
 
                         // adding description to suite
-                        var description = xmlDoc.SelectSingleNode("//properties/property[@name='Description']");
+                        var description = xElement.XPathSelectElement("//properties/property[@name='Description']");
                         if (description != null)
                         {
-                            finishSuiteRequest.Description = description.Attributes["value"].Value;
+                            finishSuiteRequest.Description = description.Attribute("value").Value;
                         }
 
-                        var eventArg = new TestItemFinishedEventArgs(_rpService, finishSuiteRequest, _flowItems[id].TestReporter, xmlDoc.OuterXml);
+                        var eventArg = new TestItemFinishedEventArgs(_rpService, finishSuiteRequest, _flowItems[id].TestReporter, report);
 
                         try
                         {
@@ -198,17 +202,17 @@ namespace ReportPortal.NUnitExtension
                         };
 
                         // understand whether finishing test suite should be defferred. Usually we need it to report stacktrace in case of OneTimeSetup method fails, and stacktrace is avalable later in "FinishSuite" method
-                        if (xmlDoc.SelectSingleNode("/*/@site")?.Value == "Parent")
+                        if (xElement.Attribute("site")?.Value == "Parent")
                         {
                             _flowItems[id].FinishTestItemRequest = finishSuiteRequest;
-                            _flowItems[id].Report = xmlDoc.OuterXml;
+                            _flowItems[id].Report = report;
                             _flowItems[id].DeferredFinishAction = finishSuiteAction;
                         }
                         else
                         {
-                            var failurestacktrace = xmlDoc.SelectSingleNode("//failure/stack-trace")?.InnerText;
+                            var failurestacktrace = xElement.XPathSelectElement("//failure/stack-trace")?.Value;
 
-                            finishSuiteAction.Invoke(id, finishSuiteRequest, xmlDoc.OuterXml, failurestacktrace);
+                            finishSuiteAction.Invoke(id, finishSuiteRequest, report, failurestacktrace);
                         }
                     }
                 }
