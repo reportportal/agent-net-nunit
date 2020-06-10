@@ -40,6 +40,8 @@ namespace ReportPortal.NUnitExtension
 
             _extensionManager.Explore(baseDir);
 
+            Shared.Extensibility.Analytics.AnalyticsReportEventsObserver.DefineConsumer("agent-dotnet-nunit");
+
             _statusMap["Passed"] = Status.Passed;
             _statusMap["Failed"] = Status.Failed;
             _statusMap["Skipped"] = Status.Skipped;
