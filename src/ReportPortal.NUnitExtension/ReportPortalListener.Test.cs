@@ -3,14 +3,13 @@ using ReportPortal.Client.Abstractions.Requests;
 using ReportPortal.Client.Converters;
 using ReportPortal.NUnitExtension.EventArguments;
 using ReportPortal.NUnitExtension.LogHandler.Messages;
-using ReportPortal.Shared;
 using ReportPortal.Shared.Reporter;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Xml;
+using System.Xml.Linq;
+using System.Xml.XPath;
 
 namespace ReportPortal.NUnitExtension
 {
@@ -21,14 +20,16 @@ namespace ReportPortal.NUnitExtension
         public static event TestStartedHandler BeforeTestStarted;
         public static event TestStartedHandler AfterTestStarted;
 
-        public void StartTest(XmlDocument xmlDoc)
+        public void StartTest(string report)
         {
+            var xElement = XElement.Parse(report);
+
             try
             {
-                var id = xmlDoc.SelectSingleNode("/*/@id").Value;
-                var parentId = xmlDoc.SelectSingleNode("/*/@parentId").Value;
-                var name = xmlDoc.SelectSingleNode("/*/@name").Value;
-                var fullname = xmlDoc.SelectSingleNode("/*/@fullname").Value;
+                var id = xElement.Attribute("id").Value;
+                var parentId = xElement.Attribute("parentId").Value;
+                var name = xElement.Attribute("name").Value;
+                var fullname = xElement.Attribute("fullname").Value;
 
                 var startTime = DateTime.UtcNow;
 
@@ -39,15 +40,14 @@ namespace ReportPortal.NUnitExtension
                     Type = TestItemType.Step
                 };
 
-                var beforeTestEventArg = new TestItemStartedEventArgs(_rpService, startTestRequest, null, xmlDoc.OuterXml);
+                var beforeTestEventArg = new TestItemStartedEventArgs(_rpService, startTestRequest, null, report);
                 try
                 {
                     BeforeTestStarted?.Invoke(this, beforeTestEventArg);
                 }
                 catch (Exception exp)
                 {
-                    Console.WriteLine("Exception was thrown in 'BeforeTestStarted' subscriber." + Environment.NewLine +
-                                      exp);
+                    _traceLogger.Error("Exception was thrown in 'BeforeTestStarted' subscriber." + Environment.NewLine + exp);
                 }
                 if (!beforeTestEventArg.Canceled)
                 {
@@ -57,18 +57,17 @@ namespace ReportPortal.NUnitExtension
 
                     try
                     {
-                        AfterTestStarted?.Invoke(this, new TestItemStartedEventArgs(_rpService, startTestRequest, testReporter, xmlDoc.OuterXml));
+                        AfterTestStarted?.Invoke(this, new TestItemStartedEventArgs(_rpService, startTestRequest, testReporter, report));
                     }
                     catch (Exception exp)
                     {
-                        Console.WriteLine("Exception was thrown in 'AfterTestStarted' subscriber." + Environment.NewLine +
-                                          exp);
+                        _traceLogger.Error("Exception was thrown in 'AfterTestStarted' subscriber." + Environment.NewLine + exp);
                     }
                 }
             }
             catch (Exception exception)
             {
-                Console.WriteLine("ReportPortal exception was thrown." + Environment.NewLine + exception);
+                _traceLogger.Error("ReportPortal exception was thrown." + Environment.NewLine + exception);
             }
         }
 
@@ -82,34 +81,36 @@ namespace ReportPortal.NUnitExtension
         public static event TestOutputHandler BeforeTestOutput;
         public static event TestOutputHandler AfterTestOutput;
 
-        public void FinishTest(XmlDocument xmlDoc)
+        public void FinishTest(string report)
         {
+            var xElement = XElement.Parse(report);
+
             try
             {
-                var id = xmlDoc.SelectSingleNode("/*/@id").Value;
-                var result = xmlDoc.SelectSingleNode("/*/@result").Value;
-                var parentId = xmlDoc.SelectSingleNode("/*/@parentId");
-                var duration = float.Parse(xmlDoc.SelectSingleNode("/*/@duration").Value, System.Globalization.CultureInfo.InvariantCulture);
+                var id = xElement.Attribute("id").Value;
+                var result = xElement.Attribute("result").Value;
+                var parentId = xElement.Attribute("parentId");
+                var duration = float.Parse(xElement.Attribute("duration").Value, System.Globalization.CultureInfo.InvariantCulture);
 
                 if (!_flowItems.ContainsKey(id))
                 {
-                    StartTest(xmlDoc);
+                    StartTest(report);
                 }
 
                 if (_flowItems.ContainsKey(id))
                 {
                     // adding console output
-                    var outputNode = xmlDoc.SelectSingleNode("//output");
+                    var outputNode = xElement.XPathSelectElement("//output");
                     if (outputNode != null)
                     {
                         var outputLogRequest = new CreateLogItemRequest
                         {
                             Level = LogLevel.Trace,
                             Time = DateTime.UtcNow,
-                            Text = "Test Output: " + Environment.NewLine + outputNode.InnerText
+                            Text = "Test Output: " + Environment.NewLine + outputNode.Value
                         };
 
-                        var outputEventArgs = new TestItemOutputEventArgs(_rpService, outputLogRequest, _flowItems[id].TestReporter, xmlDoc.OuterXml);
+                        var outputEventArgs = new TestItemOutputEventArgs(_rpService, outputLogRequest, _flowItems[id].TestReporter, report);
 
                         try
                         {
@@ -117,7 +118,7 @@ namespace ReportPortal.NUnitExtension
                         }
                         catch (Exception exp)
                         {
-                            Console.WriteLine("Exception was thrown in 'BeforeTestOutput' subscriber." + Environment.NewLine + exp);
+                            _traceLogger.Error("Exception was thrown in 'BeforeTestOutput' subscriber." + Environment.NewLine + exp);
                         }
 
                         if (!outputEventArgs.Canceled)
@@ -130,23 +131,23 @@ namespace ReportPortal.NUnitExtension
                             }
                             catch (Exception exp)
                             {
-                                Console.WriteLine("Exception was thrown in 'AfterTestOutput' subscriber." + Environment.NewLine + exp);
+                                _traceLogger.Error("Exception was thrown in 'AfterTestOutput' subscriber." + Environment.NewLine + exp);
                             }
                         }
                     }
 
                     // adding attachments
-                    var attachmentNodes = xmlDoc.SelectNodes("//attachments/attachment");
-                    foreach (XmlNode attachmentNode in attachmentNodes)
+                    var attachmentNodes = xElement.XPathSelectElements("//attachments/attachment");
+                    foreach (XElement attachmentNode in attachmentNodes)
                     {
-                        var filePath = attachmentNode.SelectSingleNode("./filePath").InnerText;
-                        var fileDescription = attachmentNode.SelectSingleNode("./description")?.InnerText;
+                        var filePath = attachmentNode.XPathSelectElement("./filePath").Value;
+                        var fileDescription = attachmentNode.XPathSelectElement("./description")?.Value;
 
                         if (File.Exists(filePath))
                         {
                             try
                             {
-                                var attachmentLogItemRequest = new Client.Abstractions.Requests.CreateLogItemRequest
+                                var attachmentLogItemRequest = new CreateLogItemRequest
                                 {
                                     Level = LogLevel.Info,
                                     Time = DateTime.UtcNow,
@@ -195,11 +196,11 @@ namespace ReportPortal.NUnitExtension
                     }
 
                     // adding failure message
-                    var failureNode = xmlDoc.SelectSingleNode("//failure");
+                    var failureNode = xElement.XPathSelectElement("//failure");
                     if (failureNode != null)
                     {
-                        var failureMessage = failureNode.SelectSingleNode("./message")?.InnerText;
-                        var failureStacktrace = failureNode.SelectSingleNode("./stack-trace")?.InnerText;
+                        var failureMessage = failureNode.XPathSelectElement("./message")?.Value;
+                        var failureStacktrace = failureNode.XPathSelectElement("./stack-trace")?.Value;
 
                         _flowItems[id].TestReporter.Log(new CreateLogItemRequest
                         {
@@ -209,10 +210,10 @@ namespace ReportPortal.NUnitExtension
                         });
 
                         // walk through assertions
-                        foreach (XmlNode assertionNode in xmlDoc.SelectNodes("test-case/assertions/assertion"))
+                        foreach (XElement assertionNode in xElement.XPathSelectElements("test-case/assertions/assertion"))
                         {
-                            var assertionMessage = assertionNode.SelectSingleNode("message")?.InnerText;
-                            var assertionStacktrace = assertionNode.SelectSingleNode("stack-trace")?.InnerText;
+                            var assertionMessage = assertionNode.XPathSelectElement("message")?.Value;
+                            var assertionStacktrace = assertionNode.XPathSelectElement("stack-trace")?.Value;
 
                             if (assertionMessage != failureMessage && assertionStacktrace != failureStacktrace)
                             {
@@ -227,10 +228,10 @@ namespace ReportPortal.NUnitExtension
                     }
 
                     // adding reason message
-                    var reasonNode = xmlDoc.SelectSingleNode("//reason");
+                    var reasonNode = xElement.XPathSelectElement("//reason");
                     if (reasonNode != null)
                     {
-                        var reasonMessage = reasonNode.SelectSingleNode("./message")?.InnerText;
+                        var reasonMessage = reasonNode.XPathSelectElement("./message")?.Value;
 
                         _flowItems[id].TestReporter.Log(new CreateLogItemRequest
                         {
@@ -248,31 +249,31 @@ namespace ReportPortal.NUnitExtension
                     };
 
                     // adding categories to test
-                    var categories = xmlDoc.SelectNodes("//properties/property[@name='Category']");
+                    var categories = xElement.XPathSelectElements("//properties/property[@name='Category']");
                     if (categories != null)
                     {
-                        finishTestRequest.Tags = new List<string>();
+                        finishTestRequest.Attributes = new List<ItemAttribute>();
 
-                        foreach (XmlNode category in categories)
+                        foreach (XElement category in categories)
                         {
-                            finishTestRequest.Tags.Add(category.Attributes["value"].Value);
+                            finishTestRequest.Attributes.Add(new ItemAttribute { Key = "Category", Value = category.Attribute("value").Value });
                         }
                     }
 
                     // adding description to test
-                    var description = xmlDoc.SelectSingleNode("//properties/property[@name='Description']");
+                    var description = xElement.XPathSelectElement("//properties/property[@name='Description']");
                     if (description != null)
                     {
-                        finishTestRequest.Description = description.Attributes["value"].Value;
+                        finishTestRequest.Description = description.Attribute("value").Value;
                     }
 
-                    var isRetry = xmlDoc.SelectSingleNode("//properties/property[@name='Retry']");
+                    var isRetry = xElement.XPathSelectElement("//properties/property[@name='Retry']");
                     if (isRetry != null)
                     {
                         finishTestRequest.IsRetry = true;
                     }
 
-                    var eventArg = new TestItemFinishedEventArgs(_rpService, finishTestRequest, _flowItems[id].TestReporter, xmlDoc.OuterXml);
+                    var eventArg = new TestItemFinishedEventArgs(_rpService, finishTestRequest, _flowItems[id].TestReporter, report);
 
                     try
                     {
@@ -280,7 +281,7 @@ namespace ReportPortal.NUnitExtension
                     }
                     catch (Exception exp)
                     {
-                        Console.WriteLine("Exception was thrown in 'BeforeTestFinished' subscriber." + Environment.NewLine + exp);
+                        _traceLogger.Error("Exception was thrown in 'BeforeTestFinished' subscriber." + Environment.NewLine + exp);
                     }
 
                     Action<string, FinishTestItemRequest, string, string> finishTestAction = (__id, __finishTestItemRequest, __report, __parentstacktrace) =>
@@ -303,36 +304,38 @@ namespace ReportPortal.NUnitExtension
                         }
                         catch (Exception exp)
                         {
-                            Console.WriteLine("Exception was thrown in 'AfterTestFinished' subscriber." + Environment.NewLine + exp);
+                            _traceLogger.Error("Exception was thrown in 'AfterTestFinished' subscriber." + Environment.NewLine + exp);
                         }
 
                         _flowItems.Remove(__id);
                     };
                     // understand whether finishing test item should be deferred. Usually we need it to report stacktrace in case of OneTimeSetup method fails, and stacktrace is avalable later in "FinishSuite" method
-                    if (xmlDoc.SelectSingleNode("/*/@site")?.Value == "Parent")
+                    if (xElement.Attribute("site")?.Value == "Parent")
                     {
                         _flowItems[id].FinishTestItemRequest = finishTestRequest;
-                        _flowItems[id].Report = xmlDoc.OuterXml;
+                        _flowItems[id].Report = report;
                         _flowItems[id].DeferredFinishAction = finishTestAction;
                     }
                     else
                     {
-                        finishTestAction.Invoke(id, finishTestRequest, xmlDoc.OuterXml, null);
+                        finishTestAction.Invoke(id, finishTestRequest, report, null);
                     }
                 }
             }
             catch (Exception exception)
             {
-                Console.WriteLine("ReportPortal exception was thrown." + Environment.NewLine + exception);
+                _traceLogger.Error("ReportPortal exception was thrown." + Environment.NewLine + exception);
             }
         }
 
-        public void TestOutput(XmlDocument xmlDoc)
+        public void TestOutput(string report)
         {
+            var xElement = XElement.Parse(report);
+
             try
             {
-                var id = xmlDoc.SelectSingleNode("/test-output/@testid").Value;
-                var message = xmlDoc.SelectSingleNode("/test-output").InnerText;
+                var id = xElement.Attribute("testid").Value;
+                var message = xElement.Value;
 
                 if (_flowItems.ContainsKey(id))
                 {
@@ -375,26 +378,28 @@ namespace ReportPortal.NUnitExtension
             }
             catch (Exception exception)
             {
-                Console.WriteLine("ReportPortal exception was thrown." + Environment.NewLine + exception);
+                _traceLogger.Error("ReportPortal exception was thrown." + Environment.NewLine + exception);
             }
         }
 
-        public void TestMessage(XmlDocument xmlDoc)
+        public void TestMessage(string report)
         {
+            var xElement = XElement.Parse(report);
+
             try
             {
-                var message = xmlDoc.SelectSingleNode("/test-message").InnerText;
-                var action = xmlDoc.SelectSingleNode("/test-message/@destination").Value;
+                var message = xElement.Value;
+                var action = xElement.Attribute("destination").Value;
 
                 switch (action)
                 {
                     case LogHandler.LogMessageHandler.ReportPortal_AddLogMessage:
                         var addLogCommunicationMessage = ModelSerializer.Deserialize<AddLogCommunicationMessage>(message);
-                        HandleLogCommunicationMessage(xmlDoc, addLogCommunicationMessage);
+                        HandleLogCommunicationMessage(xElement, addLogCommunicationMessage);
                         break;
                     case LogHandler.LogMessageHandler.ReportPortal_BeginLogScopeMessage:
                         var beginScopeCommunicationMessage = ModelSerializer.Deserialize<BeginScopeCommunicationMessage>(message);
-                        HandleBeginScopeCommunicationMessage(xmlDoc, beginScopeCommunicationMessage);
+                        HandleBeginScopeCommunicationMessage(xElement, beginScopeCommunicationMessage);
                         break;
                     case LogHandler.LogMessageHandler.ReportPortal_EndLogScopeMessage:
                         var endScopeCommunicationAction = ModelSerializer.Deserialize<EndScopeCommunicationMessage>(message);
@@ -404,15 +409,13 @@ namespace ReportPortal.NUnitExtension
             }
             catch (Exception exception)
             {
-                var errorMessage = "ReportPortal exception was thrown." + Environment.NewLine + exception;
-                Console.WriteLine(errorMessage);
-                _traceLogger.Error(errorMessage);
+                _traceLogger.Error("ReportPortal exception was thrown." + Environment.NewLine + exception);
             }
         }
 
-        private void HandleLogCommunicationMessage(XmlDocument xmlDoc, AddLogCommunicationMessage message)
+        private void HandleLogCommunicationMessage(XElement xElement, AddLogCommunicationMessage message)
         {
-            var testId = xmlDoc.SelectSingleNode("/test-message/@testid").Value;
+            var testId = xElement.Attribute("testid").Value;
 
             var logRequest = new CreateLogItemRequest
             {
@@ -444,9 +447,9 @@ namespace ReportPortal.NUnitExtension
         // key: id of logging scope, value: according test item reporter
         private Dictionary<string, ITestReporter> _nestedSteps = new Dictionary<string, ITestReporter>();
 
-        private void HandleBeginScopeCommunicationMessage(XmlDocument xmlDoc, BeginScopeCommunicationMessage message)
+        private void HandleBeginScopeCommunicationMessage(XElement xElement, BeginScopeCommunicationMessage message)
         {
-            var testId = xmlDoc.SelectSingleNode("/test-message/@testid").Value;
+            var testId = xElement.Attribute("testid").Value;
 
             var startTestItemRequest = new StartTestItemRequest
             {

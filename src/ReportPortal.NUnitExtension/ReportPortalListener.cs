@@ -30,8 +30,7 @@ namespace ReportPortal.NUnitExtension
             // first invocation of internal logger so setting base dir
             _traceLogger = TraceLogManager.Instance.WithBaseDir(baseDir).GetLogger(typeof(ReportPortalListener));
 
-            var jsonPath = Path.Combine(baseDir, "ReportPortal.config.json");
-            Config = new ConfigurationBuilder().AddJsonFile(jsonPath).AddEnvironmentVariables().Build();
+            Config = new ConfigurationBuilder().AddDefaults(baseDir).Build();
 
             var uri = Config.GetValue<string>(ConfigurationPath.ServerUrl);
             var project = Config.GetValue<string>(ConfigurationPath.ServerProject);
@@ -40,6 +39,8 @@ namespace ReportPortal.NUnitExtension
             _rpService = new Service(new Uri(uri), project, uuid);
 
             _extensionManager.Explore(baseDir);
+
+            Shared.Extensibility.Analytics.AnalyticsReportEventsObserver.DefineConsumer("agent-dotnet-nunit");
 
             _statusMap["Passed"] = Status.Passed;
             _statusMap["Failed"] = Status.Failed;
@@ -62,38 +63,39 @@ namespace ReportPortal.NUnitExtension
             {
                 var xmlDoc = new XmlDocument();
                 xmlDoc.LoadXml(report);
-                if (xmlDoc.SelectSingleNode("/start-run") != null)
+
+                if (report.StartsWith("<start-run"))
                 {
-                    StartRun(xmlDoc);
+                    StartRun(report);
                 }
-                else if (xmlDoc.SelectSingleNode("/test-run") != null)
+                else if (report.StartsWith("<test-run"))
                 {
-                    FinishRun(xmlDoc);
+                    FinishRun(report);
                 }
-                else if (xmlDoc.SelectSingleNode("/start-suite") != null)
+                else if (report.StartsWith("<start-suite"))
                 {
-                    StartSuite(xmlDoc);
+                    StartSuite(report);
                 }
-                else if (xmlDoc.SelectSingleNode("/test-suite") != null)
+                else if (report.StartsWith("<test-suite"))
                 {
-                    FinishSuite(xmlDoc);
+                    FinishSuite(report);
                 }
-                else if (xmlDoc.SelectSingleNode("/start-test") != null)
+                else if (report.StartsWith("<start-test"))
                 {
-                    StartTest(xmlDoc);
+                    StartTest(report);
                 }
-                else if (xmlDoc.SelectSingleNode("/test-case") != null)
+                else if (report.StartsWith("<test-case"))
                 {
-                    FinishTest(xmlDoc);
+                    FinishTest(report);
                 }
-                else if (xmlDoc.SelectSingleNode("/test-output") != null)
+                else if (report.StartsWith("<test-output"))
                 {
-                    TestOutput(xmlDoc);
+                    TestOutput(report);
                 }
 
-                else if (xmlDoc.SelectSingleNode("/test-message") != null)
+                else if (report.StartsWith("<test-message"))
                 {
-                    TestMessage(xmlDoc);
+                    TestMessage(report);
                 }
             }
         }
