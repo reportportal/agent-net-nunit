@@ -94,7 +94,8 @@ And [how](https://github.com/reportportal/commons-net/blob/master/docs/Logging.m
 
 
 # Useful extensions
-- [SourceBack](https://github.com/nvborisenko/reportportal-extensions-sourceback)
+- [SourceBack](https://github.com/nvborisenko/reportportal-extensions-sourceback) adds piece of test code where it was failed
+- [Insider](https://github.com/nvborisenko/reportportal-extensions-insider) brings more reporting capabilities without coding
 
 
 # Example
