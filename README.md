@@ -100,3 +100,9 @@ And [how](https://github.com/reportportal/commons-net/blob/master/docs/Logging.m
 
 # Example
 Follow [reportportal example-net-nunit](https://github.com/reportportal/example-net-nunit) repo to see the source of test project with Report Portal integration.
+
+
+# License
+ReportPortal is licensed under [Apache 2.0](https://github.com/reportportal/agent-net-nunit/blob/master/LICENSE)
+
+We use Google Analytics for sending anonymous usage information as library's name/version and the agent's name/version when starting launch. This information might help us to improve integration with ReportPortal. Used by the ReportPortal team only and not for sharing with 3rd parties. You are able to [turn off](https://github.com/reportportal/commons-net/blob/master/docs/Configuration.md#analytics) it if needed.
