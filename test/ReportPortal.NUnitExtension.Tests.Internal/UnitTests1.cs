@@ -66,7 +66,7 @@ namespace ReportPortal.NUnitExtension.Tests.Internal
         }
 
         [Test]
-        [TestCase(1)]
+        [TestCase(1, TestName = "Abc")]
         [TestCase(2)]
         public void ParametrizedTest(int a)
         {
