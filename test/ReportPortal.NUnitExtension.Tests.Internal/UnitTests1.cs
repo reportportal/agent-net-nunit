@@ -64,5 +64,13 @@ namespace ReportPortal.NUnitExtension.Tests.Internal
                 scope.Info("q");
             }
         }
+
+        [Test]
+        [TestCase(1, TestName = "Abc")]
+        [TestCase(2)]
+        public void ParametrizedTest(int a)
+        {
+
+        }
     }
 }

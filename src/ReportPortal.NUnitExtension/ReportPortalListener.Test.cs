@@ -37,7 +37,8 @@ namespace ReportPortal.NUnitExtension
                 {
                     StartTime = startTime,
                     Name = name,
-                    Type = TestItemType.Step
+                    Type = TestItemType.Step,
+                    CodeReference = ExtractCodeReferenceFromFullName(fullname)
                 };
 
                 var beforeTestEventArg = new TestItemStartedEventArgs(_rpService, startTestRequest, null, report);
@@ -489,6 +490,19 @@ namespace ReportPortal.NUnitExtension
             });
 
             _nestedSteps.Remove(message.Id);
+        }
+
+        /// <summary>
+        /// When strating test nunit doesn't provide info about namespace.
+        /// Here we try to extrract it from full name. '(' is indicator of starting test parameters.
+        /// </summary>
+        /// <param name="fullname"></param>
+        /// <returns></returns>
+        private string ExtractCodeReferenceFromFullName(string fullname)
+        {
+            var index = fullname.IndexOf("(");
+
+            return index == -1 ? fullname : fullname.Substring(0, index);
         }
     }
 }
