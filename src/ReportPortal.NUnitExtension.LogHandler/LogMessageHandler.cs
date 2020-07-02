@@ -1,15 +1,17 @@
-﻿using ReportPortal.Client.Abstractions.Requests;
-using ReportPortal.Client.Converters;
+﻿using ReportPortal.Client.Converters;
 using ReportPortal.NUnitExtension.LogHandler.Messages;
 using ReportPortal.Shared.Extensibility;
 using ReportPortal.Shared.Internal.Logging;
-using ReportPortal.Shared.Logging;
 using System;
 using System.Linq;
+using ReportPortal.Shared.Extensibility.Commands;
+using System.Collections.Generic;
+using System.Collections;
+using ReportPortal.Shared.Execution.Metadata;
 
 namespace ReportPortal.NUnitExtension.LogHandler
 {
-    public class LogMessageHandler : ILogHandler
+    public class LogMessageHandler : ICommandsListener
     {
         public const string ReportPortal_AddLogMessage = "ReportPortal-AddLogMessage";
         public const string ReportPortal_BeginLogScopeMessage = "ReportPortal-BeginLogScopeMessage";
@@ -22,6 +24,108 @@ namespace ReportPortal.NUnitExtension.LogHandler
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
         }
 
+        public void Initialize(ICommandsSource commandsSource)
+        {
+            commandsSource.OnBeginLogScopeCommand += CommandsSource_OnBeginLogScopeCommand;
+            commandsSource.OnEndLogScopeCommand += CommandsSource_OnEndLogScopeCommand;
+            commandsSource.OnLogMessageCommand += CommandsSource_OnLogMessageCommand;
+
+            commandsSource.TestCommandsSource.OnGetTestAttributes += TestCommandsSource_OnGetTestAttributes;
+            commandsSource.TestCommandsSource.OnAddTestAttributes += TestCommandsSource_OnAddTestAttributes;
+        }
+
+        private void TestCommandsSource_OnAddTestAttributes(Shared.Execution.ITestContext testContext, Shared.Extensibility.Commands.CommandArgs.TestAttributesCommandArgs args)
+        {
+            IList propertiesToAppend = new List<string>();
+            foreach (var attr in args.Attributes)
+            {
+                if (attr.Key == "Category")
+                {
+                    propertiesToAppend.Add(attr.Value);
+                }
+                else
+                {
+                    propertiesToAppend.Add($"{attr.Key}:{attr.Value}");
+                }
+            }
+
+            var properties = NUnit.Framework.Internal.TestExecutionContext.CurrentContext.CurrentTest.Properties;
+
+            if (properties.ContainsKey("Category"))
+            {
+                var categories = properties["Category"];
+                foreach (var propertyToAppend in propertiesToAppend)
+                {
+                    categories.Add(propertyToAppend);
+                }
+            }
+            else
+            {
+                properties["Category"] = propertiesToAppend;
+            }
+        }
+
+        private void TestCommandsSource_OnGetTestAttributes(Shared.Execution.ITestContext testContext, Shared.Extensibility.Commands.CommandArgs.TestAttributesCommandArgs args)
+        {
+            var properties = NUnit.Framework.Internal.TestExecutionContext.CurrentContext.CurrentTest.Properties;
+            if (properties.ContainsKey("Category"))
+            {
+                var categories = properties["Category"];
+
+                foreach (string category in categories)
+                {
+                    args.Attributes.Add(new MetaAttribute("Category", category));
+                }
+            }
+        }
+
+        private void CommandsSource_OnLogMessageCommand(Shared.Execution.ILogContext logContext, Shared.Extensibility.Commands.CommandArgs.LogMessageCommandArgs args)
+        {
+            var communicationMessage = new AddLogCommunicationMessage()
+            {
+                ParentScopeId = args.LogScope?.Id,
+                Time = args.LogItemRequest.Time,
+                Text = args.LogItemRequest.Text,
+                Level = args.LogItemRequest.Level
+            };
+            if (args.LogItemRequest.Attach != null)
+            {
+                communicationMessage.Attach = new Attach
+                {
+                    Name = args.LogItemRequest.Attach.Name,
+                    MimeType = args.LogItemRequest.Attach.MimeType,
+                    Data = args.LogItemRequest.Attach.Data
+                };
+            }
+
+            SendMessage(ReportPortal_AddLogMessage, ModelSerializer.Serialize<AddLogCommunicationMessage>(communicationMessage));
+        }
+
+        private void CommandsSource_OnEndLogScopeCommand(Shared.Execution.ILogContext logContext, Shared.Extensibility.Commands.CommandArgs.LogScopeCommandArgs args)
+        {
+            var communicationMessage = new EndScopeCommunicationMessage
+            {
+                Id = args.LogScope.Id,
+                EndTime = args.LogScope.EndTime.Value,
+                Status = args.LogScope.Status
+            };
+
+            SendMessage(ReportPortal_EndLogScopeMessage, ModelSerializer.Serialize<EndScopeCommunicationMessage>(communicationMessage));
+        }
+
+        private void CommandsSource_OnBeginLogScopeCommand(Shared.Execution.ILogContext logContext, Shared.Extensibility.Commands.CommandArgs.LogScopeCommandArgs args)
+        {
+            var communicationMessage = new BeginScopeCommunicationMessage
+            {
+                Id = args.LogScope.Id,
+                ParentScopeId = args.LogScope.Parent?.Id,
+                Name = args.LogScope.Name,
+                BeginTime = args.LogScope.BeginTime
+            };
+
+            SendMessage(ReportPortal_BeginLogScopeMessage, ModelSerializer.Serialize<BeginScopeCommunicationMessage>(communicationMessage));
+        }
+
         private static System.Reflection.Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
             // since this assembly has deep link to "nunit.framework", use any already loaded "nunit.framework" assembly from test app domain
@@ -32,57 +136,6 @@ namespace ReportPortal.NUnitExtension.LogHandler
             }
 
             return null;
-        }
-
-        public int Order => 100;
-
-        public bool Handle(ILogScope logScope, CreateLogItemRequest logRequest)
-        {
-            var communicationMessage = new AddLogCommunicationMessage()
-            {
-                ParentScopeId = logScope?.Id,
-                Time = logRequest.Time,
-                Text = logRequest.Text,
-                Level = logRequest.Level
-            };
-            if (logRequest.Attach != null)
-            {
-                communicationMessage.Attach = new Attach
-                {
-                    Name = logRequest.Attach.Name,
-                    MimeType = logRequest.Attach.MimeType,
-                    Data = logRequest.Attach.Data
-                };
-            }
-
-            SendMessage(ReportPortal_AddLogMessage, ModelSerializer.Serialize<AddLogCommunicationMessage>(communicationMessage));
-
-            return true;
-        }
-
-        public void BeginScope(ILogScope logScope)
-        {
-            var communicationMessage = new BeginScopeCommunicationMessage
-            {
-                Id = logScope.Id,
-                ParentScopeId = logScope.Parent?.Id,
-                Name = logScope.Name,
-                BeginTime = logScope.BeginTime
-            };
-
-            SendMessage(ReportPortal_BeginLogScopeMessage, ModelSerializer.Serialize<BeginScopeCommunicationMessage>(communicationMessage));
-        }
-
-        public void EndScope(ILogScope logScope)
-        {
-            var communicationMessage = new EndScopeCommunicationMessage
-            {
-                Id = logScope.Id,
-                EndTime = logScope.EndTime.Value,
-                Status = logScope.Status
-            };
-
-            SendMessage(ReportPortal_EndLogScopeMessage, ModelSerializer.Serialize<EndScopeCommunicationMessage>(communicationMessage));
         }
 
         private void SendMessage(string command, string message)

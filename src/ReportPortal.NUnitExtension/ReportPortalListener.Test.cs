@@ -3,6 +3,7 @@ using ReportPortal.Client.Abstractions.Requests;
 using ReportPortal.Client.Converters;
 using ReportPortal.NUnitExtension.EventArguments;
 using ReportPortal.NUnitExtension.LogHandler.Messages;
+using ReportPortal.Shared.Execution.Metadata;
 using ReportPortal.Shared.Reporter;
 using System;
 using System.Collections.Generic;
@@ -257,7 +258,13 @@ namespace ReportPortal.NUnitExtension
 
                         foreach (XElement category in categories)
                         {
-                            finishTestRequest.Attributes.Add(new ItemAttribute { Key = "Category", Value = category.Attribute("value").Value });
+                            var metaAttribute = MetaAttribute.Parse(category.Attribute("value").Value);
+                            var attr = (ItemAttribute)metaAttribute;
+                            if (string.IsNullOrEmpty(attr.Key))
+                            {
+                                attr.Key = "Category";
+                            }
+                            finishTestRequest.Attributes.Add(attr);
                         }
                     }
 
@@ -472,11 +479,11 @@ namespace ReportPortal.NUnitExtension
             _nestedSteps[message.Id] = nestedStep;
         }
 
-        private Dictionary<Shared.Logging.LogScopeStatus, Status> _nestedStepStatusMap = new Dictionary<Shared.Logging.LogScopeStatus, Status> {
-            { Shared.Logging.LogScopeStatus.InProgress, Status.InProgress },
-            { Shared.Logging.LogScopeStatus.Passed, Status.Passed },
-            { Shared.Logging.LogScopeStatus.Failed, Status.Failed },
-            { Shared.Logging.LogScopeStatus.Skipped,Status.Skipped }
+        private Dictionary<Shared.Execution.Logging.LogScopeStatus, Status> _nestedStepStatusMap = new Dictionary<Shared.Execution.Logging.LogScopeStatus, Status> {
+            { Shared.Execution.Logging.LogScopeStatus.InProgress, Status.InProgress },
+            { Shared.Execution.Logging.LogScopeStatus.Passed, Status.Passed },
+            { Shared.Execution.Logging.LogScopeStatus.Failed, Status.Failed },
+            { Shared.Execution.Logging.LogScopeStatus.Skipped,Status.Skipped }
         };
 
         private void HandleEndScopeCommunicationMessage(EndScopeCommunicationMessage message)

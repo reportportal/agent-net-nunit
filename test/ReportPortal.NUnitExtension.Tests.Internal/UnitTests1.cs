@@ -7,16 +7,19 @@ namespace ReportPortal.NUnitExtension.Tests.Internal
     public class UnitTests1
     {
         [Test]
-        [Category("smoke")]
+        [Category("smoke"), Category("smoke2")]
         [Description("desc")]
         public void PassedTest()
         {
-            Assert.Pass();
+            var categories = Shared.Context.Current.Metadata.Attributes;
+            categories.Add("qwe", "abc");
         }
 
         [Test]
         public void FailedTest()
         {
+            var categories = Shared.Context.Current.Metadata.Attributes;
+            categories.Add("a", "b");
             Assert.IsTrue(false);
         }
 
