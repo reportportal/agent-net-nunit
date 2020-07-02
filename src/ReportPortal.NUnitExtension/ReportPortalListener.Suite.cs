@@ -1,6 +1,7 @@
 ﻿using ReportPortal.Client.Abstractions.Models;
 using ReportPortal.Client.Abstractions.Requests;
 using ReportPortal.NUnitExtension.EventArguments;
+using ReportPortal.Shared.Execution.Metadata;
 using ReportPortal.Shared.Reporter;
 using System;
 using System.Collections.Generic;
@@ -156,7 +157,13 @@ namespace ReportPortal.NUnitExtension
 
                             foreach (XElement category in categories)
                             {
-                                finishSuiteRequest.Attributes.Add(new ItemAttribute { Key = "Category", Value = category.Attribute("value").Value });
+                                var metaAttribute = MetaAttribute.Parse(category.Attribute("value").Value);
+                                var attr = (ItemAttribute)metaAttribute;
+                                if (string.IsNullOrEmpty(attr.Key))
+                                {
+                                    attr.Key = "Category";
+                                }
+                                finishSuiteRequest.Attributes.Add(attr);
                             }
                         }
 
