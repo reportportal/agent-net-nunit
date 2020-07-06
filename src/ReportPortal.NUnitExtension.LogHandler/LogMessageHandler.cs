@@ -13,6 +13,8 @@ namespace ReportPortal.NUnitExtension.LogHandler
 {
     public class LogMessageHandler : ICommandsListener
     {
+        private const string Nunit_Category = "Category";
+
         public const string ReportPortal_AddLogMessage = "ReportPortal-AddLogMessage";
         public const string ReportPortal_BeginLogScopeMessage = "ReportPortal-BeginLogScopeMessage";
         public const string ReportPortal_EndLogScopeMessage = "ReportPortal-EndLogScopeMessage";
@@ -39,7 +41,7 @@ namespace ReportPortal.NUnitExtension.LogHandler
             IList propertiesToAppend = new List<string>();
             foreach (var attr in args.Attributes)
             {
-                if (attr.Key == "Category")
+                if (attr.Key == Nunit_Category)
                 {
                     propertiesToAppend.Add(attr.Value);
                 }
@@ -51,9 +53,9 @@ namespace ReportPortal.NUnitExtension.LogHandler
 
             var properties = NUnit.Framework.Internal.TestExecutionContext.CurrentContext.CurrentTest.Properties;
 
-            if (properties.ContainsKey("Category"))
+            if (properties.ContainsKey(Nunit_Category))
             {
-                var categories = properties["Category"];
+                var categories = properties[Nunit_Category];
                 foreach (var propertyToAppend in propertiesToAppend)
                 {
                     categories.Add(propertyToAppend);
@@ -61,20 +63,20 @@ namespace ReportPortal.NUnitExtension.LogHandler
             }
             else
             {
-                properties["Category"] = propertiesToAppend;
+                properties[Nunit_Category] = propertiesToAppend;
             }
         }
 
         private void TestCommandsSource_OnGetTestAttributes(Shared.Execution.ITestContext testContext, Shared.Extensibility.Commands.CommandArgs.TestAttributesCommandArgs args)
         {
             var properties = NUnit.Framework.Internal.TestExecutionContext.CurrentContext.CurrentTest.Properties;
-            if (properties.ContainsKey("Category"))
+            if (properties.ContainsKey(Nunit_Category))
             {
-                var categories = properties["Category"];
+                var categories = properties[Nunit_Category];
 
                 foreach (string category in categories)
                 {
-                    args.Attributes.Add(new MetaAttribute("Category", category));
+                    args.Attributes.Add(new MetaAttribute(Nunit_Category, category));
                 }
             }
         }
