@@ -354,7 +354,7 @@ namespace ReportPortal.NUnitExtension
 
                         logRequest = new CreateLogItemRequest
                         {
-                            Level = sharedMessage.Level,
+                            Level = _logMessageLevelMap[sharedMessage.Level],
                             Time = sharedMessage.Time,
                             Text = sharedMessage.Text
                         };
@@ -362,7 +362,6 @@ namespace ReportPortal.NUnitExtension
                         {
                             logRequest.Attach = new Client.Abstractions.Responses.Attach
                             {
-                                Name = sharedMessage.Attach.Name,
                                 MimeType = sharedMessage.Attach.MimeType,
                                 Data = sharedMessage.Attach.Data
                             };
@@ -427,7 +426,7 @@ namespace ReportPortal.NUnitExtension
 
             var logRequest = new CreateLogItemRequest
             {
-                Level = message.Level,
+                Level = _logMessageLevelMap[message.Level],
                 Time = message.Time,
                 Text = message.Text
             };
@@ -436,7 +435,6 @@ namespace ReportPortal.NUnitExtension
             {
                 logRequest.Attach = new Client.Abstractions.Responses.Attach
                 {
-                    Name = message.Attach.Name,
                     MimeType = message.Attach.MimeType,
                     Data = message.Attach.Data
                 };
@@ -484,6 +482,15 @@ namespace ReportPortal.NUnitExtension
             { Shared.Execution.Logging.LogScopeStatus.Passed, Status.Passed },
             { Shared.Execution.Logging.LogScopeStatus.Failed, Status.Failed },
             { Shared.Execution.Logging.LogScopeStatus.Skipped,Status.Skipped }
+        };
+
+        private Dictionary<Shared.Execution.Logging.LogMessageLevel, LogLevel> _logMessageLevelMap = new Dictionary<Shared.Execution.Logging.LogMessageLevel, LogLevel> {
+            { Shared.Execution.Logging.LogMessageLevel.Debug, LogLevel.Debug },
+            { Shared.Execution.Logging.LogMessageLevel.Error, LogLevel.Error },
+            { Shared.Execution.Logging.LogMessageLevel.Fatal, LogLevel.Fatal },
+            { Shared.Execution.Logging.LogMessageLevel.Info, LogLevel.Info },
+            { Shared.Execution.Logging.LogMessageLevel.Trace, LogLevel.Trace },
+            { Shared.Execution.Logging.LogMessageLevel.Warning, LogLevel.Warning }
         };
 
         private void HandleEndScopeCommunicationMessage(EndScopeCommunicationMessage message)

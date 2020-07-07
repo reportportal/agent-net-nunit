@@ -86,17 +86,16 @@ namespace ReportPortal.NUnitExtension.LogHandler
             var communicationMessage = new AddLogCommunicationMessage()
             {
                 ParentScopeId = args.LogScope?.Id,
-                Time = args.LogItemRequest.Time,
-                Text = args.LogItemRequest.Text,
-                Level = args.LogItemRequest.Level
+                Time = args.LogMessage.Time,
+                Text = args.LogMessage.Message,
+                Level = args.LogMessage.Level
             };
-            if (args.LogItemRequest.Attach != null)
+            if (args.LogMessage.Attachment != null)
             {
                 communicationMessage.Attach = new Attach
                 {
-                    Name = args.LogItemRequest.Attach.Name,
-                    MimeType = args.LogItemRequest.Attach.MimeType,
-                    Data = args.LogItemRequest.Attach.Data
+                    MimeType = args.LogMessage.Attachment.MimeType,
+                    Data = args.LogMessage.Attachment.Data
                 };
             }
 

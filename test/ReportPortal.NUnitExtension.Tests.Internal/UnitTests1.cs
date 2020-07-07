@@ -32,18 +32,7 @@ namespace ReportPortal.NUnitExtension.Tests.Internal
         [Test]
         public void WithAttachment()
         {
-            Shared.Log.Message(new Client.Abstractions.Requests.CreateLogItemRequest
-            {
-                Time = DateTime.UtcNow,
-                Level = Client.Abstractions.Models.LogLevel.Info,
-                Text = "text",
-                Attach = new Client.Abstractions.Responses.Attach
-                {
-                    Data = new byte[] { 1, 2, 3 },
-                    MimeType = "image/png",
-                    Name = "file.name"
-                }
-            });
+            Shared.Context.Current.Log.Info("text", "image/png", new byte[] { 1, 2, 3 });
 
             // valid file
             File.Create("attach.tmp");
@@ -60,9 +49,9 @@ namespace ReportPortal.NUnitExtension.Tests.Internal
 
             Console.WriteLine("a");
 
-            Shared.Log.Info("q");
+            Shared.Context.Current.Log.Info("q");
 
-            using (var scope = Shared.Log.BeginScope("s"))
+            using (var scope = Shared.Context.Current.Log.BeginScope("s"))
             {
                 scope.Info("q");
             }
