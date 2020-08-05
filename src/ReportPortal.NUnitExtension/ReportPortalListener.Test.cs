@@ -167,7 +167,7 @@ namespace ReportPortal.NUnitExtension
                                     }
                                 }
 
-                                attachmentLogItemRequest.Attach = new Client.Abstractions.Responses.Attach
+                                attachmentLogItemRequest.Attach = new LogItemAttach
                                 {
                                     Name = Path.GetFileName(filePath),
                                     MimeType = Shared.MimeTypes.MimeTypeMap.GetMimeType(Path.GetExtension(filePath)),
@@ -360,7 +360,7 @@ namespace ReportPortal.NUnitExtension
                         };
                         if (sharedMessage.Attach != null)
                         {
-                            logRequest.Attach = new Client.Abstractions.Responses.Attach
+                            logRequest.Attach = new LogItemAttach
                             {
                                 MimeType = sharedMessage.Attach.MimeType,
                                 Data = sharedMessage.Attach.Data
@@ -433,7 +433,7 @@ namespace ReportPortal.NUnitExtension
 
             if (message.Attach != null)
             {
-                logRequest.Attach = new Client.Abstractions.Responses.Attach
+                logRequest.Attach = new LogItemAttach
                 {
                     MimeType = message.Attach.MimeType,
                     Data = message.Attach.Data
