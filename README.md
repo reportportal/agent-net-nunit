@@ -90,12 +90,19 @@ See deatils of the customization in the [example](https://github.com/reportporta
 - [Serilog](https://github.com/reportportal/logger-net-serilog)
 - [System.Diagnostics.TraceListener](https://github.com/reportportal/logger-net-tracelistener)
 
-And [how](https://github.com/reportportal/commons-net/blob/master/docs/Logging.md) you can improve your logging experience.
+And [how](https://github.com/reportportal/commons-net/blob/master/docs/Logging.md) you can improve your logging experience with attachments or nested steps.
 
 
 # Useful extensions
-- [SourceBack](https://github.com/nvborisenko/reportportal-extensions-sourceback)
+- [SourceBack](https://github.com/nvborisenko/reportportal-extensions-sourceback) adds piece of test code where test was failed
+- [Insider](https://github.com/nvborisenko/reportportal-extensions-insider) brings more reporting capabilities without coding like methods invocation as nested steps
 
 
 # Example
 Follow [reportportal example-net-nunit](https://github.com/reportportal/example-net-nunit) repo to see the source of test project with Report Portal integration.
+
+
+# License
+ReportPortal is licensed under [Apache 2.0](https://github.com/reportportal/agent-net-nunit/blob/master/LICENSE)
+
+We use Google Analytics for sending anonymous usage information as library's name/version and the agent's name/version when starting launch. This information might help us to improve integration with ReportPortal. Used by the ReportPortal team only and not for sharing with 3rd parties. You are able to [turn off](https://github.com/reportportal/commons-net/blob/master/docs/Configuration.md#analytics) it if needed.

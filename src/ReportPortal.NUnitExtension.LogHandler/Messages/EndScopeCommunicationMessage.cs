@@ -1,4 +1,4 @@
-﻿using ReportPortal.Shared.Logging;
+﻿using ReportPortal.Shared.Execution.Logging;
 using System;
 using System.Runtime.Serialization;
 

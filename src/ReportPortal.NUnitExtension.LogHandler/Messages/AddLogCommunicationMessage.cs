@@ -1,4 +1,4 @@
-﻿using ReportPortal.Client.Abstractions.Models;
+﻿using ReportPortal.Shared.Execution.Logging;
 using System;
 using System.Runtime.Serialization;
 
@@ -23,7 +23,7 @@ namespace ReportPortal.NUnitExtension.LogHandler.Messages
         /// A level of log item.
         /// </summary>
         [DataMember]
-        public LogLevel Level = LogLevel.Info;
+        public LogMessageLevel Level = LogMessageLevel.Info;
 
         /// <summary>
         /// Message of log item.
@@ -46,15 +46,11 @@ namespace ReportPortal.NUnitExtension.LogHandler.Messages
 
         }
 
-        public Attach(string name, string mimeType, byte[] data)
+        public Attach(string mimeType, byte[] data)
         {
-            Name = name;
             MimeType = mimeType;
             Data = data;
         }
-
-        [DataMember]
-        public string Name { get; set; }
 
         [DataMember]
         public byte[] Data { get; set; }

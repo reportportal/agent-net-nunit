@@ -3,6 +3,7 @@ using ReportPortal.Client.Abstractions.Requests;
 using ReportPortal.Client.Converters;
 using ReportPortal.NUnitExtension.EventArguments;
 using ReportPortal.NUnitExtension.LogHandler.Messages;
+using ReportPortal.Shared.Execution.Metadata;
 using ReportPortal.Shared.Reporter;
 using System;
 using System.Collections.Generic;
@@ -37,7 +38,8 @@ namespace ReportPortal.NUnitExtension
                 {
                     StartTime = startTime,
                     Name = name,
-                    Type = TestItemType.Step
+                    Type = TestItemType.Step,
+                    CodeReference = ExtractCodeReferenceFromFullName(fullname)
                 };
 
                 var beforeTestEventArg = new TestItemStartedEventArgs(_rpService, startTestRequest, null, report);
@@ -165,7 +167,7 @@ namespace ReportPortal.NUnitExtension
                                     }
                                 }
 
-                                attachmentLogItemRequest.Attach = new Client.Abstractions.Responses.Attach
+                                attachmentLogItemRequest.Attach = new LogItemAttach
                                 {
                                     Name = Path.GetFileName(filePath),
                                     MimeType = Shared.MimeTypes.MimeTypeMap.GetMimeType(Path.GetExtension(filePath)),
@@ -256,7 +258,13 @@ namespace ReportPortal.NUnitExtension
 
                         foreach (XElement category in categories)
                         {
-                            finishTestRequest.Attributes.Add(new ItemAttribute { Key = "Category", Value = category.Attribute("value").Value });
+                            var metaAttribute = MetaAttribute.Parse(category.Attribute("value").Value);
+                            var attr = (ItemAttribute)metaAttribute;
+                            if (string.IsNullOrEmpty(attr.Key))
+                            {
+                                attr.Key = "Category";
+                            }
+                            finishTestRequest.Attributes.Add(attr);
                         }
                     }
 
@@ -346,15 +354,14 @@ namespace ReportPortal.NUnitExtension
 
                         logRequest = new CreateLogItemRequest
                         {
-                            Level = sharedMessage.Level,
+                            Level = _logMessageLevelMap[sharedMessage.Level],
                             Time = sharedMessage.Time,
                             Text = sharedMessage.Text
                         };
                         if (sharedMessage.Attach != null)
                         {
-                            logRequest.Attach = new Client.Abstractions.Responses.Attach
+                            logRequest.Attach = new LogItemAttach
                             {
-                                Name = sharedMessage.Attach.Name,
                                 MimeType = sharedMessage.Attach.MimeType,
                                 Data = sharedMessage.Attach.Data
                             };
@@ -419,16 +426,15 @@ namespace ReportPortal.NUnitExtension
 
             var logRequest = new CreateLogItemRequest
             {
-                Level = message.Level,
+                Level = _logMessageLevelMap[message.Level],
                 Time = message.Time,
                 Text = message.Text
             };
 
             if (message.Attach != null)
             {
-                logRequest.Attach = new Client.Abstractions.Responses.Attach
+                logRequest.Attach = new LogItemAttach
                 {
-                    Name = message.Attach.Name,
                     MimeType = message.Attach.MimeType,
                     Data = message.Attach.Data
                 };
@@ -471,11 +477,20 @@ namespace ReportPortal.NUnitExtension
             _nestedSteps[message.Id] = nestedStep;
         }
 
-        private Dictionary<Shared.Logging.LogScopeStatus, Status> _nestedStepStatusMap = new Dictionary<Shared.Logging.LogScopeStatus, Status> {
-            { Shared.Logging.LogScopeStatus.InProgress, Status.InProgress },
-            { Shared.Logging.LogScopeStatus.Passed, Status.Passed },
-            { Shared.Logging.LogScopeStatus.Failed, Status.Failed },
-            { Shared.Logging.LogScopeStatus.Skipped,Status.Skipped }
+        private Dictionary<Shared.Execution.Logging.LogScopeStatus, Status> _nestedStepStatusMap = new Dictionary<Shared.Execution.Logging.LogScopeStatus, Status> {
+            { Shared.Execution.Logging.LogScopeStatus.InProgress, Status.InProgress },
+            { Shared.Execution.Logging.LogScopeStatus.Passed, Status.Passed },
+            { Shared.Execution.Logging.LogScopeStatus.Failed, Status.Failed },
+            { Shared.Execution.Logging.LogScopeStatus.Skipped,Status.Skipped }
+        };
+
+        private Dictionary<Shared.Execution.Logging.LogMessageLevel, LogLevel> _logMessageLevelMap = new Dictionary<Shared.Execution.Logging.LogMessageLevel, LogLevel> {
+            { Shared.Execution.Logging.LogMessageLevel.Debug, LogLevel.Debug },
+            { Shared.Execution.Logging.LogMessageLevel.Error, LogLevel.Error },
+            { Shared.Execution.Logging.LogMessageLevel.Fatal, LogLevel.Fatal },
+            { Shared.Execution.Logging.LogMessageLevel.Info, LogLevel.Info },
+            { Shared.Execution.Logging.LogMessageLevel.Trace, LogLevel.Trace },
+            { Shared.Execution.Logging.LogMessageLevel.Warning, LogLevel.Warning }
         };
 
         private void HandleEndScopeCommunicationMessage(EndScopeCommunicationMessage message)
@@ -489,6 +504,19 @@ namespace ReportPortal.NUnitExtension
             });
 
             _nestedSteps.Remove(message.Id);
+        }
+
+        /// <summary>
+        /// When strating test nunit doesn't provide info about namespace.
+        /// Here we try to extrract it from full name. '(' is indicator of starting test parameters.
+        /// </summary>
+        /// <param name="fullname"></param>
+        /// <returns></returns>
+        private string ExtractCodeReferenceFromFullName(string fullname)
+        {
+            var index = fullname.IndexOf("(");
+
+            return index == -1 ? fullname : fullname.Substring(0, index);
         }
     }
 }
