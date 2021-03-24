@@ -258,13 +258,19 @@ namespace ReportPortal.NUnitExtension
 
                         foreach (XElement category in categories)
                         {
-                            var metaAttribute = MetaAttribute.Parse(category.Attribute("value").Value);
-                            var attr = (ItemAttribute)metaAttribute;
-                            if (string.IsNullOrEmpty(attr.Key))
+                            var value = category.Attribute("value").Value;
+
+                            if (!string.IsNullOrEmpty(value))
                             {
-                                attr.Key = "Category";
+                                var metaAttribute = MetaAttribute.Parse(value);
+                                var attr = (ItemAttribute)metaAttribute;
+                                if (string.IsNullOrEmpty(attr.Key))
+                                {
+                                    attr.Key = "Category";
+                                }
+
+                                finishTestRequest.Attributes.Add(attr);
                             }
-                            finishTestRequest.Attributes.Add(attr);
                         }
                     }
 

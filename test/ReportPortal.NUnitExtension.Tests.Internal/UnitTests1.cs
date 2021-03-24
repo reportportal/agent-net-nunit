@@ -7,6 +7,7 @@ namespace ReportPortal.NUnitExtension.Tests.Internal
     public class UnitTests1
     {
         [Test]
+        [Category("")]
         [Category("smoke"), Category("smoke2")]
         [Description("desc")]
         public void PassedTest()
