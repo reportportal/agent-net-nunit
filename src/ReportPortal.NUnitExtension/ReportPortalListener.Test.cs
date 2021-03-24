@@ -3,6 +3,7 @@ using ReportPortal.Client.Abstractions.Requests;
 using ReportPortal.Client.Converters;
 using ReportPortal.NUnitExtension.EventArguments;
 using ReportPortal.NUnitExtension.LogHandler.Messages;
+using ReportPortal.Shared.Converters;
 using ReportPortal.Shared.Execution.Metadata;
 using ReportPortal.Shared.Reporter;
 using System;
@@ -258,13 +259,14 @@ namespace ReportPortal.NUnitExtension
 
                         foreach (XElement category in categories)
                         {
-                            var metaAttribute = MetaAttribute.Parse(category.Attribute("value").Value);
-                            var attr = (ItemAttribute)metaAttribute;
-                            if (string.IsNullOrEmpty(attr.Key))
+                            var value = category.Attribute("value").Value;
+
+                            if (!string.IsNullOrEmpty(value))
                             {
-                                attr.Key = "Category";
+                                var attr = new ItemAttributeConverter().ConvertFrom(value, opts => opts.UndefinedKey = "Category");
+
+                                finishTestRequest.Attributes.Add(attr);
                             }
-                            finishTestRequest.Attributes.Add(attr);
                         }
                     }
 
