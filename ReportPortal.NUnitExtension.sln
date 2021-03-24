@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReportPortal.NUnitExtension
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{E0A64D99-31F6-47FC-BFC9-5DAC59F6B228}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReportPortal.NUnitExtension.Tests", "test\ReportPortal.NUnitExtension.Tests\ReportPortal.NUnitExtension.Tests.csproj", "{CB93EF07-AB9B-4A3C-AD13-9369079D6610}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReportPortal.NUnitExtension.Tests", "test\ReportPortal.NUnitExtension.Tests\ReportPortal.NUnitExtension.Tests.csproj", "{CB93EF07-AB9B-4A3C-AD13-9369079D6610}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReportPortal.NUnitExtension.Tests.Internal", "test\ReportPortal.NUnitExtension.Tests.Internal\ReportPortal.NUnitExtension.Tests.Internal.csproj", "{F10A1BE4-9A33-476D-80BA-3962225EFDB9}"
 EndProject

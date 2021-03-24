@@ -1,6 +1,7 @@
 ﻿using ReportPortal.Client.Abstractions.Models;
 using ReportPortal.Client.Abstractions.Requests;
 using ReportPortal.NUnitExtension.EventArguments;
+using ReportPortal.Shared.Converters;
 using ReportPortal.Shared.Execution.Metadata;
 using ReportPortal.Shared.Reporter;
 using System;
@@ -161,12 +162,7 @@ namespace ReportPortal.NUnitExtension
 
                                 if (!string.IsNullOrEmpty(value))
                                 {
-                                    var metaAttribute = MetaAttribute.Parse(value);
-                                    var attr = (ItemAttribute)metaAttribute;
-                                    if (string.IsNullOrEmpty(attr.Key))
-                                    {
-                                        attr.Key = "Category";
-                                    }
+                                    var attr = new ItemAttributeConverter().ConvertFrom(value, opts => opts.UndefinedKey = "Category");
 
                                     finishSuiteRequest.Attributes.Add(attr);
                                 }
