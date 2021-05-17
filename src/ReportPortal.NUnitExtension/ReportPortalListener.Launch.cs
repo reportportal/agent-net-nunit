@@ -112,6 +112,10 @@ namespace ReportPortal.NUnitExtension
 
                     Console.WriteLine($"Elapsed: {sw.Elapsed}");
 
+                    var statisticsRecord = _launchReporter.StatisticsCounter.ToString();
+                    _traceLogger.Info(statisticsRecord);
+                    Console.WriteLine(statisticsRecord);
+
                     try
                     {
                         AfterRunFinished?.Invoke(this, new RunFinishedEventArgs(_rpService, finishLaunchRequest, _launchReporter, report));
