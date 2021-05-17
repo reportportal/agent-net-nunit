@@ -32,11 +32,7 @@ namespace ReportPortal.NUnitExtension
 
             Config = new ConfigurationBuilder().AddDefaults(baseDir).Build();
 
-            var uri = Config.GetValue<string>(ConfigurationPath.ServerUrl);
-            var project = Config.GetValue<string>(ConfigurationPath.ServerProject);
-            var uuid = Config.GetValue<string>(ConfigurationPath.ServerAuthenticationUuid);
-
-            _rpService = new Service(new Uri(uri), project, uuid);
+            _rpService = new Shared.Reporter.Http.ClientServiceBuilder(Config).Build();
 
             _extensionManager.Explore(baseDir);
 
