@@ -40,6 +40,7 @@ namespace ReportPortal.NUnitExtension
                     StartTime = startTime,
                     Name = name,
                     Type = TestItemType.Step,
+                    TestCaseId = fullname,
                     CodeReference = ExtractCodeReferenceFromFullName(fullname)
                 };
 
