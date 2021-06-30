@@ -483,7 +483,9 @@ namespace ReportPortal.NUnitExtension
             { Shared.Execution.Logging.LogScopeStatus.InProgress, Status.InProgress },
             { Shared.Execution.Logging.LogScopeStatus.Passed, Status.Passed },
             { Shared.Execution.Logging.LogScopeStatus.Failed, Status.Failed },
-            { Shared.Execution.Logging.LogScopeStatus.Skipped,Status.Skipped }
+            { Shared.Execution.Logging.LogScopeStatus.Skipped,Status.Skipped },
+            { Shared.Execution.Logging.LogScopeStatus.Warn,Status.Warn },
+            { Shared.Execution.Logging.LogScopeStatus.Info,Status.Info }
         };
 
         private Dictionary<Shared.Execution.Logging.LogMessageLevel, LogLevel> _logMessageLevelMap = new Dictionary<Shared.Execution.Logging.LogMessageLevel, LogLevel> {
