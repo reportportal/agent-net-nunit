@@ -15,14 +15,14 @@ Imagine you have the next folders structure:
 
 ```
 C:
-|- NUnitRunner
-  |- nunit.console.exe
-  |- ReportPortal.addins
-|- YourProject
-  |- bin
-    |- Debug
-      |- YourProject.Tests.dll
-      |- ReportPortal.NUnitExtension.dll
+├─ NUnitRunner
+│ ├─ nunit.console.exe
+│ ├─ ReportPortal.addins
+├─ YourProject
+│ ├─ bin
+│ │ ├─ Debug
+│ │ │ ├─ YourProject.Tests.dll
+│ │ │ ├─ ReportPortal.NUnitExtension.dll
 ```
 
 To enable ReportPortal.Extension you need create a `ReportPortal.addins` file in the `NUnitRunner` folder with the following content:
