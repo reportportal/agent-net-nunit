@@ -1,6 +1,7 @@
 using FluentAssertions;
 using NUnit.Engine;
 using NUnit.Framework;
+using System;
 using System.IO;
 using System.Linq;
 using WireMock.Server;
@@ -18,9 +19,9 @@ namespace ReportPortal.NUnitExtension.Tests
         {
             _server = WireMockServer.Start();
 
-            File.WriteAllText("ReportPortal_Server_Url", $"http://localhost:{_server.Ports[0]}/api/v1");
-            File.WriteAllText("ReportPortal_Server_Project", "any_project");
-            File.WriteAllText("ReportPortal_Server_Authentication_Uuid", "any_token");
+            Environment.SetEnvironmentVariable("ReportPortal_Server_Url", $"http://localhost:{_server.Ports[0]}/api/v1");
+            Environment.SetEnvironmentVariable("ReportPortal_Server_Project", "any_project");
+            Environment.SetEnvironmentVariable("ReportPortal_Server_Authentication_Uuid", "any_token");
         }
 
         [TearDown]
