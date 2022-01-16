@@ -1,6 +1,5 @@
 ﻿using NUnit.Engine;
 using NUnit.Engine.Extensibility;
-using ReportPortal.Client;
 using ReportPortal.Client.Abstractions.Models;
 using ReportPortal.Client.Abstractions.Requests;
 using ReportPortal.Shared.Configuration;
@@ -36,7 +35,7 @@ namespace ReportPortal.NUnitExtension
 
             _extensionManager.Explore(baseDir);
 
-            Shared.Extensibility.Analytics.AnalyticsReportEventsObserver.DefineConsumer("agent-dotnet-nunit");
+            Shared.Extensibility.Embedded.Analytics.AnalyticsReportEventsObserver.DefineConsumer("agent-dotnet-nunit");
 
             _statusMap["Passed"] = Status.Passed;
             _statusMap["Failed"] = Status.Failed;
