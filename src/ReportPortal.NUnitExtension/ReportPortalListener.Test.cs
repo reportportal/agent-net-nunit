@@ -270,6 +270,28 @@ namespace ReportPortal.NUnitExtension
                         }
                     }
 
+                    // adding author attribute to test
+                    var authorElements = xElement.XPathSelectElements("//properties/property[@name='Author']");
+                    if (authorElements != null)
+                    {
+                        if (finishTestRequest == null)
+                        {
+                            finishTestRequest.Attributes = new List<ItemAttribute>();
+                        }
+
+                        foreach (XElement authorElement in authorElements)
+                        {
+                            var value = authorElement.Attribute("value").Value;
+
+                            if (!string.IsNullOrEmpty(value))
+                            {
+                                var attr = new ItemAttribute { Key = "Author", Value = value };
+
+                                finishTestRequest.Attributes.Add(attr);
+                            }
+                        }
+                    }
+
                     // adding description to test
                     var description = xElement.XPathSelectElement("//properties/property[@name='Description']");
                     if (description != null)

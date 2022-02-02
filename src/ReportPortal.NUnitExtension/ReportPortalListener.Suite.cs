@@ -169,6 +169,28 @@ namespace ReportPortal.NUnitExtension
                             }
                         }
 
+                        // adding author attribute to suite
+                        var authorElements = xElement.XPathSelectElements("//properties/property[@name='Author']");
+                        if (authorElements != null)
+                        {
+                            if (finishSuiteRequest == null)
+                            {
+                                finishSuiteRequest.Attributes = new List<ItemAttribute>();
+                            }
+
+                            foreach (XElement authorElement in authorElements)
+                            {
+                                var value = authorElement.Attribute("value").Value;
+
+                                if (!string.IsNullOrEmpty(value))
+                                {
+                                    var attr = new ItemAttribute { Key = "Author", Value = value };
+
+                                    finishSuiteRequest.Attributes.Add(attr);
+                                }
+                            }
+                        }
+
                         // adding description to suite
                         var description = xElement.XPathSelectElement("//properties/property[@name='Description']");
                         if (description != null)
