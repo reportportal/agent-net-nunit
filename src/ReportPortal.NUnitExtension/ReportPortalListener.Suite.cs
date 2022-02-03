@@ -154,7 +154,10 @@ namespace ReportPortal.NUnitExtension
                         var categories = xElement.XPathSelectElements("//properties/property[@name='Category']");
                         if (categories != null)
                         {
-                            finishSuiteRequest.Attributes = new List<ItemAttribute>();
+                            if (finishSuiteRequest.Attributes == null)
+                            {
+                                finishSuiteRequest.Attributes = new List<ItemAttribute>();
+                            }
 
                             foreach (XElement category in categories)
                             {
@@ -163,6 +166,28 @@ namespace ReportPortal.NUnitExtension
                                 if (!string.IsNullOrEmpty(value))
                                 {
                                     var attr = new ItemAttributeConverter().ConvertFrom(value, opts => opts.UndefinedKey = "Category");
+
+                                    finishSuiteRequest.Attributes.Add(attr);
+                                }
+                            }
+                        }
+
+                        // adding author attribute to suite
+                        var authorElements = xElement.XPathSelectElements("//properties/property[@name='Author']");
+                        if (authorElements != null)
+                        {
+                            if (finishSuiteRequest == null)
+                            {
+                                finishSuiteRequest.Attributes = new List<ItemAttribute>();
+                            }
+
+                            foreach (XElement authorElement in authorElements)
+                            {
+                                var value = authorElement.Attribute("value").Value;
+
+                                if (!string.IsNullOrEmpty(value))
+                                {
+                                    var attr = new ItemAttribute { Key = "Author", Value = value };
 
                                     finishSuiteRequest.Attributes.Add(attr);
                                 }

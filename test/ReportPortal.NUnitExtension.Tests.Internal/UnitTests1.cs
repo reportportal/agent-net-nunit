@@ -4,12 +4,14 @@ using System.IO;
 
 namespace ReportPortal.NUnitExtension.Tests.Internal
 {
+    [Author("Smith")]
     public class UnitTests1
     {
         [Test]
         [Category("")]
         [Category("smoke"), Category("smoke2")]
         [Description("desc")]
+        [Author("John")] [Author("Ian")]
         public void PassedTest()
         {
             var categories = Shared.Context.Current.Metadata.Attributes;

@@ -255,7 +255,10 @@ namespace ReportPortal.NUnitExtension
                     var categories = xElement.XPathSelectElements("//properties/property[@name='Category']");
                     if (categories != null)
                     {
-                        finishTestRequest.Attributes = new List<ItemAttribute>();
+                        if (finishTestRequest.Attributes == null)
+                        {
+                            finishTestRequest.Attributes = new List<ItemAttribute>();
+                        }
 
                         foreach (XElement category in categories)
                         {
@@ -264,6 +267,28 @@ namespace ReportPortal.NUnitExtension
                             if (!string.IsNullOrEmpty(value))
                             {
                                 var attr = new ItemAttributeConverter().ConvertFrom(value, opts => opts.UndefinedKey = "Category");
+
+                                finishTestRequest.Attributes.Add(attr);
+                            }
+                        }
+                    }
+
+                    // adding author attribute to test
+                    var authorElements = xElement.XPathSelectElements("//properties/property[@name='Author']");
+                    if (authorElements != null)
+                    {
+                        if (finishTestRequest == null)
+                        {
+                            finishTestRequest.Attributes = new List<ItemAttribute>();
+                        }
+
+                        foreach (XElement authorElement in authorElements)
+                        {
+                            var value = authorElement.Attribute("value").Value;
+
+                            if (!string.IsNullOrEmpty(value))
+                            {
+                                var attr = new ItemAttribute { Key = "Author", Value = value };
 
                                 finishTestRequest.Attributes.Add(attr);
                             }

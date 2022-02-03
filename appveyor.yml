@@ -1,15 +1,13 @@
 ﻿image: Visual Studio 2019
 
+environment:
+  IGNORE_NORMALISATION_GIT_HEAD_MOVE: 1
+
 install:
-  - gitversion /l console /output buildserver
   - dotnet tool install -g codecov.tool
 
 configuration:
   - Release
-
-dotnet_csproj:
-  patch: true
-  version: '$(GitVersion_SemVer)'
 
 build_script:
   - dotnet build
