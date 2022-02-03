@@ -255,7 +255,10 @@ namespace ReportPortal.NUnitExtension
                     var categories = xElement.XPathSelectElements("//properties/property[@name='Category']");
                     if (categories != null)
                     {
-                        finishTestRequest.Attributes = new List<ItemAttribute>();
+                        if (finishTestRequest.Attributes == null)
+                        {
+                            finishTestRequest.Attributes = new List<ItemAttribute>();
+                        }
 
                         foreach (XElement category in categories)
                         {
