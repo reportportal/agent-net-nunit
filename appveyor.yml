@@ -10,6 +10,7 @@ configuration:
   - Release
 
 build_script:
+  - dotnet build
   - dotnet pack
 
 test_script:
