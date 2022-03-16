@@ -16,10 +16,17 @@ namespace ReportPortal.NUnitExtension
 {
     public partial class ReportPortalListener
     {
-        public delegate void TestStartedHandler(object sender, TestItemStartedEventArgs e);
+        public static event EventHandler<TestItemStartedEventArgs> BeforeTestStarted;
 
-        public static event TestStartedHandler BeforeTestStarted;
-        public static event TestStartedHandler AfterTestStarted;
+        public static event EventHandler<TestItemStartedEventArgs> AfterTestStarted;
+
+        public static event EventHandler<TestItemFinishedEventArgs> BeforeTestFinished;
+
+        public static event EventHandler<TestItemFinishedEventArgs> AfterTestFinished;
+
+        public static event EventHandler<TestItemOutputEventArgs> BeforeTestOutput;
+
+        public static event EventHandler<TestItemOutputEventArgs> AfterTestOutput;
 
         public void StartTest(string report)
         {
@@ -43,29 +50,17 @@ namespace ReportPortal.NUnitExtension
                     CodeReference = ExtractCodeReferenceFromFullName(fullname)
                 };
 
-                var beforeTestEventArg = new TestItemStartedEventArgs(_rpService, startTestRequest, null, report);
-                try
-                {
-                    BeforeTestStarted?.Invoke(this, beforeTestEventArg);
-                }
-                catch (Exception exp)
-                {
-                    _traceLogger.Error("Exception was thrown in 'BeforeTestStarted' subscriber." + Environment.NewLine + exp);
-                }
-                if (!beforeTestEventArg.Canceled)
+                var itemStartedEventArgs = new TestItemStartedEventArgs(_rpService, startTestRequest, null, report);
+                RiseEvent(BeforeTestStarted, itemStartedEventArgs, nameof(BeforeTestStarted));
+
+                if (!itemStartedEventArgs.Canceled)
                 {
                     var testReporter = _flowItems[parentId].TestReporter.StartChildTestReporter(startTestRequest);
 
                     _flowItems[id] = new FlowItemInfo(id, parentId, FlowItemInfo.FlowType.Test, fullname, testReporter, startTime);
 
-                    try
-                    {
-                        AfterTestStarted?.Invoke(this, new TestItemStartedEventArgs(_rpService, startTestRequest, testReporter, report));
-                    }
-                    catch (Exception exp)
-                    {
-                        _traceLogger.Error("Exception was thrown in 'AfterTestStarted' subscriber." + Environment.NewLine + exp);
-                    }
+                    itemStartedEventArgs.TestReporter = testReporter;
+                    RiseEvent(AfterTestStarted, itemStartedEventArgs, nameof(AfterTestStarted));
                 }
             }
             catch (Exception exception)
@@ -73,16 +68,6 @@ namespace ReportPortal.NUnitExtension
                 _traceLogger.Error("ReportPortal exception was thrown." + Environment.NewLine + exception);
             }
         }
-
-        public delegate void TestFinishedHandler(object sender, TestItemFinishedEventArgs e);
-
-        public static event TestFinishedHandler BeforeTestFinished;
-        public static event TestFinishedHandler AfterTestFinished;
-
-        public delegate void TestOutputHandler(object sender, TestItemOutputEventArgs e);
-
-        public static event TestOutputHandler BeforeTestOutput;
-        public static event TestOutputHandler AfterTestOutput;
 
         public void FinishTest(string report)
         {
@@ -114,28 +99,12 @@ namespace ReportPortal.NUnitExtension
                         };
 
                         var outputEventArgs = new TestItemOutputEventArgs(_rpService, outputLogRequest, _flowItems[id].TestReporter, report);
-
-                        try
-                        {
-                            BeforeTestOutput?.Invoke(this, outputEventArgs);
-                        }
-                        catch (Exception exp)
-                        {
-                            _traceLogger.Error("Exception was thrown in 'BeforeTestOutput' subscriber." + Environment.NewLine + exp);
-                        }
+                        RiseEvent(BeforeTestOutput, outputEventArgs, nameof(BeforeTestOutput));
 
                         if (!outputEventArgs.Canceled)
                         {
                             _flowItems[id].TestReporter.Log(outputLogRequest);
-
-                            try
-                            {
-                                AfterTestOutput?.Invoke(this, outputEventArgs);
-                            }
-                            catch (Exception exp)
-                            {
-                                _traceLogger.Error("Exception was thrown in 'AfterTestOutput' subscriber." + Environment.NewLine + exp);
-                            }
+                            RiseEvent(AfterTestOutput, outputEventArgs, nameof(AfterTestOutput));
                         }
                     }
 
@@ -308,16 +277,8 @@ namespace ReportPortal.NUnitExtension
                         finishTestRequest.IsRetry = true;
                     }
 
-                    var eventArg = new TestItemFinishedEventArgs(_rpService, finishTestRequest, _flowItems[id].TestReporter, report);
-
-                    try
-                    {
-                        BeforeTestFinished?.Invoke(this, eventArg);
-                    }
-                    catch (Exception exp)
-                    {
-                        _traceLogger.Error("Exception was thrown in 'BeforeTestFinished' subscriber." + Environment.NewLine + exp);
-                    }
+                    var itemFinishedEventArgs = new TestItemFinishedEventArgs(_rpService, finishTestRequest, _flowItems[id].TestReporter, report);
+                    RiseEvent(BeforeTestFinished, itemFinishedEventArgs, nameof(BeforeTestFinished));
 
                     Action<string, FinishTestItemRequest, string, string> finishTestAction = (__id, __finishTestItemRequest, __report, __parentstacktrace) =>
                     {
@@ -333,14 +294,8 @@ namespace ReportPortal.NUnitExtension
 
                         _flowItems[__id].TestReporter.Finish(__finishTestItemRequest);
 
-                        try
-                        {
-                            AfterTestFinished?.Invoke(this, new TestItemFinishedEventArgs(_rpService, __finishTestItemRequest, _flowItems[__id].TestReporter, __report));
-                        }
-                        catch (Exception exp)
-                        {
-                            _traceLogger.Error("Exception was thrown in 'AfterTestFinished' subscriber." + Environment.NewLine + exp);
-                        }
+                        var args = new TestItemFinishedEventArgs(_rpService, __finishTestItemRequest, _flowItems[__id].TestReporter, __report);
+                        RiseEvent(AfterTestFinished, args, nameof(AfterTestFinished));
 
                         _flowItems.Remove(__id);
                     };

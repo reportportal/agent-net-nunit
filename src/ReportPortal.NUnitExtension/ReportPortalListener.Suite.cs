@@ -14,9 +14,13 @@ namespace ReportPortal.NUnitExtension
 {
     public partial class ReportPortalListener
     {
-        public delegate void SuiteStartedHandler(object sender, TestItemStartedEventArgs e);
-        public static event SuiteStartedHandler BeforeSuiteStarted;
-        public static event SuiteStartedHandler AfterSuiteStarted;
+        public static EventHandler<TestItemStartedEventArgs> BeforeSuiteStarted;
+
+        public static EventHandler<TestItemStartedEventArgs> AfterSuiteStarted;
+
+        public static EventHandler<TestItemFinishedEventArgs> BeforeSuiteFinished;
+
+        public static EventHandler<TestItemFinishedEventArgs> AfterSuiteFinished;
 
         private void StartSuite(string report)
         {
@@ -40,27 +44,20 @@ namespace ReportPortal.NUnitExtension
                     Type = TestItemType.Suite
                 };
 
-                var beforeSuiteEventArg = new TestItemStartedEventArgs(_rpService, startSuiteRequest, null, report);
+                var itemStartedEventArgs = new TestItemStartedEventArgs(_rpService, startSuiteRequest, null, report);
 
                 var rootNamespaces = Config.GetValues<string>("rootNamespaces", null);
                 if (rootNamespaces != null && rootNamespaces.Any(n => n == name))
                 {
-                    beforeSuiteEventArg.Canceled = true;
+                    itemStartedEventArgs.Canceled = true;
                 }
 
-                if (!beforeSuiteEventArg.Canceled)
+                if (!itemStartedEventArgs.Canceled)
                 {
-                    try
-                    {
-                        BeforeSuiteStarted?.Invoke(this, beforeSuiteEventArg);
-                    }
-                    catch (Exception exp)
-                    {
-                        _traceLogger.Error("Exception was thrown in 'BeforeSuiteStarted' subscriber." + Environment.NewLine + exp);
-                    }
+                    RiseEvent(BeforeSuiteStarted, itemStartedEventArgs, nameof(BeforeSuiteStarted));
                 }
 
-                if (!beforeSuiteEventArg.Canceled)
+                if (!itemStartedEventArgs.Canceled)
                 {
                     ITestReporter suiteReporter;
 
@@ -83,14 +80,8 @@ namespace ReportPortal.NUnitExtension
 
                     _flowItems[id] = new FlowItemInfo(id, parentId, FlowItemInfo.FlowType.Suite, name, suiteReporter, startTime);
 
-                    try
-                    {
-                        AfterSuiteStarted?.Invoke(this, new TestItemStartedEventArgs(_rpService, startSuiteRequest, suiteReporter, report));
-                    }
-                    catch (Exception exp)
-                    {
-                        _traceLogger.Error("Exception was thrown in 'AfterSuiteStarted' subscriber." + Environment.NewLine + exp);
-                    }
+                    itemStartedEventArgs = new TestItemStartedEventArgs(_rpService, startSuiteRequest, suiteReporter, report);
+                    RiseEvent(AfterSuiteStarted, itemStartedEventArgs, nameof(AfterSuiteStarted));
                 }
                 else
                 {
@@ -115,10 +106,6 @@ namespace ReportPortal.NUnitExtension
             }
             else return null;
         }
-
-        public delegate void SuiteFinishedHandler(object sender, TestItemFinishedEventArgs e);
-        public static event SuiteFinishedHandler BeforeSuiteFinished;
-        public static event SuiteFinishedHandler AfterSuiteFinished;
 
         private void FinishSuite(string report)
         {
@@ -201,16 +188,8 @@ namespace ReportPortal.NUnitExtension
                             finishSuiteRequest.Description = description.Attribute("value").Value;
                         }
 
-                        var eventArg = new TestItemFinishedEventArgs(_rpService, finishSuiteRequest, _flowItems[id].TestReporter, report);
-
-                        try
-                        {
-                            BeforeSuiteFinished?.Invoke(this, eventArg);
-                        }
-                        catch (Exception exp)
-                        {
-                            _traceLogger.Error("Exception was thrown in 'BeforeSuiteFinished' subscriber." + Environment.NewLine + exp);
-                        }
+                        var itemFinishedEventArgs = new TestItemFinishedEventArgs(_rpService, finishSuiteRequest, _flowItems[id].TestReporter, report);
+                        RiseEvent(BeforeSuiteFinished, itemFinishedEventArgs, nameof(BeforeSuiteFinished));
 
                         Action<string, FinishTestItemRequest, string, string> finishSuiteAction = (__id, __finishSuiteRequest, __report, __parentstacktrace) =>
                         {
@@ -223,14 +202,8 @@ namespace ReportPortal.NUnitExtension
 
                             _flowItems[__id].TestReporter?.Finish(__finishSuiteRequest);
 
-                            try
-                            {
-                                AfterSuiteFinished?.Invoke(this, new TestItemFinishedEventArgs(_rpService, __finishSuiteRequest, _flowItems[__id].TestReporter, __report));
-                            }
-                            catch (Exception exp)
-                            {
-                                _traceLogger.Error("Exception was thrown in 'AfterSuiteFinished' subscriber." + Environment.NewLine + exp);
-                            }
+                            var args = new TestItemFinishedEventArgs(_rpService, __finishSuiteRequest, _flowItems[__id].TestReporter, __report);
+                            RiseEvent(AfterSuiteFinished, args, nameof(AfterSuiteFinished));
 
                             _flowItems.Remove(__id);
                         };

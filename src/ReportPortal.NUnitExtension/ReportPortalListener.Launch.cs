@@ -13,11 +13,15 @@ namespace ReportPortal.NUnitExtension
 {
     public partial class ReportPortalListener
     {
-        private ILaunchReporter _launchReporter;
+        public static event EventHandler<RunStartedEventArgs> BeforeRunStarted;
 
-        public delegate void RunStartedHandler(object sender, RunStartedEventArgs e);
-        public static event RunStartedHandler BeforeRunStarted;
-        public static event RunStartedHandler AfterRunStarted;
+        public static event EventHandler<RunStartedEventArgs> AfterRunStarted;
+
+        public static event EventHandler<RunFinishedEventArgs> BeforeRunFinished;
+
+        public static event EventHandler<RunFinishedEventArgs> AfterRunFinished;
+
+        private ILaunchReporter _launchReporter;
 
         private void StartRun(string report)
         {
@@ -43,31 +47,18 @@ namespace ReportPortal.NUnitExtension
                     Attributes = Config.GetKeyValues("Launch:Attributes", new List<KeyValuePair<string, string>>()).Select(a => new ItemAttribute { Key = a.Key, Value = a.Value }).ToList()
                 };
 
-                var eventArg = new RunStartedEventArgs(_rpService, startLaunchRequest);
+                var runStartedEventArgs = new RunStartedEventArgs(_rpService, startLaunchRequest);
 
-                try
-                {
-                    BeforeRunStarted?.Invoke(this, eventArg);
-                }
-                catch (Exception exp)
-                {
-                    _traceLogger.Error("Exception was thrown in 'BeforeRunStarted' subscriber." + Environment.NewLine + exp);
-                }
+                RiseEvent(BeforeRunStarted, runStartedEventArgs, nameof(BeforeRunStarted));
 
-                if (!eventArg.Canceled)
+                if (!runStartedEventArgs.Canceled)
                 {
                     _launchReporter = new LaunchReporter(_rpService, Config, null, _extensionManager);
 
-                    _launchReporter.Start(eventArg.StartLaunchRequest);
+                    _launchReporter.Start(runStartedEventArgs.StartLaunchRequest);
 
-                    try
-                    {
-                        AfterRunStarted?.Invoke(this, new RunStartedEventArgs(_rpService, startLaunchRequest, _launchReporter, report));
-                    }
-                    catch (Exception exp)
-                    {
-                        _traceLogger.Error("Exception was thrown in 'AfterRunStarted' subscriber." + Environment.NewLine + exp);
-                    }
+                    runStartedEventArgs = new RunStartedEventArgs(_rpService, startLaunchRequest, _launchReporter, report);
+                    RiseEvent(AfterRunStarted, runStartedEventArgs, nameof(AfterRunStarted));
                 }
             }
             catch (Exception exception)
@@ -75,10 +66,6 @@ namespace ReportPortal.NUnitExtension
                 _traceLogger.Error("ReportPortal exception was thrown." + Environment.NewLine + exception);
             }
         }
-
-        public delegate void RunFinishedHandler(object sender, RunFinishedEventArgs e);
-        public static event RunFinishedHandler BeforeRunFinished;
-        public static event RunFinishedHandler AfterRunFinished;
 
         private void FinishRun(string report)
         {
@@ -93,14 +80,8 @@ namespace ReportPortal.NUnitExtension
                 };
 
                 var eventArg = new RunFinishedEventArgs(_rpService, finishLaunchRequest, _launchReporter, report);
-                try
-                {
-                    BeforeRunFinished?.Invoke(this, eventArg);
-                }
-                catch (Exception exp)
-                {
-                    _traceLogger.Error("Exception was thrown in 'BeforeRunFinished' subscriber." + Environment.NewLine + exp);
-                }
+
+                RiseEvent(BeforeRunFinished, eventArg, nameof(BeforeRunFinished));
 
                 if (!eventArg.Canceled)
                 {
@@ -116,14 +97,7 @@ namespace ReportPortal.NUnitExtension
                     _traceLogger.Info(statisticsRecord);
                     Console.WriteLine(statisticsRecord);
 
-                    try
-                    {
-                        AfterRunFinished?.Invoke(this, new RunFinishedEventArgs(_rpService, finishLaunchRequest, _launchReporter, report));
-                    }
-                    catch (Exception exp)
-                    {
-                        _traceLogger.Error("Exception was thrown in 'AfterRunFinished' subscriber." + Environment.NewLine + exp);
-                    }
+                    RiseEvent(AfterRunFinished, eventArg, nameof(AfterRunFinished));
                 }
             }
             catch (Exception exception)

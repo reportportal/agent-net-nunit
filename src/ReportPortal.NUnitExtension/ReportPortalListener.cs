@@ -95,6 +95,24 @@ namespace ReportPortal.NUnitExtension
             }
         }
 
+        private void RiseEvent<TEventArgs>(EventHandler<TEventArgs> handler, TEventArgs args, string subscriber)
+            where TEventArgs : EventArgs
+        {
+            InvokeSafely(() => handler?.Invoke(this, args), $"Exception was thrown in '{subscriber}' subscriber.");
+        }
+
+        private void InvokeSafely(Action action, string errorMessage = "ReportPortal exception was thrown.")
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception exception)
+            {
+                _traceLogger.Error(string.Concat(errorMessage, Environment.NewLine, exception));
+            }
+        }
+
         internal class FlowItemInfo
         {
             public FlowItemInfo(string id, string parentId, FlowType flowType, string fullName, ITestReporter reporter, DateTime startTime)
