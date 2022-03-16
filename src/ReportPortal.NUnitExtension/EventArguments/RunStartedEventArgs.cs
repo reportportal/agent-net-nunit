@@ -1,32 +1,25 @@
-﻿using System;
-using ReportPortal.Client.Abstractions;
+﻿using ReportPortal.Client.Abstractions;
 using ReportPortal.Client.Abstractions.Requests;
 using ReportPortal.Shared.Reporter;
 
 namespace ReportPortal.NUnitExtension.EventArguments
 {
-    public class RunStartedEventArgs : EventArgs
+    public class RunStartedEventArgs : BaseNUnitEventArgs
     {
-        public RunStartedEventArgs(IClientService service, StartLaunchRequest request)
+        public RunStartedEventArgs(IClientService service, StartLaunchRequest request, string report = null)
+            : base(service, report)
         {
-            Service = service;
             StartLaunchRequest = request;
         }
 
-        public RunStartedEventArgs(IClientService service, StartLaunchRequest request, ILaunchReporter launchReporter, string report) : this(service, request)
+        public RunStartedEventArgs(IClientService service, StartLaunchRequest request, ILaunchReporter launchReporter, string report)
+            : this(service, request, report)
         {
             LaunchReporter = launchReporter;
-            Report = report;
         }
-
-        public IClientService Service { get; }
 
         public StartLaunchRequest StartLaunchRequest { get; }
 
         public ILaunchReporter LaunchReporter { get; }
-
-        public string Report { get; }
-
-        public bool Canceled { get; set; }
     }
 }
