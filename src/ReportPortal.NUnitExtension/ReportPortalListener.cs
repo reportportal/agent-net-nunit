@@ -118,6 +118,11 @@ namespace ReportPortal.NUnitExtension
                 .ToArray();
         }
 
+        private static bool IsShouldBeDeferred(XElement xElement)
+        {
+            return xElement.Attribute("site")?.Value == "Parent";
+        }
+
         private static void HandleProperties(XElement xElement, FinishTestItemRequest request)
         {
             for (int index = 0; index < _propertyHandlers.Length; index++)
