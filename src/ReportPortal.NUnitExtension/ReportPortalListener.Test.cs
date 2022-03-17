@@ -1,6 +1,7 @@
 ﻿using ReportPortal.Client.Abstractions.Models;
 using ReportPortal.Client.Abstractions.Requests;
 using ReportPortal.Client.Converters;
+using ReportPortal.NUnitExtension.Attributes;
 using ReportPortal.NUnitExtension.EventArguments;
 using ReportPortal.NUnitExtension.Extensions;
 using ReportPortal.NUnitExtension.LogHandler.Messages;
@@ -8,6 +9,7 @@ using ReportPortal.Shared.Execution.Logging;
 using ReportPortal.Shared.Reporter;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Xml.Linq;
 using System.Xml.XPath;
@@ -49,6 +51,7 @@ namespace ReportPortal.NUnitExtension
         // key: id of logging scope, value: according test item reporter
         private readonly Dictionary<string, ITestReporter> _nestedSteps = new Dictionary<string, ITestReporter>();
 
+        [ReportKey("<start-test")]
         public void StartTest(string report) => InvokeSafely(() => StartTest(XElement.Parse(report)));
 
         private void StartTest(XElement xElement)
@@ -85,6 +88,7 @@ namespace ReportPortal.NUnitExtension
             RiseEvent(AfterTestStarted, itemStartedEventArgs, nameof(AfterTestStarted));
         }
 
+        [ReportKey("<test-case")]
         public void FinishTest(string report) => InvokeSafely(() => FinishTest(XElement.Parse(report)));
 
         private void FinishTest(XElement xElement)
@@ -168,6 +172,7 @@ namespace ReportPortal.NUnitExtension
             RiseEvent(AfterTestOutput, outputEventArgs, nameof(AfterTestOutput));
         }
 
+        [ReportKey("<test-output")]
         public void TestOutput(string report) => InvokeSafely(() => TestOutput(XElement.Parse(report)));
 
         private void TestOutput(XElement xElement)
@@ -192,6 +197,7 @@ namespace ReportPortal.NUnitExtension
             _flowItems[id].TestReporter.Log(request);
         }
 
+        [ReportKey("<test-message")]
         public void TestMessage(string report) => InvokeSafely(() => TestMessage(XElement.Parse(report)));
 
         private void TestMessage(XElement xElement)

@@ -2,6 +2,7 @@
 using NUnit.Engine.Extensibility;
 using ReportPortal.Client.Abstractions.Models;
 using ReportPortal.Client.Abstractions.Requests;
+using ReportPortal.NUnitExtension.Attributes;
 using ReportPortal.NUnitExtension.Extensions;
 using ReportPortal.NUnitExtension.Handlers.Attributes;
 using ReportPortal.NUnitExtension.Handlers.Properties;
@@ -13,7 +14,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Xml;
+using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
 namespace ReportPortal.NUnitExtension
@@ -21,15 +23,30 @@ namespace ReportPortal.NUnitExtension
     [Extension(Description = "ReportPortal extension to send test results")]
     public partial class ReportPortalListener : ITestEventListener
     {
+        private static readonly Regex _reportKeyRegex = new Regex(@"^(<[^\s>]*)");
+
         private static readonly IPropertyHandler[] _propertyHandlers;
 
         private static readonly IAttributeHandler[] _attributeHandlers;
 
+        private static readonly Dictionary<string, Status> _statusMap = new Dictionary<string, Status>
+        {
+            ["Passed"] = Status.Passed,
+            ["Failed"] = Status.Failed,
+            ["Skipped"] = Status.Skipped,
+            ["Inconclusive"] = Status.Skipped,
+            ["Warning"] = Status.Failed,
+        };
+
         private readonly ITraceLogger _traceLogger;
 
-        private Client.Abstractions.IClientService _rpService;
+        private readonly Client.Abstractions.IClientService _rpService;
 
-        private IExtensionManager _extensionManager = new ExtensionManager();
+        private readonly IExtensionManager _extensionManager = new ExtensionManager();
+
+        private readonly Dictionary<string, Action<string>> _processors;
+
+        private readonly Dictionary<string, FlowItemInfo> _flowItems = new Dictionary<string, FlowItemInfo>();
 
         static ReportPortalListener()
         {
@@ -39,6 +56,7 @@ namespace ReportPortal.NUnitExtension
 
         public ReportPortalListener()
         {
+            _processors = ScanTypeForProcessors();
             var baseDir = Path.GetDirectoryName(new Uri(typeof(ReportPortalListener).Assembly.CodeBase).LocalPath);
 
             // first invocation of internal logger so setting base dir
@@ -47,21 +65,10 @@ namespace ReportPortal.NUnitExtension
             Config = new ConfigurationBuilder().AddDefaults(baseDir).Build();
 
             _rpService = new Shared.Reporter.Http.ClientServiceBuilder(Config).Build();
-
             _extensionManager.Explore(baseDir);
 
             Shared.Extensibility.Embedded.Analytics.AnalyticsReportEventsObserver.DefineConsumer("agent-dotnet-nunit");
-
-            _statusMap["Passed"] = Status.Passed;
-            _statusMap["Failed"] = Status.Failed;
-            _statusMap["Skipped"] = Status.Skipped;
-            _statusMap["Inconclusive"] = Status.Skipped;
-            _statusMap["Warning"] = Status.Failed;
         }
-
-        private static Dictionary<string, Status> _statusMap = new Dictionary<string, Status>();
-
-        private Dictionary<string, FlowItemInfo> _flowItems = new Dictionary<string, FlowItemInfo>();
 
         public static IConfiguration Config { get; private set; }
 
@@ -69,44 +76,9 @@ namespace ReportPortal.NUnitExtension
         {
             _traceLogger.Verbose($"Agent got an event:{Environment.NewLine}{report}");
 
-            if (Config.GetValue("Enabled", true))
+            if (Config.IsEnabled() && _processors.TryGetValue(GetReportKey(report), out var processor))
             {
-                var xmlDoc = new XmlDocument();
-                xmlDoc.LoadXml(report);
-
-                if (report.StartsWith("<start-run"))
-                {
-                    StartRun(report);
-                }
-                else if (report.StartsWith("<test-run"))
-                {
-                    FinishRun(report);
-                }
-                else if (report.StartsWith("<start-suite"))
-                {
-                    StartSuite(report);
-                }
-                else if (report.StartsWith("<test-suite"))
-                {
-                    FinishSuite(report);
-                }
-                else if (report.StartsWith("<start-test"))
-                {
-                    StartTest(report);
-                }
-                else if (report.StartsWith("<test-case"))
-                {
-                    FinishTest(report);
-                }
-                else if (report.StartsWith("<test-output"))
-                {
-                    TestOutput(report);
-                }
-
-                else if (report.StartsWith("<test-message"))
-                {
-                    TestMessage(report);
-                }
+                processor.Invoke(report);
             }
         }
 
@@ -137,6 +109,25 @@ namespace ReportPortal.NUnitExtension
             {
                 _attributeHandlers[index].Handle(xElement, reporter);
             }
+        }
+
+        private static string GetReportKey(string report)
+        {
+            return _reportKeyRegex.Match(report).Value;
+        }
+
+        private Dictionary<string, Action<string>> ScanTypeForProcessors()
+        {
+            var flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
+
+            var methods = typeof(ReportPortalListener).GetMethods(flags)
+                 .Where(method => method.GetCustomAttribute<ReportKeyAttribute>() != null)
+                 .Select(method => new { Method = method, method.GetCustomAttribute<ReportKeyAttribute>().Key })
+                 .ToList();
+
+            return methods.ToDictionary(
+                kvp => kvp.Key,
+                kvp => (Action<string>)kvp.Method.CreateDelegate(typeof(Action<string>), this));
         }
 
         private void RiseEvent<TEventArgs>(EventHandler<TEventArgs> handler, TEventArgs args, string subscriber)
