@@ -1,18 +1,18 @@
-﻿using ReportPortal.Client.Abstractions.Models;
-using ReportPortal.Client.Abstractions.Requests;
+﻿using ReportPortal.Client.Abstractions.Requests;
 using ReportPortal.NUnitExtension.EventArguments;
-using ReportPortal.Shared.Configuration;
+using ReportPortal.NUnitExtension.Extensions;
 using ReportPortal.Shared.Reporter;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Xml.Linq;
 
 namespace ReportPortal.NUnitExtension
 {
     public partial class ReportPortalListener
     {
+        private const string DefaultName = "NUnit Launch";
+
+        private const string DefaultDescription = "";
+
         public static event EventHandler<RunStartedEventArgs> BeforeRunStarted;
 
         public static event EventHandler<RunStartedEventArgs> AfterRunStarted;
@@ -23,89 +23,65 @@ namespace ReportPortal.NUnitExtension
 
         private ILaunchReporter _launchReporter;
 
-        private void StartRun(string report)
+        private void StartRun(string report) => InvokeSafely(() => StartLaunch(report));
+
+        private void StartLaunch(string report)
         {
-            var xElement = XElement.Parse(report);
-
-            try
+            var startLaunchRequest = new StartLaunchRequest
             {
-                LaunchMode launchMode;
-                if (Config.GetValue(ConfigurationPath.LaunchDebugMode, false))
-                {
-                    launchMode = LaunchMode.Debug;
-                }
-                else
-                {
-                    launchMode = LaunchMode.Default;
-                }
-                var startLaunchRequest = new StartLaunchRequest
-                {
-                    Name = Config.GetValue(ConfigurationPath.LaunchName, "NUnit Launch"),
-                    Description = Config.GetValue(ConfigurationPath.LaunchDescription, ""),
-                    StartTime = DateTime.UtcNow,
-                    Mode = launchMode,
-                    Attributes = Config.GetKeyValues("Launch:Attributes", new List<KeyValuePair<string, string>>()).Select(a => new ItemAttribute { Key = a.Key, Value = a.Value }).ToList()
-                };
+                StartTime = DateTime.UtcNow,
+                Mode = Config.GetMode(),
+                Attributes = Config.GetAttributes(),
+                Name = Config.GetName(DefaultName),
+                Description = Config.GetDescription(DefaultDescription),
+            };
 
-                var runStartedEventArgs = new RunStartedEventArgs(_rpService, startLaunchRequest);
+            var runStartedEventArgs = new RunStartedEventArgs(_rpService, startLaunchRequest);
+            RiseEvent(BeforeRunStarted, runStartedEventArgs, nameof(BeforeRunStarted));
 
-                RiseEvent(BeforeRunStarted, runStartedEventArgs, nameof(BeforeRunStarted));
-
-                if (!runStartedEventArgs.Canceled)
-                {
-                    _launchReporter = new LaunchReporter(_rpService, Config, null, _extensionManager);
-
-                    _launchReporter.Start(runStartedEventArgs.StartLaunchRequest);
-
-                    runStartedEventArgs = new RunStartedEventArgs(_rpService, startLaunchRequest, _launchReporter, report);
-                    RiseEvent(AfterRunStarted, runStartedEventArgs, nameof(AfterRunStarted));
-                }
-            }
-            catch (Exception exception)
+            if (runStartedEventArgs.Canceled)
             {
-                _traceLogger.Error("ReportPortal exception was thrown." + Environment.NewLine + exception);
+                return;
             }
+
+            _launchReporter = new LaunchReporter(_rpService, Config, null, _extensionManager);
+            _launchReporter.Start(runStartedEventArgs.StartLaunchRequest);
+
+            runStartedEventArgs = new RunStartedEventArgs(_rpService, startLaunchRequest, _launchReporter, report);
+            RiseEvent(AfterRunStarted, runStartedEventArgs, nameof(AfterRunStarted));
         }
 
-        private void FinishRun(string report)
+        private void FinishRun(string report) => InvokeSafely(() => FinishLaunch(report));
+
+        private void FinishLaunch(string report)
         {
-            var xElement = XElement.Parse(report);
-
-            try
+            var finishLaunchRequest = new FinishLaunchRequest
             {
-                var finishLaunchRequest = new FinishLaunchRequest
-                {
-                    EndTime = DateTime.UtcNow,
+                EndTime = DateTime.UtcNow,
+            };
 
-                };
+            var runFinishedEventArgs = new RunFinishedEventArgs(_rpService, finishLaunchRequest, _launchReporter, report);
+            RiseEvent(BeforeRunFinished, runFinishedEventArgs, nameof(BeforeRunFinished));
 
-                var eventArg = new RunFinishedEventArgs(_rpService, finishLaunchRequest, _launchReporter, report);
-
-                RiseEvent(BeforeRunFinished, eventArg, nameof(BeforeRunFinished));
-
-                if (!eventArg.Canceled)
-                {
-                    var sw = Stopwatch.StartNew();
-                    Console.Write("Finishing to send the results to Report Portal... ");
-
-                    _launchReporter.Finish(finishLaunchRequest);
-                    _launchReporter.Sync();
-
-                    Console.WriteLine($"Elapsed: {sw.Elapsed}");
-
-                    var statisticsRecord = _launchReporter.StatisticsCounter.ToString();
-                    _traceLogger.Info(statisticsRecord);
-                    Console.WriteLine(statisticsRecord);
-
-                    RiseEvent(AfterRunFinished, eventArg, nameof(AfterRunFinished));
-                }
-            }
-            catch (Exception exception)
+            if (runFinishedEventArgs.Canceled)
             {
-                var errorMessage = "ReportPortal exception was thrown." + Environment.NewLine + exception;
-                _traceLogger.Error(errorMessage);
-                Console.WriteLine(errorMessage);
+                return;
             }
+
+            var sw = Stopwatch.StartNew();
+            Console.Write("Finishing to send the results to Report Portal...");
+
+            _launchReporter.Finish(finishLaunchRequest);
+            _launchReporter.Sync();
+
+            Console.WriteLine($"Elapsed: {sw.Elapsed}");
+
+            var statisticsRecord = _launchReporter.StatisticsCounter.ToString();
+            _traceLogger.Info(statisticsRecord);
+            Console.WriteLine(statisticsRecord);
+
+            runFinishedEventArgs = new RunFinishedEventArgs(_rpService, finishLaunchRequest, _launchReporter, report);
+            RiseEvent(AfterRunFinished, runFinishedEventArgs, nameof(AfterRunFinished));
         }
     }
 }
