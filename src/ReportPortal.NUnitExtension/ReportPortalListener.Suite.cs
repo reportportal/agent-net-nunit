@@ -1,11 +1,9 @@
 ﻿using ReportPortal.Client.Abstractions.Models;
 using ReportPortal.Client.Abstractions.Requests;
 using ReportPortal.NUnitExtension.EventArguments;
-using ReportPortal.Shared.Converters;
-using ReportPortal.Shared.Execution.Metadata;
+using ReportPortal.NUnitExtension.Extensions;
 using ReportPortal.Shared.Reporter;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 using System.Xml.XPath;
@@ -61,7 +59,7 @@ namespace ReportPortal.NUnitExtension
                 {
                     ITestReporter suiteReporter;
 
-                    if (string.IsNullOrEmpty(parentId) || !_flowItems.ContainsKey(parentId))
+                    if (!parentId.HasValue() || !_flowItems.ContainsKey(parentId))
                     {
                         suiteReporter = _launchReporter.StartChildTestReporter(startSuiteRequest);
                     }
@@ -100,7 +98,7 @@ namespace ReportPortal.NUnitExtension
             {
                 return _flowItems[id];
             }
-            else if (!string.IsNullOrEmpty(_flowItems[id].ParentId))
+            else if (_flowItems[id].ParentId.HasValue())
             {
                 return FindReportedParentFlowItem(_flowItems[id].ParentId);
             }
@@ -137,56 +135,7 @@ namespace ReportPortal.NUnitExtension
                             Status = _statusMap[result]
                         };
 
-                        // adding categories to suite
-                        var categories = xElement.XPathSelectElements("//properties/property[@name='Category']");
-                        if (categories != null)
-                        {
-                            if (finishSuiteRequest.Attributes == null)
-                            {
-                                finishSuiteRequest.Attributes = new List<ItemAttribute>();
-                            }
-
-                            foreach (XElement category in categories)
-                            {
-                                var value = category.Attribute("value").Value;
-
-                                if (!string.IsNullOrEmpty(value))
-                                {
-                                    var attr = new ItemAttributeConverter().ConvertFrom(value, opts => opts.UndefinedKey = "Category");
-
-                                    finishSuiteRequest.Attributes.Add(attr);
-                                }
-                            }
-                        }
-
-                        // adding author attribute to suite
-                        var authorElements = xElement.XPathSelectElements("//properties/property[@name='Author']");
-                        if (authorElements != null)
-                        {
-                            if (finishSuiteRequest == null)
-                            {
-                                finishSuiteRequest.Attributes = new List<ItemAttribute>();
-                            }
-
-                            foreach (XElement authorElement in authorElements)
-                            {
-                                var value = authorElement.Attribute("value").Value;
-
-                                if (!string.IsNullOrEmpty(value))
-                                {
-                                    var attr = new ItemAttribute { Key = "Author", Value = value };
-
-                                    finishSuiteRequest.Attributes.Add(attr);
-                                }
-                            }
-                        }
-
-                        // adding description to suite
-                        var description = xElement.XPathSelectElement("//properties/property[@name='Description']");
-                        if (description != null)
-                        {
-                            finishSuiteRequest.Description = description.Attribute("value").Value;
-                        }
+                        HandleProperties(xElement, finishSuiteRequest);
 
                         var itemFinishedEventArgs = new TestItemFinishedEventArgs(_rpService, finishSuiteRequest, _flowItems[id].TestReporter, report);
                         RiseEvent(BeforeSuiteFinished, itemFinishedEventArgs, nameof(BeforeSuiteFinished));
@@ -223,7 +172,6 @@ namespace ReportPortal.NUnitExtension
                         }
                     }
                 }
-
             }
             catch (Exception exception)
             {

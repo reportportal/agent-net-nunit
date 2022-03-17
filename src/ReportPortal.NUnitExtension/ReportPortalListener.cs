@@ -2,6 +2,9 @@
 using NUnit.Engine.Extensibility;
 using ReportPortal.Client.Abstractions.Models;
 using ReportPortal.Client.Abstractions.Requests;
+using ReportPortal.NUnitExtension.Extensions;
+using ReportPortal.NUnitExtension.Handlers.Attributes;
+using ReportPortal.NUnitExtension.Handlers.Properties;
 using ReportPortal.Shared.Configuration;
 using ReportPortal.Shared.Extensibility;
 using ReportPortal.Shared.Internal.Logging;
@@ -9,18 +12,30 @@ using ReportPortal.Shared.Reporter;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Xml;
+using System.Xml.Linq;
 
 namespace ReportPortal.NUnitExtension
 {
     [Extension(Description = "ReportPortal extension to send test results")]
     public partial class ReportPortalListener : ITestEventListener
     {
+        private static readonly IPropertyHandler[] _propertyHandlers;
+
+        private static readonly IAttributeHandler[] _attributeHandlers;
+
         private readonly ITraceLogger _traceLogger;
 
         private Client.Abstractions.IClientService _rpService;
 
         private IExtensionManager _extensionManager = new ExtensionManager();
+
+        static ReportPortalListener()
+        {
+            _propertyHandlers = ScanAssemblyForHandlers<IPropertyHandler>();
+            _attributeHandlers = ScanAssemblyForHandlers<IAttributeHandler>();
+        }
 
         public ReportPortalListener()
         {
@@ -92,6 +107,30 @@ namespace ReportPortal.NUnitExtension
                 {
                     TestMessage(report);
                 }
+            }
+        }
+
+        private static THandler[] ScanAssemblyForHandlers<THandler>()
+        {
+            return typeof(ReportPortalListener).Assembly.GetTypes()
+                .Where(t => !t.IsAbstract && t.HasDefaultConstructor() && typeof(THandler).IsAssignableFrom(t))
+                .Select(t => (THandler)Activator.CreateInstance(t))
+                .ToArray();
+        }
+
+        private static void HandleProperties(XElement xElement, FinishTestItemRequest request)
+        {
+            for (int index = 0; index < _propertyHandlers.Length; index++)
+            {
+                _propertyHandlers[index].Handle(xElement, request);
+            }
+        }
+
+        private static void HandleAttributes(XElement xElement, ITestReporter reporter)
+        {
+            for (int index = 0; index < _attributeHandlers.Length; index++)
+            {
+                _attributeHandlers[index].Handle(xElement, reporter);
             }
         }
 
