@@ -1,5 +1,4 @@
 ﻿using ReportPortal.Client.Abstractions.Requests;
-using ReportPortal.NUnitExtension.Attributes;
 using ReportPortal.NUnitExtension.EventArguments;
 using ReportPortal.NUnitExtension.Extensions;
 using ReportPortal.Shared.Reporter;
@@ -25,7 +24,6 @@ namespace ReportPortal.NUnitExtension
 
         private ILaunchReporter _launchReporter;
 
-        [ReportKey("<start-run")]
         private void StartRun(string report) => InvokeSafely(() => StartLaunch(report));
 
         private void StartLaunch(string report)
@@ -54,7 +52,6 @@ namespace ReportPortal.NUnitExtension
             RiseEvent(AfterRunStarted, runStartedEventArgs, nameof(AfterRunStarted));
         }
 
-        [ReportKey("<test-run")]
         private void FinishRun(string report) => InvokeSafely(() => FinishLaunch(report));
 
         private void FinishLaunch(string report)

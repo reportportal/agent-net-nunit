@@ -2,7 +2,6 @@
 using NUnit.Engine.Extensibility;
 using ReportPortal.Client.Abstractions.Models;
 using ReportPortal.Client.Abstractions.Requests;
-using ReportPortal.NUnitExtension.Attributes;
 using ReportPortal.NUnitExtension.Extensions;
 using ReportPortal.NUnitExtension.Handlers.Attributes;
 using ReportPortal.NUnitExtension.Handlers.Properties;
@@ -14,8 +13,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
 namespace ReportPortal.NUnitExtension
@@ -23,11 +20,20 @@ namespace ReportPortal.NUnitExtension
     [Extension(Description = "ReportPortal extension to send test results")]
     public partial class ReportPortalListener : ITestEventListener
     {
-        private static readonly Regex _reportKeyRegex = new Regex(@"^(<[^\s>]*)");
+        private static readonly IPropertyHandler[] _propertyHandlers = new IPropertyHandler[]
+        {
+            new AuthorPropertyHandler(),
+            new DescriptionPropertyHandler(),
+            new CategoryPropertyHandler(),
+            new RetryPropertyHandler(),
+        };
 
-        private static readonly IPropertyHandler[] _propertyHandlers;
-
-        private static readonly IAttributeHandler[] _attributeHandlers;
+        private static readonly IAttributeHandler[] _attributeHandlers = new IAttributeHandler[]
+        {
+            new AttachmentsHandler(),
+            new FailureHandler(),
+            new ReasonHandler(),
+        };
 
         private static readonly Dictionary<string, Status> _statusMap = new Dictionary<string, Status>
         {
@@ -48,15 +54,9 @@ namespace ReportPortal.NUnitExtension
 
         private readonly Dictionary<string, FlowItemInfo> _flowItems = new Dictionary<string, FlowItemInfo>();
 
-        static ReportPortalListener()
-        {
-            _propertyHandlers = ScanAssemblyForHandlers<IPropertyHandler>();
-            _attributeHandlers = ScanAssemblyForHandlers<IAttributeHandler>();
-        }
-
         public ReportPortalListener()
         {
-            _processors = ScanTypeForProcessors();
+            _processors = GetProcessors();
             var baseDir = Path.GetDirectoryName(new Uri(typeof(ReportPortalListener).Assembly.CodeBase).LocalPath);
 
             // first invocation of internal logger so setting base dir
@@ -76,18 +76,10 @@ namespace ReportPortal.NUnitExtension
         {
             _traceLogger.Verbose($"Agent got an event:{Environment.NewLine}{report}");
 
-            if (Config.IsEnabled() && _processors.TryGetValue(GetReportKey(report), out var processor))
+            if (Config.IsEnabled())
             {
-                processor.Invoke(report);
+                Process(report);
             }
-        }
-
-        private static THandler[] ScanAssemblyForHandlers<THandler>()
-        {
-            return typeof(ReportPortalListener).Assembly.GetTypes()
-                .Where(t => !t.IsAbstract && t.HasDefaultConstructor() && typeof(THandler).IsAssignableFrom(t))
-                .Select(t => (THandler)Activator.CreateInstance(t))
-                .ToArray();
         }
 
         private static bool IsShouldBeDeferred(XElement xElement)
@@ -111,23 +103,29 @@ namespace ReportPortal.NUnitExtension
             }
         }
 
-        private static string GetReportKey(string report)
+        private Dictionary<string, Action<string>> GetProcessors()
         {
-            return _reportKeyRegex.Match(report).Value;
+            return new Dictionary<string, Action<string>>
+            {
+                ["<start-run"] = StartRun,
+                ["<test-run"] = FinishRun,
+                ["<start-test"] = StartTest,
+                ["<test-case"] = FinishTest,
+                ["<start-suite"] = StartSuite,
+                ["<test-suite"] = FinishSuite,
+                ["<test-output"] = TestOutput,
+                ["<test-message"] = TestMessage
+            };
         }
 
-        private Dictionary<string, Action<string>> ScanTypeForProcessors()
+        private void Process(string report)
         {
-            var flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
+            var key = _processors.Keys.FirstOrDefault(k => report.StartsWith(k));
 
-            var methods = typeof(ReportPortalListener).GetMethods(flags)
-                 .Where(method => method.GetCustomAttribute<ReportKeyAttribute>() != null)
-                 .Select(method => new { Method = method, method.GetCustomAttribute<ReportKeyAttribute>().Key })
-                 .ToList();
-
-            return methods.ToDictionary(
-                kvp => kvp.Key,
-                kvp => (Action<string>)kvp.Method.CreateDelegate(typeof(Action<string>), this));
+            if (_processors.TryGetValue(key, out var processor))
+            {
+                processor(report);
+            }
         }
 
         private void RiseEvent<TEventArgs>(EventHandler<TEventArgs> handler, TEventArgs args, string subscriber)

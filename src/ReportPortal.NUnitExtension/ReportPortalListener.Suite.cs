@@ -1,6 +1,5 @@
 ﻿using ReportPortal.Client.Abstractions.Models;
 using ReportPortal.Client.Abstractions.Requests;
-using ReportPortal.NUnitExtension.Attributes;
 using ReportPortal.NUnitExtension.EventArguments;
 using ReportPortal.NUnitExtension.Extensions;
 using ReportPortal.Shared.Reporter;
@@ -23,7 +22,6 @@ namespace ReportPortal.NUnitExtension
 
         public static EventHandler<TestItemFinishedEventArgs> AfterSuiteFinished;
 
-        [ReportKey("<start-suite")]
         private void StartSuite(string report) => InvokeSafely(() => StartSuite(XElement.Parse(report)));
 
         private void StartSuite(XElement xElement)
@@ -64,7 +62,6 @@ namespace ReportPortal.NUnitExtension
             }
         }
 
-        [ReportKey("<test-suite")]
         private void FinishSuite(string report) => InvokeSafely(() => FinishSuite(XElement.Parse(report)));
 
         private void FinishSuite(XElement xElement)
