@@ -39,8 +39,6 @@ namespace ReportPortal.NUnitExtension.Extensions
             return configuration.GetValue("Enabled", true);
         }
 
-        public static bool IsDisabled(this IConfiguration configuration) => !IsEnabled(configuration);
-
         public static IEnumerable<string> GetRootNamespaces(this IConfiguration configuration, IEnumerable<string> defaultValue = null)
         {
             return configuration.GetValues<string>("rootNamespaces", defaultValue);
