@@ -467,14 +467,21 @@ namespace ReportPortal.NUnitExtension
                 };
             }
 
-            var testItemReporter = _flowItems[testId].TestReporter;
-
             if (message.ParentScopeId != null)
             {
-                testItemReporter = _nestedSteps[message.ParentScopeId];
+                _nestedSteps[message.ParentScopeId].Log(logRequest);
             }
-
-            testItemReporter.Log(logRequest);
+            else
+            {
+                if (message.ContextType == ContextType.Launch)
+                {
+                    _flowItems[testId].TestReporter.LaunchReporter.Log(logRequest);
+                }
+                else
+                {
+                    _flowItems[testId].TestReporter.Log(logRequest);
+                }
+            }
         }
 
         // key: id of logging scope, value: according test item reporter
@@ -492,14 +499,23 @@ namespace ReportPortal.NUnitExtension
                 HasStats = false
             };
 
-            var parentTestItem = _flowItems[testId].TestReporter;
+            ITestReporter nestedStep;
 
             if (message.ParentScopeId != null)
             {
-                parentTestItem = _nestedSteps[message.ParentScopeId];
+                nestedStep = _nestedSteps[message.ParentScopeId].StartChildTestReporter(startTestItemRequest);
             }
-
-            var nestedStep = parentTestItem.StartChildTestReporter(startTestItemRequest);
+            else
+            {
+                if (message.ContextType == ContextType.Launch)
+                {
+                    nestedStep = _flowItems[testId].TestReporter.LaunchReporter.StartChildTestReporter(startTestItemRequest);
+                }
+                else
+                {
+                    nestedStep = _flowItems[testId].TestReporter.StartChildTestReporter(startTestItemRequest);
+                }
+            }
 
             _nestedSteps[message.Id] = nestedStep;
         }

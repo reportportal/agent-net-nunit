@@ -16,5 +16,8 @@ namespace ReportPortal.NUnitExtension.LogHandler.Messages
 
         [DataMember]
         public DateTime BeginTime { get; set; }
+
+        [DataMember]
+        public ContextType ContextType { get; set; }
     }
 }

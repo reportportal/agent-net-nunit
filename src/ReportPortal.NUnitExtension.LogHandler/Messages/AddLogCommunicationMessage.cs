@@ -31,6 +31,9 @@ namespace ReportPortal.NUnitExtension.LogHandler.Messages
         [DataMember]
         public string Text { get; set; }
 
+        [DataMember]
+        public ContextType ContextType { get; set; }
+
         /// <summary>
         /// Specify an attachment of log item.
         /// </summary>

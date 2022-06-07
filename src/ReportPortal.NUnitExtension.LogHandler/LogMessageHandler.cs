@@ -90,6 +90,9 @@ namespace ReportPortal.NUnitExtension.LogHandler
                 Text = args.LogMessage.Message,
                 Level = args.LogMessage.Level
             };
+
+            communicationMessage.ContextType = logContext is Shared.Execution.LaunchContext ? ContextType.Launch : ContextType.Test;
+
             if (args.LogMessage.Attachment != null)
             {
                 communicationMessage.Attach = new Attach
@@ -123,6 +126,8 @@ namespace ReportPortal.NUnitExtension.LogHandler
                 Name = args.LogScope.Name,
                 BeginTime = args.LogScope.BeginTime
             };
+
+            communicationMessage.ContextType = logContext is Shared.Execution.LaunchContext ? ContextType.Launch : ContextType.Test;
 
             SendMessage(ReportPortal_BeginLogScopeMessage, ModelSerializer.Serialize<BeginScopeCommunicationMessage>(communicationMessage));
         }
