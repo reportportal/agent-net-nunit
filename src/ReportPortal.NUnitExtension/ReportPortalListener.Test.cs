@@ -475,11 +475,11 @@ namespace ReportPortal.NUnitExtension
             {
                 if (message.ContextType == ContextType.Launch)
                 {
-                    _flowItems[testId].TestReporter.LaunchReporter.Log(logRequest);
+                    FindFlowItem(testId).TestReporter.LaunchReporter.Log(logRequest);
                 }
                 else
                 {
-                    _flowItems[testId].TestReporter.Log(logRequest);
+                    FindFlowItem(testId).TestReporter.Log(logRequest);
                 }
             }
         }
@@ -509,11 +509,11 @@ namespace ReportPortal.NUnitExtension
             {
                 if (message.ContextType == ContextType.Launch)
                 {
-                    nestedStep = _flowItems[testId].TestReporter.LaunchReporter.StartChildTestReporter(startTestItemRequest);
+                    nestedStep = FindFlowItem(testId).TestReporter.LaunchReporter.StartChildTestReporter(startTestItemRequest);
                 }
                 else
                 {
-                    nestedStep = _flowItems[testId].TestReporter.StartChildTestReporter(startTestItemRequest);
+                    nestedStep = FindFlowItem(testId).TestReporter.StartChildTestReporter(startTestItemRequest);
                 }
             }
 
@@ -549,6 +549,30 @@ namespace ReportPortal.NUnitExtension
             });
 
             _nestedSteps.Remove(message.Id);
+        }
+
+        /// <summary>
+        /// Finds some particular item in flow (suite/test/step) with fallback to parent.
+        /// If the suite/test/step is ignored from sending to the server, then parent will be used (recursively.)
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        private FlowItemInfo FindFlowItem(string id)
+        {
+            if (!_flowItems.TryGetValue(id, out var flowItem))
+            {
+                throw new Exception($"Unknown execution context for {id}");
+            }
+
+            if (flowItem.TestReporter != null)
+            {
+                return flowItem;
+            }
+            else
+            {
+                return FindFlowItem(flowItem.ParentId);
+            }
         }
 
         /// <summary>

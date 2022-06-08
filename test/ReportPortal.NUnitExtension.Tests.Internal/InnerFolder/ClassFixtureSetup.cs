@@ -9,6 +9,7 @@ namespace ReportPortal.NUnitExtension.Tests.Internal.InnerFolder
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
+            ReportPortal.Shared.Context.Launch.Log.Info("From global setup");
             throw new Exception("Assembly SetUpFixture exception.");
         }
 
