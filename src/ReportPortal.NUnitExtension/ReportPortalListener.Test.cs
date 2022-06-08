@@ -475,7 +475,16 @@ namespace ReportPortal.NUnitExtension
             {
                 if (message.ContextType == ContextType.Launch)
                 {
-                    FindFlowItem(testId).TestReporter.LaunchReporter.Log(logRequest);
+                    var flowItem = FindFlowItem(testId);
+
+                    if (flowItem.TestReporter != null)
+                    {
+                        flowItem.TestReporter.LaunchReporter.Log(logRequest);
+                    }
+                    else
+                    {
+                        _launchReporter.Log(logRequest);
+                    }
                 }
                 else
                 {
@@ -509,7 +518,16 @@ namespace ReportPortal.NUnitExtension
             {
                 if (message.ContextType == ContextType.Launch)
                 {
-                    nestedStep = FindFlowItem(testId).TestReporter.LaunchReporter.StartChildTestReporter(startTestItemRequest);
+                    var flowItem = FindFlowItem(testId);
+
+                    if (flowItem.TestReporter != null)
+                    {
+                        nestedStep = flowItem.TestReporter.LaunchReporter.StartChildTestReporter(startTestItemRequest);
+                    }
+                    else
+                    {
+                        nestedStep = _launchReporter?.StartChildTestReporter(startTestItemRequest);
+                    }
                 }
                 else
                 {
@@ -557,13 +575,9 @@ namespace ReportPortal.NUnitExtension
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        /// <exception cref="Exception"></exception>
         private FlowItemInfo FindFlowItem(string id)
         {
-            if (!_flowItems.TryGetValue(id, out var flowItem))
-            {
-                throw new Exception($"Unknown execution context for {id}");
-            }
+            var flowItem = _flowItems[id];
 
             if (flowItem.TestReporter != null)
             {
@@ -571,7 +585,14 @@ namespace ReportPortal.NUnitExtension
             }
             else
             {
-                return FindFlowItem(flowItem.ParentId);
+                if (!string.IsNullOrEmpty(flowItem.ParentId))
+                {
+                    return FindFlowItem(flowItem.ParentId);
+                }
+                else
+                {
+                    return flowItem;
+                }
             }
         }
 
