@@ -18,7 +18,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GitVersion.MsBuild" Version="5.8.1">
+    <PackageReference Include="GitVersion.MsBuild" Version="5.10.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -45,4 +45,10 @@
     <None Include="$(MSBuildProjectDirectory)\..\ReportPortal.NUnitExtension.LogHandler\bin\$(Configuration)\net45\ReportPortal.NUnitExtension.LogHandler.dll" Pack="true" PackagePath="lib\net45" Visible="false" />
     <None Include="$(MSBuildProjectDirectory)\..\ReportPortal.NUnitExtension.LogHandler\bin\$(Configuration)\netstandard2.0\ReportPortal.NUnitExtension.LogHandler.dll" Pack="true" PackagePath="lib\netstandard2.0" Visible="false" />
   </ItemGroup>
+
+  <Target Name="GeneratePackageReleaseNotes" DependsOnTargets="GetVersion" BeforeTargets="GenerateNuspec">
+    <PropertyGroup>
+      <PackageReleaseNotes>Please see [here]($(RepositoryUrl)/releases/tag/$(GitVersion_FullSemVer)) what is new in this version.</PackageReleaseNotes>
+    </PropertyGroup>
+  </Target>
 </Project>
