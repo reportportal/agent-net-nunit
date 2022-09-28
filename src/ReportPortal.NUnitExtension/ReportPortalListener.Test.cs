@@ -1,6 +1,5 @@
 ﻿using ReportPortal.Client.Abstractions.Models;
 using ReportPortal.Client.Abstractions.Requests;
-using ReportPortal.Client.Converters;
 using ReportPortal.NUnitExtension.EventArguments;
 using ReportPortal.NUnitExtension.LogHandler.Messages;
 using ReportPortal.Shared.Converters;
@@ -9,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
@@ -377,7 +377,7 @@ namespace ReportPortal.NUnitExtension
                     CreateLogItemRequest logRequest = null;
                     try
                     {
-                        var sharedMessage = ModelSerializer.Deserialize<AddLogCommunicationMessage>(message);
+                        var sharedMessage = JsonSerializer.Deserialize<AddLogCommunicationMessage>(message);
 
                         logRequest = new CreateLogItemRequest
                         {
@@ -428,15 +428,15 @@ namespace ReportPortal.NUnitExtension
                 switch (action)
                 {
                     case LogHandler.LogMessageHandler.ReportPortal_AddLogMessage:
-                        var addLogCommunicationMessage = ModelSerializer.Deserialize<AddLogCommunicationMessage>(message);
+                        var addLogCommunicationMessage = JsonSerializer.Deserialize<AddLogCommunicationMessage>(message);
                         HandleLogCommunicationMessage(xElement, addLogCommunicationMessage);
                         break;
                     case LogHandler.LogMessageHandler.ReportPortal_BeginLogScopeMessage:
-                        var beginScopeCommunicationMessage = ModelSerializer.Deserialize<BeginScopeCommunicationMessage>(message);
+                        var beginScopeCommunicationMessage = JsonSerializer.Deserialize<BeginScopeCommunicationMessage>(message);
                         HandleBeginScopeCommunicationMessage(xElement, beginScopeCommunicationMessage);
                         break;
                     case LogHandler.LogMessageHandler.ReportPortal_EndLogScopeMessage:
-                        var endScopeCommunicationAction = ModelSerializer.Deserialize<EndScopeCommunicationMessage>(message);
+                        var endScopeCommunicationAction = JsonSerializer.Deserialize<EndScopeCommunicationMessage>(message);
                         HandleEndScopeCommunicationMessage(endScopeCommunicationAction);
                         break;
                 }

@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net45;netstandard2.0;</TargetFrameworks>
+    <TargetFrameworks>net462;netstandard2.0;</TargetFrameworks>
     <PackageId>ReportPortal.NUnit</PackageId>
-    <Version>1.0.0</Version>
+
     <Description>NUnit addin for reporting test results to http://reportportal.io</Description>
     <Authors>Nikolay Borisenko, Report Portal Community</Authors>
     <PackageTags>report nunit addin reportportal testing</PackageTags>
@@ -25,7 +25,7 @@
     <PackageReference Include="NUnit.Engine.Api" Version="3.10.0">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="ReportPortal.Shared" Version="3.2.0">
+    <PackageReference Include="ReportPortal.Shared" Version="3.3.0-alpha.13">
       <PrivateAssets>contentfiles; analyzers;</PrivateAssets>
     </PackageReference>
   </ItemGroup>

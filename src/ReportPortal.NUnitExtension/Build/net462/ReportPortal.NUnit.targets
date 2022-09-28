@@ -3,9 +3,9 @@
 
   <PropertyGroup>
 
-    <_ReportPortal_NUnit_Runtime_Path>$(MSBuildThisFileDirectory)..\..\lib\net45\ReportPortal.NUnitExtension.dll</_ReportPortal_NUnit_Runtime_Path>
-    <_ReportPortal_NUnit_LogHandler_Runtime_Path>$(MSBuildThisFileDirectory)..\..\lib\net45\ReportPortal.NUnitExtension.LogHandler.dll</_ReportPortal_NUnit_LogHandler_Runtime_Path>
-    <_ReportPortal_NUnit_Runtime_Pdb_Path>$(MSBuildThisFileDirectory)..\..\lib\net45\ReportPortal.NUnitExtension.pdb</_ReportPortal_NUnit_Runtime_Pdb_Path>
+    <_ReportPortal_NUnit_Runtime_Path>$(MSBuildThisFileDirectory)..\..\lib\net462\ReportPortal.NUnitExtension.dll</_ReportPortal_NUnit_Runtime_Path>
+    <_ReportPortal_NUnit_LogHandler_Runtime_Path>$(MSBuildThisFileDirectory)..\..\lib\net462\ReportPortal.NUnitExtension.LogHandler.dll</_ReportPortal_NUnit_LogHandler_Runtime_Path>
+    <_ReportPortal_NUnit_Runtime_Pdb_Path>$(MSBuildThisFileDirectory)..\..\lib\net462\ReportPortal.NUnitExtension.pdb</_ReportPortal_NUnit_Runtime_Pdb_Path>
 
   </PropertyGroup>
 

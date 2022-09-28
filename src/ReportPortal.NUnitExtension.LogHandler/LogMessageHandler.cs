@@ -8,6 +8,7 @@ using ReportPortal.Shared.Extensibility.Commands;
 using System.Collections.Generic;
 using System.Collections;
 using ReportPortal.Shared.Execution.Metadata;
+using System.Text.Json;
 
 namespace ReportPortal.NUnitExtension.LogHandler
 {
@@ -102,7 +103,7 @@ namespace ReportPortal.NUnitExtension.LogHandler
                 };
             }
 
-            SendMessage(ReportPortal_AddLogMessage, ModelSerializer.Serialize<AddLogCommunicationMessage>(communicationMessage));
+            SendMessage(ReportPortal_AddLogMessage, JsonSerializer.Serialize(communicationMessage));
         }
 
         private void CommandsSource_OnEndLogScopeCommand(Shared.Execution.ILogContext logContext, Shared.Extensibility.Commands.CommandArgs.LogScopeCommandArgs args)
@@ -114,7 +115,7 @@ namespace ReportPortal.NUnitExtension.LogHandler
                 Status = args.LogScope.Status
             };
 
-            SendMessage(ReportPortal_EndLogScopeMessage, ModelSerializer.Serialize<EndScopeCommunicationMessage>(communicationMessage));
+            SendMessage(ReportPortal_EndLogScopeMessage, JsonSerializer.Serialize(communicationMessage));
         }
 
         private void CommandsSource_OnBeginLogScopeCommand(Shared.Execution.ILogContext logContext, Shared.Extensibility.Commands.CommandArgs.LogScopeCommandArgs args)
@@ -129,7 +130,7 @@ namespace ReportPortal.NUnitExtension.LogHandler
 
             communicationMessage.ContextType = logContext is Shared.Execution.LaunchContext ? ContextType.Launch : ContextType.Test;
 
-            SendMessage(ReportPortal_BeginLogScopeMessage, ModelSerializer.Serialize<BeginScopeCommunicationMessage>(communicationMessage));
+            SendMessage(ReportPortal_BeginLogScopeMessage, JsonSerializer.Serialize(communicationMessage));
         }
 
         private static System.Reflection.Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
