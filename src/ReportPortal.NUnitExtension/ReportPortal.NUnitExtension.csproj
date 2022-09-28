@@ -42,7 +42,7 @@
 
     <None Include="..\..\Logo.png" Pack="true" PackagePath="\" Visible="false" />
 
-    <None Include="$(MSBuildProjectDirectory)\..\ReportPortal.NUnitExtension.LogHandler\bin\$(Configuration)\net45\ReportPortal.NUnitExtension.LogHandler.dll" Pack="true" PackagePath="lib\net462" Visible="false" />
+    <None Include="$(MSBuildProjectDirectory)\..\ReportPortal.NUnitExtension.LogHandler\bin\$(Configuration)\net462\ReportPortal.NUnitExtension.LogHandler.dll" Pack="true" PackagePath="lib\net462" Visible="false" />
     <None Include="$(MSBuildProjectDirectory)\..\ReportPortal.NUnitExtension.LogHandler\bin\$(Configuration)\netstandard2.0\ReportPortal.NUnitExtension.LogHandler.dll" Pack="true" PackagePath="lib\netstandard2.0" Visible="false" />
   </ItemGroup>
 
