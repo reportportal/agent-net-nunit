@@ -9,6 +9,7 @@ using ReportPortal.Shared.Reporter;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Xml;
 
 namespace ReportPortal.NUnitExtension
@@ -16,6 +17,22 @@ namespace ReportPortal.NUnitExtension
     [Extension(Description = "ReportPortal extension to send test results")]
     public partial class ReportPortalListener : ITestEventListener
     {
+        static ReportPortalListener()
+        {
+            AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
+        }
+
+        private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+        {
+            // Microsoft Test Host references to v4 of this assembly for .net framework, but RP needs v6
+            if (args.Name.StartsWith("System.Runtime.CompilerServices.Unsafe", StringComparison.OrdinalIgnoreCase))
+            {
+                return Assembly.Load("System.Runtime.CompilerServices.Unsafe");
+            }
+
+            return null;
+        }
+
         private readonly ITraceLogger _traceLogger;
 
         private Client.Abstractions.IClientService _rpService;
