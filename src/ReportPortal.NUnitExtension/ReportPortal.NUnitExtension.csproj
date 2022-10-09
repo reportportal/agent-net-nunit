@@ -48,7 +48,7 @@
 
   <Target Name="GeneratePackageReleaseNotes" DependsOnTargets="GetVersion" BeforeTargets="GenerateNuspec">
     <PropertyGroup>
-      <PackageReleaseNotes>Please see [here]($(RepositoryUrl)/releases/tag/$(GitVersion_FullSemVer)) what is new in this version.</PackageReleaseNotes>
+      <PackageReleaseNotes>Please see ($(RepositoryUrl)/releases/tag/$(GitVersion_FullSemVer) what is new in this version.</PackageReleaseNotes>
     </PropertyGroup>
   </Target>
 </Project>
