@@ -9,7 +9,7 @@
     <PackageTags>report nunit addin reportportal testing</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageIcon>Logo.png</PackageIcon>
-    <PackageProjectUrl>http://reportportal.io</PackageProjectUrl>
+    <PackageProjectUrl>https://reportportal.io</PackageProjectUrl>
 
     <RepositoryType>GitHub</RepositoryType>
     <RepositoryUrl>https://github.com/reportportal/agent-net-nunit</RepositoryUrl>
