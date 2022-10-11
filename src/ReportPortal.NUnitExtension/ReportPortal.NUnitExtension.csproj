@@ -4,12 +4,12 @@
     <TargetFrameworks>net462;netstandard2.0;</TargetFrameworks>
     <PackageId>ReportPortal.NUnit</PackageId>
 
-    <Description>NUnit addin for reporting test results to http://reportportal.io</Description>
+    <Description>NUnit addin for reporting test results to https://reportportal.io</Description>
     <Authors>Nikolay Borisenko, Report Portal Community</Authors>
     <PackageTags>report nunit addin reportportal testing</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageIcon>Logo.png</PackageIcon>
-    <PackageProjectUrl>http://reportportal.io</PackageProjectUrl>
+    <PackageProjectUrl>https://reportportal.io</PackageProjectUrl>
 
     <RepositoryType>GitHub</RepositoryType>
     <RepositoryUrl>https://github.com/reportportal/agent-net-nunit</RepositoryUrl>
@@ -48,7 +48,7 @@
 
   <Target Name="GeneratePackageReleaseNotes" DependsOnTargets="GetVersion" BeforeTargets="GenerateNuspec">
     <PropertyGroup>
-      <PackageReleaseNotes>Please see [here]($(RepositoryUrl)/releases/tag/$(GitVersion_FullSemVer)) what is new in this version.</PackageReleaseNotes>
+      <PackageReleaseNotes>Please see $(RepositoryUrl)/releases/tag/$(GitVersion_FullSemVer) what is new in this version.</PackageReleaseNotes>
     </PropertyGroup>
   </Target>
 </Project>
