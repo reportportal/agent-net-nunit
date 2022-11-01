@@ -1,5 +1,4 @@
-﻿using ReportPortal.Client.Converters;
-using ReportPortal.NUnitExtension.LogHandler.Messages;
+﻿using ReportPortal.NUnitExtension.LogHandler.Messages;
 using ReportPortal.Shared.Extensibility;
 using ReportPortal.Shared.Internal.Logging;
 using System;
