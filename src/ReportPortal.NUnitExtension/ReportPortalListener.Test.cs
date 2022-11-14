@@ -157,29 +157,18 @@ namespace ReportPortal.NUnitExtension
                                     Text = fileDescription != null ? fileDescription : Path.GetFileName(filePath)
                                 };
 
-                                byte[] bytes;
-
-                                using (var fileStream = File.Open(filePath, FileMode.Open, FileAccess.Read))
-                                {
-                                    using (var memoryStream = new MemoryStream())
-                                    {
-                                        fileStream.CopyTo(memoryStream);
-                                        bytes = memoryStream.ToArray();
-                                    }
-                                }
-
                                 attachmentLogItemRequest.Attach = new LogItemAttach
                                 {
                                     Name = Path.GetFileName(filePath),
                                     MimeType = Shared.MimeTypes.MimeTypeMap.GetMimeType(Path.GetExtension(filePath)),
-                                    Data = bytes
+                                    Data = File.ReadAllBytes(filePath)
                                 };
 
                                 _flowItems[id].TestReporter.Log(attachmentLogItemRequest);
                             }
                             catch (Exception attachmentExp)
                             {
-                                _flowItems[id].TestReporter.Log(new Client.Abstractions.Requests.CreateLogItemRequest
+                                _flowItems[id].TestReporter.Log(new CreateLogItemRequest
                                 {
                                     Level = LogLevel.Warning,
                                     Time = DateTime.UtcNow,
