@@ -125,6 +125,19 @@ namespace ReportPortal.NUnitExtension
                         _traceLogger.Error("Exception was thrown in 'AfterRunFinished' subscriber." + Environment.NewLine + exp);
                     }
                 }
+                else
+                {
+                    var sw = Stopwatch.StartNew();
+                    Console.Write("Finishing to send the results to Report Portal... ");
+
+                    _launchReporter.Sync();
+
+                    Console.WriteLine($"Elapsed: {sw.Elapsed}");
+
+                    var statisticsRecord = _launchReporter.StatisticsCounter.ToString();
+                    _traceLogger.Info(statisticsRecord);
+                    Console.WriteLine(statisticsRecord);
+                }
             }
             catch (Exception exception)
             {
