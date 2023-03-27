@@ -35,9 +35,11 @@ namespace ReportPortal.NUnitExtension
 
         private readonly ITraceLogger _traceLogger;
 
-        private Client.Abstractions.IClientService _rpService;
+        private readonly Client.Abstractions.IClientService _rpService;
 
-        private IExtensionManager _extensionManager = new ExtensionManager();
+        private readonly IExtensionManager _extensionManager = new ExtensionManager();
+
+        private readonly bool _isEnabled;
 
         public ReportPortalListener()
         {
@@ -48,66 +50,75 @@ namespace ReportPortal.NUnitExtension
 
             Config = new ConfigurationBuilder().AddDefaults(baseDir).Build();
 
-            _rpService = new Shared.Reporter.Http.ClientServiceBuilder(Config).Build();
+            _isEnabled = Config.GetValue("Enabled", true);
 
-            _extensionManager.Explore(baseDir);
+            if (_isEnabled)
+            {
 
-            Shared.Extensibility.Embedded.Analytics.AnalyticsReportEventsObserver.DefineConsumer("agent-dotnet-nunit");
+                _rpService = new Shared.Reporter.Http.ClientServiceBuilder(Config).Build();
 
-            _statusMap["Passed"] = Status.Passed;
-            _statusMap["Failed"] = Status.Failed;
-            _statusMap["Skipped"] = Status.Skipped;
-            _statusMap["Inconclusive"] = Status.Skipped;
-            _statusMap["Warning"] = Status.Failed;
+                _extensionManager.Explore(baseDir);
+
+                Shared.Extensibility.Embedded.Analytics.AnalyticsReportEventsObserver.DefineConsumer("agent-dotnet-nunit");
+
+                _statusMap["Passed"] = Status.Passed;
+                _statusMap["Failed"] = Status.Failed;
+                _statusMap["Skipped"] = Status.Skipped;
+                _statusMap["Inconclusive"] = Status.Skipped;
+                _statusMap["Warning"] = Status.Failed;
+            }
         }
 
-        private static Dictionary<string, Status> _statusMap = new Dictionary<string, Status>();
+        private static readonly Dictionary<string, Status> _statusMap = new Dictionary<string, Status>();
 
-        private Dictionary<string, FlowItemInfo> _flowItems = new Dictionary<string, FlowItemInfo>();
+        private readonly Dictionary<string, FlowItemInfo> _flowItems = new Dictionary<string, FlowItemInfo>();
 
         public static IConfiguration Config { get; private set; }
 
         public void OnTestEvent(string report)
         {
-            _traceLogger.Verbose($"Agent got an event:{Environment.NewLine}{report}");
-
-            if (Config.GetValue("Enabled", true))
+            if (_isEnabled)
             {
-                var xmlDoc = new XmlDocument();
-                xmlDoc.LoadXml(report);
+                _traceLogger.Verbose($"Agent got an event:{Environment.NewLine}{report}");
 
-                if (report.StartsWith("<start-run"))
+                if (Config.GetValue("Enabled", true))
                 {
-                    StartRun(report);
-                }
-                else if (report.StartsWith("<test-run"))
-                {
-                    FinishRun(report);
-                }
-                else if (report.StartsWith("<start-suite"))
-                {
-                    StartSuite(report);
-                }
-                else if (report.StartsWith("<test-suite"))
-                {
-                    FinishSuite(report);
-                }
-                else if (report.StartsWith("<start-test"))
-                {
-                    StartTest(report);
-                }
-                else if (report.StartsWith("<test-case"))
-                {
-                    FinishTest(report);
-                }
-                else if (report.StartsWith("<test-output"))
-                {
-                    TestOutput(report);
-                }
+                    var xmlDoc = new XmlDocument();
+                    xmlDoc.LoadXml(report);
 
-                else if (report.StartsWith("<test-message"))
-                {
-                    TestMessage(report);
+                    if (report.StartsWith("<start-run"))
+                    {
+                        StartRun(report);
+                    }
+                    else if (report.StartsWith("<test-run"))
+                    {
+                        FinishRun(report);
+                    }
+                    else if (report.StartsWith("<start-suite"))
+                    {
+                        StartSuite(report);
+                    }
+                    else if (report.StartsWith("<test-suite"))
+                    {
+                        FinishSuite(report);
+                    }
+                    else if (report.StartsWith("<start-test"))
+                    {
+                        StartTest(report);
+                    }
+                    else if (report.StartsWith("<test-case"))
+                    {
+                        FinishTest(report);
+                    }
+                    else if (report.StartsWith("<test-output"))
+                    {
+                        TestOutput(report);
+                    }
+
+                    else if (report.StartsWith("<test-message"))
+                    {
+                        TestMessage(report);
+                    }
                 }
             }
         }
