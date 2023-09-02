@@ -38,7 +38,7 @@ nunit3-console.exe --list-extensions
 
 # Configuration
 
-Add `ReportPortal.config.json` file with configuration of the integration to test project. This file will be copied automatically to output folder during project building.
+Add `ReportPortal.json` file with configuration of the integration to test project. This file will be copied automatically to output folder during project building.
 
 Example of config file:
 ```json
@@ -46,11 +46,9 @@ Example of config file:
   "$schema": "https://raw.githubusercontent.com/reportportal/agent-net-nunit/master/src/ReportPortal.NUnitExtension/ReportPortal.config.schema",
   "enabled": true,
   "server": {
-    "url": "https://rp.epam.com/api/v1/",
+    "url": "https://rp.epam.com",
     "project": "default_project",
-    "authentication": {
-      "uuid": "aa19555c-c9ce-42eb-bb11-87757225d535"
-    }
+    "apiKey": "aa19555c-c9ce-42eb-bb11-87757225d535"
   },
   "launch": {
     "name": "NUnit 3 Demo Launch",

@@ -52,27 +52,17 @@
           ],
           "pattern": "^(.*)$"
         },
-        "authentication": {
-          "$id": "#/properties/server/properties/authentication",
-          "type": "object",
-          "title": "The Authentication Schema",
-          "required": [
-            "uuid"
+        "apiKey": {
+          "description":"the name of authentication api key (uuid)",
+          "$id": "#/properties/server/properties/apiKey",
+          "type": "string",
+          "title": "The API KEY Schema",
+          "default": "",
+          "examples": [
+            "aa19555c-c9ce-42eb-bb11-87757225d535"
           ],
-          "properties": {
-            "uuid": {
-              "description":"user identifier to access the reportportal",
-              "$id": "#/properties/server/properties/authentication/properties/uuid",
-              "type": "string",
-              "title": "The Uuid Schema",
-              "default": "",
-              "examples": [
-                "aa19555c-c9ce-42eb-bb11-87757225d535"
-              ],
-              "pattern": "^(.*)$"
-            }
-          }
-        }
+          "pattern": "^(.*)$"
+        },
       }
     },
     "launch": {
