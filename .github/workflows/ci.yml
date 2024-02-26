@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  - push
+  - workflow_dispatch
+
+jobs:
+
+  Build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Install CodeCov
+        run: dotnet tool install -g codecov.tool
+
+      - name: Build
+        run: dotnet build
+
+      - name: Pack
+        run: dotnet pack --property:PackageOutputPath=../../pkgs
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: pkgs
+          path: |
+            ./pkgs/*.nupkg
+            ./pkgs/*.snupkg
+
+      - name: Test
+        run: dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=OpenCover /p:CoverletOutput=./Coverage.xml
+
+      - name: Publish Coverage
+        uses: codecov/codecov-action@v3
+        with:
+          files: '**/*/Coverage.*.xml'
+

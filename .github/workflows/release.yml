@@ -1,0 +1,51 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - develop
+    tags: '*'
+
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+      with: 
+        fetch-depth: 0
+    - name: Pack
+      run: dotnet pack -c Release --property:PackageOutputPath=../../pkgs
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: pkgs
+        path: |
+            ./pkgs/*.nupkg
+            ./pkgs/*.snupkg
+  
+  Publish_GitHub:
+    environment: 
+      name: GitHub Packages
+    runs-on: ubuntu-latest
+    needs: Build
+    
+    steps:
+    - name: Download Artifacts
+      uses: actions/download-artifact@v3
+    - name: Push
+      run: dotnet nuget push **/*.nupkg -k ${{ secrets.GITHUB_TOKEN }} -s 'https://nuget.pkg.github.com/reportportal/index.json'
+
+  Publish_NuGet:
+    if: startsWith(github.event.ref, 'refs/tags')
+    environment: 
+      name: NuGet Gallery
+      url: https://www.nuget.org/packages/ReportPortal.Client
+    runs-on: ubuntu-latest
+    needs: Build
+    
+    steps:
+    - name: Download Artifacts
+      uses: actions/download-artifact@v3
+    - name: Push
+      run: dotnet nuget push **/*.nupkg -s 'https://api.nuget.org/v3/index.json' -k ${{secrets.NUGET_API_KEY}}
