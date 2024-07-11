@@ -11,20 +11,15 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with: 
         fetch-depth: 0
-
-    - name: Setup GitHub NuGet feed
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: dotnet nuget update source "ReportPortal GitHub" --username reportportal --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text
 
     - name: Pack
       run: dotnet pack -c Release --property:PackageOutputPath=../../pkgs
 
     - name: Upload Artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: pkgs
         path: |
@@ -39,7 +34,7 @@ jobs:
     
     steps:
     - name: Download Artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
     - name: Push
       run: dotnet nuget push **/*.nupkg -k ${{ secrets.GITHUB_TOKEN }} -s 'https://nuget.pkg.github.com/reportportal/index.json'
 
@@ -53,6 +48,6 @@ jobs:
     
     steps:
     - name: Download Artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
     - name: Push
       run: dotnet nuget push **/*.nupkg -s 'https://api.nuget.org/v3/index.json' -k ${{ secrets.NUGET_API_KEY }}
