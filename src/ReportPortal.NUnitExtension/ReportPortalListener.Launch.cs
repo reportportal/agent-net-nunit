@@ -105,12 +105,11 @@ namespace ReportPortal.NUnitExtension
                 if (!eventArg.Canceled)
                 {
                     var sw = Stopwatch.StartNew();
-                    Console.Write("Finishing to send the results to Report Portal... ");
-
+                    
                     _launchReporter.Finish(finishLaunchRequest);
                     _launchReporter.Sync();
 
-                    Console.WriteLine($"Elapsed: {sw.Elapsed}");
+                    Console.WriteLine($"Successfully sent at {_launchReporter.Info.Url} Elapsed: {sw.Elapsed}");
 
                     var statisticsRecord = _launchReporter.StatisticsCounter.ToString();
                     _traceLogger.Info(statisticsRecord);
@@ -128,11 +127,10 @@ namespace ReportPortal.NUnitExtension
                 else
                 {
                     var sw = Stopwatch.StartNew();
-                    Console.Write("Finishing to send the results to Report Portal... ");
 
                     _launchReporter.Sync();
 
-                    Console.WriteLine($"Elapsed: {sw.Elapsed}");
+                    Console.WriteLine($"Successfully sent at {_launchReporter.Info.Url} Elapsed: {sw.Elapsed}");
 
                     var statisticsRecord = _launchReporter.StatisticsCounter.ToString();
                     _traceLogger.Info(statisticsRecord);
