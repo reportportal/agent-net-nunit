@@ -1,5 +1,4 @@
-﻿using ReportPortal.Shared.Execution.Logging;
-using System;
+﻿using System;
 
 namespace ReportPortal.NUnitExtension.LogHandler.Messages
 {
@@ -18,7 +17,7 @@ namespace ReportPortal.NUnitExtension.LogHandler.Messages
         /// <summary>
         /// A level of log item.
         /// </summary>
-        public LogMessageLevel Level { get; set; } = LogMessageLevel.Info;
+        public string Level { get; set; } = "INFO";
 
         /// <summary>
         /// Message of log item.

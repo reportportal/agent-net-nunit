@@ -88,7 +88,7 @@ namespace ReportPortal.NUnitExtension.LogHandler
                 ParentScopeId = args.LogScope?.Id,
                 Time = args.LogMessage.Time,
                 Text = args.LogMessage.Message,
-                Level = args.LogMessage.Level
+                Level = args.LogMessage.LevelString
             };
 
             communicationMessage.ContextType = logContext is Shared.Execution.LaunchContext ? ContextType.Launch : ContextType.Test;
