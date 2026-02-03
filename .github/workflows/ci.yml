@@ -15,6 +15,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+
       - name: Install CodeCov
         run: dotnet tool install -g codecov.tool
 
