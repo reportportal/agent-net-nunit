@@ -370,7 +370,7 @@ namespace ReportPortal.NUnitExtension
 
                         logRequest = new CreateLogItemRequest
                         {
-                            Level = _logMessageLevelMap[sharedMessage.Level],
+                            LevelString = sharedMessage.Level,
                             Time = sharedMessage.Time,
                             Text = sharedMessage.Text
                         };
@@ -442,7 +442,7 @@ namespace ReportPortal.NUnitExtension
 
             var logRequest = new CreateLogItemRequest
             {
-                Level = _logMessageLevelMap[message.Level],
+                LevelString = message.Level,
                 Time = message.Time,
                 Text = message.Text
             };
@@ -534,15 +534,6 @@ namespace ReportPortal.NUnitExtension
             { Shared.Execution.Logging.LogScopeStatus.Skipped, Status.Skipped },
             { Shared.Execution.Logging.LogScopeStatus.Warn, Status.Warn },
             { Shared.Execution.Logging.LogScopeStatus.Info, Status.Info }
-        };
-
-        private Dictionary<Shared.Execution.Logging.LogMessageLevel, LogLevel> _logMessageLevelMap = new Dictionary<Shared.Execution.Logging.LogMessageLevel, LogLevel> {
-            { Shared.Execution.Logging.LogMessageLevel.Debug, LogLevel.Debug },
-            { Shared.Execution.Logging.LogMessageLevel.Error, LogLevel.Error },
-            { Shared.Execution.Logging.LogMessageLevel.Fatal, LogLevel.Fatal },
-            { Shared.Execution.Logging.LogMessageLevel.Info, LogLevel.Info },
-            { Shared.Execution.Logging.LogMessageLevel.Trace, LogLevel.Trace },
-            { Shared.Execution.Logging.LogMessageLevel.Warning, LogLevel.Warning }
         };
 
         private void HandleEndScopeCommunicationMessage(EndScopeCommunicationMessage message)
