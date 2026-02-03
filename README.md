@@ -1,4 +1,4 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/q4l1kw3xrbi79m7i/branch/master?svg=true)](https://ci.appveyor.com/project/nvborisenko/agent-net-nunit/branch/master)
+[![CI](https://github.com/reportportal/agent-net-nunit/actions/workflows/ci.yml/badge.svg)](https://github.com/reportportal/agent-net-nunit/actions/workflows/ci.yml)
 [![NuGet Badge](https://buildstats.info/nuget/reportportal.nunit)](https://www.nuget.org/packages/reportportal.nunit)
 
 
